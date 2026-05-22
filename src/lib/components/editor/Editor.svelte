@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from 'svelte';
   import { Editor } from '@tiptap/core';
   import StarterKit from '@tiptap/starter-kit';
-  import { getHTMLFromFragment } from '@tiptap/html';
   import { marked } from 'marked';
   import TurndownService from 'turndown';
   import { Paywall } from './extensions/Paywall';
@@ -33,7 +32,7 @@
 
   function getMarkdown(): string {
     if (!editor) return '';
-    const html = getHTMLFromFragment(editor.state.doc.content, editor.schema);
+    const html = editor.getHTML();
     return turndown.turndown(html);
   }
 
