@@ -1,0 +1,45 @@
+{
+  "name": "stacked2",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.37.0",
+    "@tiptap/core": "^3.10.4",
+    "@tiptap/extension-code-block": "^3.10.4",
+    "@tiptap/extension-image": "^3.10.4",
+    "@tiptap/extension-link": "^3.10.4",
+    "@tiptap/html": "^3.10.4",
+    "@tiptap/pm": "^3.10.4",
+    "@tiptap/starter-kit": "^3.10.4",
+    "@tiptap/suggestion": "^3.10.4",
+    "idb": "^8.0.0",
+    "js-yaml": "^4.1.0",
+    "katex": "^0.16.0",
+    "marked": "^13.0.0",
+    "openai": "^4.77.0",
+    "turndown": "^7.2.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/js-yaml": "^4.0.9",
+    "@types/katex": "^0.16.7",
+    "@types/marked": "^6.0.0",
+    "@types/turndown": "^5.0.5",
+    "jsdom": "^26.0.0",
+    "svelte": "^5.39.6",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.0",
+    "vite": "npm:rolldown-vite@^7.1.14",
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.8"
+  }
+}

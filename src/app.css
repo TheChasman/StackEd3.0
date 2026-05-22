@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    @apply h-full overflow-hidden bg-white text-gray-900;
+  }
+  #app {
+    @apply h-full flex flex-col;
+  }
+}
+
+/* KaTeX styles */
+@import "katex/dist/katex.min.css";
+
+/* TipTap editor base */
+.ProseMirror {
+  @apply outline-none min-h-full px-8 py-6;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-gray-400 pointer-events-none float-left h-0;
+}
+
+/* Poetry block */
+.poetry-block {
+  @apply whitespace-pre-wrap font-serif italic my-4 pl-4 border-l-2 border-gray-300;
+}
