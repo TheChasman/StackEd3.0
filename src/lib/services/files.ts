@@ -4,13 +4,13 @@ import type { ArticleFrontmatter, ParsedFile } from '$lib/types/article';
 import { addRecentFile } from '$lib/services/storage';
 
 export async function openFolder(): Promise<FileSystemDirectoryHandle> {
-  return window.showDirectoryPicker({ mode: 'readwrite' });
+  return (window as any).showDirectoryPicker({ mode: 'readwrite' });
 }
 
 export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFile> {
   const fileHandle =
     handle ??
-    (await window.showOpenFilePicker({
+    (await (window as any).showOpenFilePicker({
       types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }],
       multiple: false,
     }))[0];

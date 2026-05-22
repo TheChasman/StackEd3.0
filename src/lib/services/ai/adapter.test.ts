@@ -30,8 +30,8 @@ describe('ClaudeAdapter', () => {
     });
 
     const adapter = new ClaudeAdapter('sk-ant-test');
-    // @ts-expect-error — accessing private field for test
-    adapter['client'].messages.create = mockCreate;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adapter as any)['client'].messages.create = mockCreate;
 
     const result = await adapter.search('Paris architecture');
 
@@ -63,8 +63,8 @@ describe('OpenAIAdapter', () => {
     });
 
     const adapter = new OpenAIAdapter('sk-openai-test');
-    // @ts-expect-error — accessing private field for test
-    adapter['client'].responses.create = mockCreate;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adapter as any)['client'].responses.create = mockCreate;
 
     const result = await adapter.search('Paris architecture');
 
