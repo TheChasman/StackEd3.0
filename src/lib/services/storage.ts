@@ -8,7 +8,7 @@ interface StackEdDB extends DBSchema {
   };
 }
 
-const DB_PROMISE: Promise<IDBPDatabase<StackEdDB>> = openDB<StackEdDB>('stacked2', 1, {
+const DB_PROMISE: Promise<IDBPDatabase<StackEdDB>> = openDB<StackEdDB>('stacked', 1, {
   upgrade(db) {
     db.createObjectStore('settings');
     db.createObjectStore('recents', { keyPath: 'id', autoIncrement: true });

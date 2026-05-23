@@ -40,19 +40,19 @@
 
 <div class="flex flex-col h-full">
   <!-- Search input -->
-  <div class="p-3 border-b border-gray-200">
+  <div class="p-3 border-b border-dark-600">
     <div class="flex gap-1">
       <input
         type="text"
         bind:value={query}
         placeholder="Research topic or question…"
-        class="flex-1 text-sm border border-gray-200 rounded px-2 py-1"
+        class="flex-1 text-sm border border-dark-600 rounded px-2 py-1"
         onkeydown={(e) => e.key === 'Enter' && search()}
       />
       <button
         onclick={search}
         disabled={loading || !query.trim()}
-        class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50"
+        class="px-3 py-1 bg-primary-600 text-dark-900 text-sm rounded hover:bg-primary-700 disabled:opacity-50"
       >
         {loading ? '…' : 'Go'}
       </button>
@@ -65,19 +65,19 @@
   <!-- Results -->
   <div class="flex-1 overflow-y-auto p-3">
     {#if loading}
-      <p class="text-sm text-gray-400 animate-pulse">Researching…</p>
+      <p class="text-sm text-dark-400 animate-pulse">Researching…</p>
     {:else if result}
       <div class="flex flex-col gap-3">
-        <div class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{result.summary}</div>
+        <div class="text-sm text-dark-100 whitespace-pre-wrap leading-relaxed">{result.summary}</div>
 
         {#if result.citations.length > 0}
           <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase mb-1">Sources</p>
+            <p class="text-xs font-semibold text-dark-400 uppercase mb-1">Sources</p>
             <ul class="flex flex-col gap-1">
               {#each result.citations as cite}
                 <li class="text-xs">
-                  <a href={cite.url} target="_blank" rel="noopener" class="text-indigo-600 hover:underline truncate block">{cite.title}</a>
-                  {#if cite.snippet}<p class="text-gray-500 line-clamp-2">{cite.snippet}</p>{/if}
+                  <a href={cite.url} target="_blank" rel="noopener" class="text-primary-400 hover:underline truncate block">{cite.title}</a>
+                  {#if cite.snippet}<p class="text-dark-300 line-clamp-2">{cite.snippet}</p>{/if}
                 </li>
               {/each}
             </ul>
@@ -86,13 +86,13 @@
 
         <button
           onclick={() => insertAtCursor(`\n\n> ${result!.summary}\n`)}
-          class="self-start text-xs px-3 py-1 border border-gray-300 rounded hover:bg-gray-50"
+          class="self-start text-xs px-3 py-1 border border-dark-600 rounded hover:bg-dark-700"
         >
           Insert summary
         </button>
       </div>
     {:else}
-      <p class="text-sm text-gray-400">Enter a query above to research a topic.</p>
+      <p class="text-sm text-dark-400">Enter a query above to research a topic.</p>
     {/if}
   </div>
 </div>

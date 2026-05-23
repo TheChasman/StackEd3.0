@@ -1,5 +1,5 @@
 {
-  "name": "StackEd 2.0",
+  "name": "StackEd",
   "short_name": "StackEd",
   "description": "Substack post editor for the StackPipe pipeline",
   "start_url": "/",

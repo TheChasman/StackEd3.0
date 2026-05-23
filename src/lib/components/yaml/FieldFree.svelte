@@ -22,23 +22,23 @@
 </script>
 
 <div class="flex flex-col gap-0.5">
-  <label class="text-xs font-medium text-gray-600 uppercase tracking-wide">{label}</label>
+  <label class="text-xs font-medium text-dark-300 uppercase tracking-wide">{label}</label>
 
   {#if type === 'toggle'}
     <button
       role="switch"
       aria-checked={Boolean(value)}
       onclick={() => update(!value)}
-      class="w-10 h-5 rounded-full relative transition-colors {value ? 'bg-indigo-500' : 'bg-gray-300'}"
+      class="w-10 h-5 rounded-full relative transition-colors {value ? 'bg-primary-600' : 'bg-dark-600'}"
     >
-      <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform {value ? 'translate-x-5' : ''}"></span>
+      <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-dark-800 shadow transition-transform {value ? 'translate-x-5' : ''}"></span>
     </button>
 
   {:else if type === 'select'}
     <select
       value={String(value)}
       onchange={(e) => update((e.target as HTMLSelectElement).value)}
-      class="text-sm border border-gray-200 rounded px-2 py-1 bg-white"
+      class="text-sm border border-dark-600 rounded px-2 py-1 bg-dark-800"
     >
       {#each options ?? [] as opt}
         <option value={opt}>{opt}</option>
@@ -50,7 +50,7 @@
       value={String(value)}
       oninput={(e) => update((e.target as HTMLTextAreaElement).value)}
       rows={3}
-      class="text-sm border border-gray-200 rounded px-2 py-1 resize-none"
+      class="text-sm border border-dark-600 rounded px-2 py-1 resize-none"
     ></textarea>
 
   {:else if type === 'datetime'}
@@ -58,7 +58,7 @@
       type="datetime-local"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}
-      class="text-sm border border-gray-200 rounded px-2 py-1"
+      class="text-sm border border-dark-600 rounded px-2 py-1"
     />
 
   {:else}
@@ -66,7 +66,7 @@
       type="text"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}
-      class="text-sm border border-gray-200 rounded px-2 py-1"
+      class="text-sm border border-dark-600 rounded px-2 py-1"
     />
   {/if}
 </div>

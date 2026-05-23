@@ -9,6 +9,6 @@
 </script>
 
 <div class="flex flex-col gap-0.5">
-  <label class="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</label>
-  <p class="text-sm text-gray-400 truncate">{display(value)}</p>
+  <label class="text-xs font-medium text-dark-400 uppercase tracking-wide">{label}</label>
+  <p class="text-sm text-dark-400 truncate">{display(value)}</p>
 </div>

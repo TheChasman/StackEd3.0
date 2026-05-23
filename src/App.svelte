@@ -61,33 +61,33 @@
 </script>
 
 <!-- App chrome: header -->
-<header class="flex items-center gap-2 px-4 py-2 border-b border-gray-200 bg-white shrink-0">
-  <h1 class="font-semibold text-gray-800 text-sm">StackEd</h1>
+<header class="flex items-center gap-2 px-4 py-2 border-b border-dark-700 bg-dark-800 shrink-0">
+  <h1 class="font-semibold text-dark-50 text-sm">StackEd</h1>
   <div class="flex-1"></div>
 
-  <button onclick={handleOpen} class="px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50">
+  <button onclick={handleOpen} class="px-3 py-1.5 text-sm border border-dark-600 rounded hover:bg-dark-700">
     Open
   </button>
   <button
     onclick={handleSave}
     disabled={!documentStore.dirty}
-    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-40"
+    class="px-3 py-1.5 text-sm bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:opacity-40"
   >
     Save
   </button>
   <button
     onclick={() => showRecents = true}
-    class="px-2 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
+    class="px-2 py-1.5 text-sm border border-dark-600 rounded hover:bg-dark-700"
     title="Recent files"
   >⏱</button>
   <button
     onclick={() => settingsStore.toggleSidebar()}
-    class="px-2 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
+    class="px-2 py-1.5 text-sm border border-dark-600 rounded hover:bg-dark-700"
     title="Toggle sidebar"
   >⊞</button>
   <button
     onclick={() => showSettings = true}
-    class="px-2 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50"
+    class="px-2 py-1.5 text-sm border border-dark-600 rounded hover:bg-dark-700"
     title="Settings"
   >⚙</button>
 </header>
@@ -101,12 +101,12 @@
 
   <!-- Right sidebar -->
   {#if settingsStore.sidebarVisible}
-    <aside class="w-72 border-l border-gray-200 flex flex-col min-h-0 shrink-0">
+    <aside class="w-72 border-l border-dark-600 flex flex-col min-h-0 shrink-0">
       <!-- YAML panel -->
-      <div class="flex flex-col {yamlCollapsed ? 'h-auto' : 'flex-1'} min-h-0 border-b border-gray-200">
+      <div class="flex flex-col {yamlCollapsed ? 'h-auto' : 'flex-1'} min-h-0 border-b border-dark-600">
         <button
           onclick={() => yamlCollapsed = !yamlCollapsed}
-          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:bg-gray-50 shrink-0"
+          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-dark-300 uppercase tracking-wide hover:bg-dark-700 shrink-0"
         >
           Article
           <span>{yamlCollapsed ? '▾' : '▴'}</span>
@@ -122,7 +122,7 @@
       <div class="flex flex-col {researchCollapsed ? 'h-auto' : 'flex-1'} min-h-0">
         <button
           onclick={() => researchCollapsed = !researchCollapsed}
-          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide hover:bg-gray-50 shrink-0"
+          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-dark-300 uppercase tracking-wide hover:bg-dark-700 shrink-0"
         >
           Research
           <span>{researchCollapsed ? '▾' : '▴'}</span>

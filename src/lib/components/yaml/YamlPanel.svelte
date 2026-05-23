@@ -18,20 +18,20 @@
     seo: 'bg-pink-100 text-pink-700',
     fact_check: 'bg-red-100 text-red-700',
     staged: 'bg-green-100 text-green-700',
-    posted: 'bg-gray-100 text-gray-700',
+    posted: 'bg-dark-600 text-dark-100',
   };
 </script>
 
 {#if !fm}
-  <div class="p-4 text-sm text-gray-400">No file open.</div>
+  <div class="p-4 text-sm text-dark-400">No file open.</div>
 {:else}
   <div class="flex flex-col gap-4 p-4 overflow-y-auto h-full text-sm">
 
     <!-- Status group -->
     <section>
-      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Status</h3>
+      <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Status</h3>
       <div class="flex items-center gap-2 mb-2">
-        <span class="px-2 py-0.5 rounded-full text-xs font-medium {PIPELINE_COLOURS[fm.pipeline_stage] ?? 'bg-gray-100 text-gray-600'}">
+        <span class="px-2 py-0.5 rounded-full text-xs font-medium {PIPELINE_COLOURS[fm.pipeline_stage] ?? 'bg-dark-600 text-dark-200'}">
           {fm.pipeline_stage.replace('_', ' ')}
         </span>
         {#if isLocked}
@@ -39,7 +39,7 @@
         {/if}
       </div>
       {#if fm.substack_url}
-        <a href={fm.substack_url} target="_blank" rel="noopener" class="text-xs text-indigo-600 underline truncate block">
+        <a href={fm.substack_url} target="_blank" rel="noopener" class="text-xs text-primary-400 underline truncate block">
           {fm.substack_url}
         </a>
       {/if}
@@ -63,7 +63,7 @@
 
     <!-- Content group (author-free fields) -->
     <section>
-      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Content</h3>
+      <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Content</h3>
       <div class="flex flex-col gap-3">
         <FieldFree label="Title" field="title" />
         <FieldFree label="Subtitle" field="subtitle" />
@@ -77,7 +77,7 @@
 
     <!-- AI-generated group (padlocked) -->
     <section>
-      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">AI Generated</h3>
+      <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">AI Generated</h3>
       <div class="flex flex-col gap-3">
         <FieldPadlocked label="AI Draft" field="ai_draft" />
         <FieldPadlocked label="Fact Check Notes" field="fact_check_notes" />
@@ -90,7 +90,7 @@
 
     <!-- Publishing group (author-free fields) -->
     <section>
-      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Publishing</h3>
+      <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Publishing</h3>
       <div class="flex flex-col gap-3">
         <FieldFree label="Publication" field="publication" />
         <FieldFree label="Section" field="section" />

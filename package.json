@@ -1,5 +1,5 @@
 {
-  "name": "stacked2",
+  "name": "stacked",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,11 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
+    "@tauri-apps/api": "^2.11.0",
     "@tiptap/core": "^3.10.4",
     "@tiptap/extension-code-block": "^3.10.4",
     "@tiptap/extension-image": "^3.10.4",
@@ -30,6 +34,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/vite": "^4.1.17",
+    "@tauri-apps/cli": "^2.11.2",
     "@types/js-yaml": "^4.0.9",
     "@types/katex": "^0.16.7",
     "@types/marked": "^6.0.0",

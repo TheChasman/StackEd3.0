@@ -23,10 +23,10 @@
   }
 </script>
 
-<div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden w-56">
+<div class="bg-dark-800 border border-dark-600 rounded-lg shadow-lg overflow-hidden w-56">
   {#each items as item, i}
     <button
-      class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 {i === selectedIndex ? 'bg-gray-100' : ''}"
+      class="w-full text-left px-3 py-2 text-sm hover:bg-dark-700 {i === selectedIndex ? 'bg-dark-600' : ''}"
       onclick={() => command(item)}
     >
       {item.title}

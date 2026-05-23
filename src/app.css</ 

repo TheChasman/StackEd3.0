@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-50: #f8f9fa;
+  --color-dark-100: #e9ecef;
+  --color-dark-200: #adb5bd;
+  --color-dark-300: #868e96;
+  --color-dark-400: #6c757d;
+  --color-dark-500: #495057;
+  --color-dark-600: #343a40;
+  --color-dark-700: #212529;
+  --color-dark-800: #1a1d20;
+  --color-dark-900: #0d1117;
+
+  --color-primary-50: #fffbeb;
+  --color-primary-100: #fef3c7;
+  --color-primary-200: #fde68a;
+  --color-primary-300: #fcd34d;
+  --color-primary-400: #fbbf24;
+  --color-primary-500: #f59e0b;
+  --color-primary-600: #d97706;
+  --color-primary-700: #b45309;
+  --color-primary-800: #92400e;
+  --color-primary-900: #78350f;
+
+  --font-sans: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', Menlo, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-dark-900 text-dark-50 font-sans antialiased min-h-screen;
+  }
+}
+
+@import "katex/dist/katex.min.css";
+
+.ProseMirror {
+  @apply outline-none min-h-full px-8 py-6;
+}
+
+.ProseMirror p {
+  @apply mb-5 leading-relaxed;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-dark-400 pointer-events-none float-left h-0;
+}
+
+.poetry-block {
+  @apply whitespace-pre-wrap font-serif italic my-4 pl-4 border-l-2 border-dark-600;
+}
+</ 
