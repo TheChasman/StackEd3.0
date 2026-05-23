@@ -6,11 +6,14 @@
   import StatusBar from '$lib/components/StatusBar.svelte';
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import RecentFiles from '$lib/components/RecentFiles.svelte';
+  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
+  import { themeStore } from '$lib/stores/theme.svelte';
   import { openFile, saveFile } from '$lib/services/files';
   import { loadFolderHandle } from '$lib/services/storage';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
+  import '$lib/themes/catppuccin.css';
 
   let showSettings = $state(false);
   let showRecents = $state(false);
@@ -77,6 +80,7 @@
   >
     Save
   </button>
+  <ThemeSwitcher />
   <button
     onclick={() => showRecents = true}
     class="px-2 py-1.5 text-sm border border-dark-600 rounded hover:bg-dark-700"

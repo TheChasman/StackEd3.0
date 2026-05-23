@@ -1,0 +1,150 @@
+/* Catppuccin Theme CSS Variables */
+:root {
+  /* Default to Mocha flavor */
+  --cat-rosewater: #f5e0dc;
+  --cat-flamingo: #f2cdcd;
+  --cat-pink: #f5c2e7;
+  --cat-mauve: #cba6f7;
+  --cat-red: #f38ba8;
+  --cat-maroon: #eba0ac;
+  --cat-peach: #fab387;
+  --cat-yellow: #f9e2af;
+  --cat-green: #a6e3a1;
+  --cat-teal: #94e2d5;
+  --cat-sky: #89dceb;
+  --cat-sapphire: #74c7ec;
+  --cat-blue: #89b4fa;
+  --cat-lavender: #b4befe;
+  --cat-text: #cdd6f4;
+  --cat-subtext1: #bac2de;
+  --cat-subtext0: #a6adc8;
+  --cat-overlay2: #9399b2;
+  --cat-overlay1: #7f849c;
+  --cat-overlay0: #6c7086;
+  --cat-surface2: #585b70;
+  --cat-surface1: #45475a;
+  --cat-surface0: #313244;
+  --cat-base: #1e1e2e;
+  --cat-mantle: #181825;
+  --cat-crust: #11111b;
+}
+
+/* Apply Catppuccin colors to app elements */
+body {
+  background-color: var(--cat-base);
+  color: var(--cat-text);
+}
+
+/* Primary colors using Catppuccin */
+.primary-500 {
+  color: var(--cat-blue);
+}
+
+.primary-600 {
+  color: var(--cat-sapphire);
+}
+
+.bg-primary {
+  background-color: var(--cat-blue);
+}
+
+.bg-primary-hover {
+  background-color: var(--cat-sapphire);
+}
+
+.bg-primary-active {
+  background-color: var(--cat-lavender);
+}
+
+/* Status colors using Catppuccin */
+.text-success {
+  color: var(--cat-green);
+}
+
+.text-error {
+  color: var(--cat-red);
+}
+
+.text-warning {
+  color: var(--cat-yellow);
+}
+
+.text-info {
+  color: var(--cat-sky);
+}
+
+.bg-success {
+  background-color: var(--cat-green);
+}
+
+.bg-error {
+  background-color: var(--cat-red);
+}
+
+.bg-warning {
+  background-color: var(--cat-yellow);
+}
+
+.bg-info {
+  background-color: var(--cat-sky);
+}
+
+/* Surface/background colors */
+.bg-surface {
+  background-color: var(--cat-surface0);
+}
+
+.bg-surface-1 {
+  background-color: var(--cat-surface1);
+}
+
+.bg-surface-2 {
+  background-color: var(--cat-surface2);
+}
+
+.border-surface {
+  border-color: var(--cat-surface1);
+}
+
+/* Text variants */
+.text-muted {
+  color: var(--cat-subtext0);
+}
+
+.text-dim {
+  color: var(--cat-overlay1);
+}
+
+/* Hover states */
+a:hover,
+button:hover {
+  color: var(--cat-sky);
+}
+
+.hover\:text-sky:hover {
+  color: var(--cat-sky);
+}
+
+.hover\:bg-surface:hover {
+  background-color: var(--cat-surface1);
+}
+
+/* Editor-specific theming */
+.prose {
+  color: var(--cat-text);
+}
+
+.prose-invert a {
+  color: var(--cat-blue);
+}
+
+.prose-invert a:hover {
+  color: var(--cat-sky);
+}
+
+/* Tailwind dark mode integration */
+@supports (color: rgb(var(--color-base))) {
+  :root {
+    color-scheme: dark;
+  }
+}
