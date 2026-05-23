@@ -6,11 +6,15 @@
   import TurndownService from 'turndown';
   import { Paywall } from './extensions/Paywall';
   import { SubscribeButton } from './extensions/SubscribeButton';
+  import { ShareButton } from './extensions/ShareButton';
   import { Poll } from './extensions/Poll';
   import { Poetry } from './extensions/Poetry';
   import { Latex } from './extensions/LaTeX';
   import { Footnote } from './extensions/Footnote';
-  import { documentStore } from '$lib/stores/document.svelte';
+import { FinancialChart } from './extensions/FinancialChart';
+import { PredictionMarket } from './extensions/PredictionMarket';
+import { Recipe } from './extensions/Recipe';
+import { documentStore } from '$lib/stores/document.svelte';
   import Toolbar from './Toolbar.svelte';
 
   let element: HTMLDivElement;
@@ -23,6 +27,7 @@
     return (
       el.dataset?.type === 'paywall' ||
       el.dataset?.type === 'subscribe-button' ||
+      el.dataset?.type === 'share-button' ||
       el.dataset?.type === 'poll' ||
       el.dataset?.type === 'latex' ||
       el.dataset?.type === 'footnote' ||
@@ -49,10 +54,14 @@
         StarterKit,
         Paywall,
         SubscribeButton,
+        ShareButton,
         Poll,
         Poetry,
         Latex,
         Footnote,
+        FinancialChart,
+        PredictionMarket,
+        Recipe,
       ],
       content: '',
       onUpdate: () => {

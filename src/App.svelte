@@ -10,6 +10,7 @@
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { openFile, saveFile } from '$lib/services/files';
   import { loadFolderHandle } from '$lib/services/storage';
+  import { setupZoomShortcuts } from '$lib/utils/zoom';
 
   let showSettings = $state(false);
   let showRecents = $state(false);
@@ -23,6 +24,7 @@
     yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
     researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
     window.addEventListener('stacked:save', handleSaveEvent);
+    setupZoomShortcuts();
     return () => window.removeEventListener('stacked:save', handleSaveEvent);
   });
 
