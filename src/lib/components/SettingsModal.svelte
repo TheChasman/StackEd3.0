@@ -35,7 +35,7 @@
 
       <!-- AI Provider -->
       <section class="flex flex-col gap-2">
-        <label class="text-sm font-medium">AI Provider</label>
+        <span class="text-sm font-medium">AI Provider</span>
         <div class="flex gap-3">
           {#each ['claude', 'openai'] as p}
             <button
@@ -61,7 +61,7 @@
 
       <!-- Pipeline folder -->
       <section class="flex flex-col gap-1">
-        <label class="text-sm font-medium">Pipeline Folder</label>
+        <span class="text-sm font-medium">Pipeline Folder</span>
         <button
           onclick={connectFolder}
           class="px-3 py-2 border border-dark-600 rounded text-sm hover:bg-dark-700 text-left"

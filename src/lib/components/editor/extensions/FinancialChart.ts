@@ -61,7 +61,12 @@ export const FinancialChart = Node.create<FinancialChartOptions>({
       
       updateBtn.onclick = () => {
         if (typeof getPos === 'function') {
-          editor.commands.updateAttributes(getPos(), { symbol: input.value })
+          const pos = getPos();
+          if (typeof pos === 'number') {
+            editor.view.dispatch(
+              editor.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, symbol: input.value })
+            );
+          }
         }
       }
       

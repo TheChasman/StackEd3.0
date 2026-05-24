@@ -10,6 +10,7 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -41,6 +42,7 @@
     "@types/turndown": "^5.0.5",
     "jsdom": "^26.0.0",
     "svelte": "^5.39.6",
+    "svelte-check": "^4.4.8",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.0",
     "vite": "npm:rolldown-vite@^7.1.14",

@@ -11,6 +11,7 @@
   import { Poetry } from './extensions/Poetry';
   import { Latex } from './extensions/LaTeX';
   import { Footnote } from './extensions/Footnote';
+import Image from '@tiptap/extension-image';
 import { FinancialChart } from './extensions/FinancialChart';
 import { PredictionMarket } from './extensions/PredictionMarket';
 import { Recipe } from './extensions/Recipe';
@@ -44,7 +45,7 @@ import { documentStore } from '$lib/stores/document.svelte';
   function setMarkdown(md: string): void {
     if (!editor) return;
     const html = marked.parse(md) as string;
-    editor.commands.setContent(html, false);
+    editor.commands.setContent(html, { emitUpdate: false });
   }
 
   onMount(() => {
@@ -52,6 +53,7 @@ import { documentStore } from '$lib/stores/document.svelte';
       element,
       extensions: [
         StarterKit,
+        Image,
         Paywall,
         SubscribeButton,
         ShareButton,

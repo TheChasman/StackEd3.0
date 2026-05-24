@@ -21,20 +21,20 @@
   let yamlCollapsed = $state(false);
   let researchCollapsed = $state(false);
 
-  onMount(async () => {
-    await settingsStore.loadFromStorage();
-    const initialPath = await invoke<string | null>('initial_file_path').catch(() => null);
-    if (initialPath) {
-      const parsed = await openFilePath(initialPath);
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
-    }
-    // Try to restore folder handle (does not auto-open a file)
-    await loadFolderHandle().catch(() => {});
-    yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
-    researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
-    window.addEventListener('stacked:save', handleSaveEvent);
-    setupZoomShortcuts();
-    return () => window.removeEventListener('stacked:save', handleSaveEvent);
+  onMount(() => {
+    void (async () => {
+      await settingsStore.loadFromStorage();
+      const initialPath = await invoke<string | null>('initial_file_path').catch(() => null);
+      if (initialPath) {
+        const parsed = await openFilePath(initialPath);
+        documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+      }
+      // Try to restore folder handle (does not auto-open a file)
+      await loadFolderHandle().catch(() => {});
+      yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
+      researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
+      setupZoomShortcuts();
+    })();
   });
 
   async function handleOpen() {
@@ -70,8 +70,13 @@
     }
   }
 
-  // Listen for save shortcut dispatched by Editor
   function handleSaveEvent() { handleSave(); }
+
+  // Listen for save shortcut — in $effect so cleanup runs on destroy
+  $effect(() => {
+    window.addEventListener('stacked:save', handleSaveEvent);
+    return () => window.removeEventListener('stacked:save', handleSaveEvent);
+  });
 
   // Sidebar visibility persists across sessions
   $effect(() => {
