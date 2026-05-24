@@ -87,5 +87,6 @@ export interface ParsedFile {
   frontmatter: ArticleFrontmatter;
   body: string;
   fieldOrder: string[];
-  fileHandle: FileSystemFileHandle;
+  fileHandle: FileSystemFileHandle | null;
+  filePath: string | null;
 }

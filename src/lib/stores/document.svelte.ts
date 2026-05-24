@@ -5,6 +5,7 @@ class DocumentStore {
   body = $state('');
   fieldOrder = $state<string[]>([]);
   fileHandle = $state<FileSystemFileHandle | null>(null);
+  filePath = $state<string | null>(null);
   dirty = $state(false);
 
   get isLocked(): boolean {
@@ -28,12 +29,14 @@ class DocumentStore {
     frontmatter: ArticleFrontmatter,
     body: string,
     fieldOrder: string[],
-    fileHandle: FileSystemFileHandle,
+    fileHandle: FileSystemFileHandle | null,
+    filePath: string | null = null,
   ): void {
     this.frontmatter = frontmatter;
     this.body = body;
     this.fieldOrder = fieldOrder;
     this.fileHandle = fileHandle;
+    this.filePath = filePath;
     this.dirty = false;
   }
 
@@ -97,6 +100,7 @@ class DocumentStore {
     this.body = '';
     this.fieldOrder = [];
     this.fileHandle = null;
+    this.filePath = null;
     this.dirty = false;
   }
 }

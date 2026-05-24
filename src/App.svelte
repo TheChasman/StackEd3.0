@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { invoke } from '@tauri-apps/api/core';
   import Editor from '$lib/components/editor/Editor.svelte';
   import YamlPanel from '$lib/components/yaml/YamlPanel.svelte';
   import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
@@ -10,7 +11,7 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { openFile, saveFile } from '$lib/services/files';
+  import { openFile, openFilePath, saveFile, saveFilePath } from '$lib/services/files';
   import { loadFolderHandle } from '$lib/services/storage';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import '$lib/themes/catppuccin.css';
@@ -22,6 +23,11 @@
 
   onMount(async () => {
     await settingsStore.loadFromStorage();
+    const initialPath = await invoke<string | null>('initial_file_path').catch(() => null);
+    if (initialPath) {
+      const parsed = await openFilePath(initialPath);
+      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+    }
     // Try to restore folder handle (does not auto-open a file)
     await loadFolderHandle().catch(() => {});
     yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
@@ -34,21 +40,30 @@
   async function handleOpen() {
     try {
       const parsed = await openFile();
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle);
+      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
     } catch {
       // User cancelled picker
     }
   }
 
   async function handleSave() {
-    if (!documentStore.fileHandle || !documentStore.frontmatter) return;
+    if ((!documentStore.fileHandle && !documentStore.filePath) || !documentStore.frontmatter) return;
     try {
-      await saveFile(
-        documentStore.fileHandle,
-        documentStore.frontmatter,
-        documentStore.fieldOrder,
-        documentStore.body,
-      );
+      if (documentStore.filePath) {
+        await saveFilePath(
+          documentStore.filePath,
+          documentStore.frontmatter,
+          documentStore.fieldOrder,
+          documentStore.body,
+        );
+      } else if (documentStore.fileHandle) {
+        await saveFile(
+          documentStore.fileHandle,
+          documentStore.frontmatter,
+          documentStore.fieldOrder,
+          documentStore.body,
+        );
+      }
       documentStore.markClean();
     } catch (e) {
       alert('Save failed: ' + (e instanceof Error ? e.message : e));

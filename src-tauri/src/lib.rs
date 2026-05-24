@@ -1,4 +1,5 @@
 mod zoom;
+mod file_io;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -14,6 +15,9 @@ pub fn run() {
       Ok(())
     })
     .invoke_handler(tauri::generate_handler![
+      file_io::initial_file_path,
+      file_io::read_markdown_file,
+      file_io::write_markdown_file,
       zoom::set_zoom,
       zoom::get_zoom,
       zoom::zoom_in,
