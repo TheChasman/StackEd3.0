@@ -1,8 +1,41 @@
 import { invoke } from '@tauri-apps/api/core';
+import { save } from '@tauri-apps/plugin-dialog';
 import { parseMarkdownFile, serializeArticleFile } from '$lib/utils/frontmatter';
 import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
 import type { ArticleFrontmatter, ParsedFile } from '$lib/types/article';
 import { addRecentFile } from '$lib/services/storage';
+
+const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
+
+function getLocalStorage(): Storage | null {
+  try {
+    return globalThis.localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function getFolderPath(filePath: string): string {
+  const normalized = filePath.replaceAll('\\', '/');
+  const index = normalized.lastIndexOf('/');
+  return index > 0 ? filePath.slice(0, index) : '';
+}
+
+function rememberLastSavedFolder(filePath: string): void {
+  const folder = getFolderPath(filePath);
+  if (folder) getLocalStorage()?.setItem(LAST_SAVED_FOLDER_KEY, folder);
+}
+
+function getSuggestedFileName(frontmatter: ArticleFrontmatter): string {
+  const baseName = frontmatter.title.trim().replace(/[/:*?"<>|\\]/g, '-');
+  return `${baseName || 'document'}.md`;
+}
+
+function getDefaultSavePath(frontmatter: ArticleFrontmatter): string {
+  const fileName = getSuggestedFileName(frontmatter);
+  const folder = getLocalStorage()?.getItem(LAST_SAVED_FOLDER_KEY);
+  return folder ? `${folder}/${fileName}` : fileName;
+}
 
 export async function openFolder(): Promise<FileSystemDirectoryHandle> {
   return (window as any).showDirectoryPicker({ mode: 'readwrite' });
@@ -29,6 +62,24 @@ export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFil
   await addRecentFile(fileHandle, frontmatter.title || file.name).catch(() => {});
 
   return { frontmatter, body, fieldOrder, fileHandle, filePath: null };
+}
+
+export async function saveAsFile(
+  frontmatter: ArticleFrontmatter,
+  fieldOrder: string[],
+  body: string,
+): Promise<string | null> {
+  const filePath = await save({
+    title: 'Save StackEd Markdown File',
+    defaultPath: getDefaultSavePath(frontmatter),
+    filters: [{ name: 'Markdown', extensions: ['md'] }],
+  });
+
+  if (!filePath) return null;
+
+  await saveFilePath(filePath, frontmatter, fieldOrder, body);
+  rememberLastSavedFolder(filePath);
+  return filePath;
 }
 
 function parseContent(content: string, fallbackTitle: string): Omit<ParsedFile, 'fileHandle' | 'filePath'> {
@@ -71,4 +122,5 @@ export async function saveFilePath(
 ): Promise<void> {
   const content = serializeArticleFile(frontmatter, fieldOrder, body);
   await invoke('write_markdown_file', { filePath, content });
+  rememberLastSavedFolder(filePath);
 }

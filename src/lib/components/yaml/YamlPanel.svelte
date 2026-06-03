@@ -67,7 +67,7 @@
       <div class="flex flex-col gap-3">
         <FieldFree label="Title" field="title" />
         <FieldFree label="Subtitle" field="subtitle" />
-        <FieldFree label="Spark Notes" field="spark_notes" type="textarea" />
+        <FieldFree label="Spark Notes" field="spark_notes" type="textarea" rows={6} />
         <FieldFree label="Hook" field="hook" type="textarea" />
         <FieldFree label="Opening" field="opening" type="textarea" />
         <FieldFree label="Research Notes" field="research_notes" type="textarea" />

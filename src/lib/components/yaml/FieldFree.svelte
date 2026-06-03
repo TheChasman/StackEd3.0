@@ -7,11 +7,13 @@
     field,
     type = 'text',
     options,
+    rows = 3,
   }: {
     label: string;
     field: keyof ArticleFrontmatter;
     type?: 'text' | 'textarea' | 'select' | 'toggle' | 'datetime';
     options?: string[];
+    rows?: number;
   } = $props();
 
   let value = $derived(documentStore.frontmatter?.[field] ?? '');
@@ -49,7 +51,7 @@
     <textarea
       value={String(value)}
       oninput={(e) => update((e.target as HTMLTextAreaElement).value)}
-      rows={3}
+      rows={rows}
       class="text-sm border border-dark-600 rounded px-2 py-1 resize-none"
     ></textarea>
 

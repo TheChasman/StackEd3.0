@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api/core';
+import { getCurrentWebview } from '@tauri-apps/api/webview';
 
 let currentZoom = 1.0;
 
@@ -8,9 +8,8 @@ export async function getZoom(): Promise<number> {
 
 export async function setZoom(factor: number): Promise<void> {
   const clamped = Math.max(0.5, Math.min(3.0, factor));
-  document.documentElement.style.zoom = `${clamped * 100}%`;
   currentZoom = clamped;
-  await invoke('set_zoom', { factor: clamped });
+  await getCurrentWebview().setZoom(clamped);
 }
 
 export async function zoomIn(): Promise<number> {

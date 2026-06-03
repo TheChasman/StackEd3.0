@@ -1,5 +1,13 @@
 import { loadApiKey, saveApiKey } from '$lib/services/storage';
 
+function getLocalStorage(): Storage | null {
+  try {
+    return globalThis.localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
 class SettingsStore {
   provider = $state<'claude' | 'openai'>('claude');
   apiKey = $state('');
@@ -11,7 +19,7 @@ class SettingsStore {
 
   setProvider(provider: 'claude' | 'openai'): void {
     this.provider = provider;
-    localStorage.setItem('provider', provider);
+    getLocalStorage()?.setItem('provider', provider);
   }
 
   setApiKey(key: string): void {
@@ -22,16 +30,17 @@ class SettingsStore {
 
   toggleSidebar(): void {
     this.sidebarVisible = !this.sidebarVisible;
-    localStorage.setItem('sidebarVisible', String(this.sidebarVisible));
+    getLocalStorage()?.setItem('sidebarVisible', String(this.sidebarVisible));
   }
 
   /** Call once at app startup to hydrate from persisted storage. */
   async loadFromStorage(): Promise<void> {
-    const provider = localStorage.getItem('provider');
+    const storage = getLocalStorage();
+    const provider = storage?.getItem('provider');
     if (provider === 'claude' || provider === 'openai') {
       this.provider = provider;
     }
-    const sidebar = localStorage.getItem('sidebarVisible');
+    const sidebar = storage?.getItem('sidebarVisible');
     if (sidebar !== null) {
       this.sidebarVisible = sidebar === 'true';
     }
