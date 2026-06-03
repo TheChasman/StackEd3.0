@@ -6,6 +6,8 @@ import type { ArticleFrontmatter, ParsedFile } from '$lib/types/article';
 import { addRecentFile } from '$lib/services/storage';
 
 const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
+const STACKED_ARTICLE_EXTENSIONS = ['.sub', '.md'];
+const STACKED_ARTICLE_SAVE_EXTENSIONS = ['sub', 'md'];
 
 function getLocalStorage(): Storage | null {
   try {
@@ -28,7 +30,7 @@ function rememberLastSavedFolder(filePath: string): void {
 
 function getSuggestedFileName(frontmatter: ArticleFrontmatter): string {
   const baseName = frontmatter.title.trim().replace(/[/:*?"<>|\\]/g, '-');
-  return `${baseName || 'document'}.md`;
+  return `${baseName || 'document'}.sub`;
 }
 
 function getDefaultSavePath(frontmatter: ArticleFrontmatter): string {
@@ -45,7 +47,7 @@ export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFil
   const fileHandle =
     handle ??
     (await (window as any).showOpenFilePicker({
-      types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }],
+      types: [{ description: 'StackEd Article', accept: { 'text/markdown': STACKED_ARTICLE_EXTENSIONS } }],
       multiple: false,
     }))[0];
 
@@ -70,9 +72,9 @@ export async function saveAsFile(
   body: string,
 ): Promise<string | null> {
   const filePath = await save({
-    title: 'Save StackEd Markdown File',
+    title: 'Save StackEd Article',
     defaultPath: getDefaultSavePath(frontmatter),
-    filters: [{ name: 'Markdown', extensions: ['md'] }],
+    filters: [{ name: 'StackEd Article', extensions: STACKED_ARTICLE_SAVE_EXTENSIONS }],
   });
 
   if (!filePath) return null;

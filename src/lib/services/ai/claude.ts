@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { AIAdapter, SearchResult, Citation } from './adapter';
+import { buildResearchPrompt } from './context';
+import type { AIAdapter, SearchResult, Citation, ArticleContext } from './adapter';
 
 export class ClaudeAdapter implements AIAdapter {
   private client: Anthropic;
@@ -9,7 +10,7 @@ export class ClaudeAdapter implements AIAdapter {
     this.client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
   }
 
-  async search(query: string): Promise<SearchResult> {
+  async search(query: string, context?: ArticleContext): Promise<SearchResult> {
     const response = await this.client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -18,7 +19,7 @@ export class ClaudeAdapter implements AIAdapter {
       messages: [
         {
           role: 'user',
-          content: `Research the following topic and provide a concise summary with sources:\n\n${query}`,
+          content: buildResearchPrompt(query, context),
         },
       ],
     });

@@ -82,7 +82,7 @@ export interface PermissionsManifest {
   fields: Record<string, FieldPermission>;
 }
 
-// Parsed .md file (before loading into the store)
+// Parsed StackEd article file (before loading into the store)
 export interface ParsedFile {
   frontmatter: ArticleFrontmatter;
   body: string;

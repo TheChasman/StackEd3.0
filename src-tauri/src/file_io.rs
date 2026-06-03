@@ -6,7 +6,10 @@ where
 {
   args.into_iter()
     .skip(1)
-    .find(|arg| arg.ends_with(".md"))
+    .find(|arg| {
+      let lower = arg.to_ascii_lowercase();
+      lower.ends_with(".md") || lower.ends_with(".sub")
+    })
 }
 
 #[tauri::command]
@@ -86,6 +89,17 @@ mod tests {
     ]);
 
     assert_eq!(path, Some("/vault/Articles/Net Zero/Net Zero.md".to_string()));
+  }
+
+  #[test]
+  fn test_first_markdown_arg_accepts_sub_files() {
+    let path = first_markdown_arg([
+      "stacked".to_string(),
+      "--some-tauri-flag".to_string(),
+      "/vault/Articles/Checkmate/Checkmate.sub".to_string(),
+    ]);
+
+    assert_eq!(path, Some("/vault/Articles/Checkmate/Checkmate.sub".to_string()));
   }
 
   #[test]

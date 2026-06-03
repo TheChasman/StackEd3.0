@@ -1,5 +1,6 @@
 <script lang="ts">
   import { settingsStore } from '$lib/stores/settings.svelte';
+  import { documentStore } from '$lib/stores/document.svelte';
   import { createAdapter } from '$lib/services/ai/adapter';
   import type { SearchResult } from '$lib/services/ai/adapter';
 
@@ -24,7 +25,12 @@
     result = null;
     try {
       const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
-      result = await adapter.search(query);
+      result = await adapter.search(query, {
+        frontmatter: documentStore.frontmatter,
+        fieldOrder: documentStore.fieldOrder,
+        body: documentStore.body,
+        filePath: documentStore.filePath,
+      });
     } catch (e) {
       error = e instanceof Error ? e.message : 'Research failed.';
     } finally {
@@ -74,7 +80,7 @@
           <div>
             <p class="text-xs font-semibold text-dark-400 uppercase mb-1">Sources</p>
             <ul class="flex flex-col gap-1">
-              {#each result.citations as cite}
+              {#each result.citations as cite (cite.url)}
                 <li class="text-xs">
                   <a href={cite.url} target="_blank" rel="noopener" class="text-primary-400 hover:underline truncate block">{cite.title}</a>
                   {#if cite.snippet}<p class="text-dark-300 line-clamp-2">{cite.snippet}</p>{/if}

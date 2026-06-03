@@ -1,3 +1,5 @@
+import type { ArticleFrontmatter } from '$lib/types/article';
+
 export interface Citation {
   title: string;
   url: string;
@@ -10,8 +12,15 @@ export interface SearchResult {
   query: string;
 }
 
+export interface ArticleContext {
+  frontmatter: ArticleFrontmatter | null;
+  fieldOrder: string[];
+  body: string;
+  filePath: string | null;
+}
+
 export interface AIAdapter {
-  search(query: string): Promise<SearchResult>;
+  search(query: string, context?: ArticleContext): Promise<SearchResult>;
 }
 
 // Static imports — both are small; the unused adapter is tree-shaken at build time.

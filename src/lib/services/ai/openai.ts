@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
-import type { AIAdapter, SearchResult, Citation } from './adapter';
+import { buildResearchPrompt } from './context';
+import type { AIAdapter, SearchResult, Citation, ArticleContext } from './adapter';
 
 export class OpenAIAdapter implements AIAdapter {
   private client: OpenAI;
@@ -9,12 +10,12 @@ export class OpenAIAdapter implements AIAdapter {
     this.client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
   }
 
-  async search(query: string): Promise<SearchResult> {
+  async search(query: string, context?: ArticleContext): Promise<SearchResult> {
     // Uses the Responses API with web_search_preview tool
     const response = await (this.client as any).responses.create({
       model: 'gpt-4o-mini',
       tools: [{ type: 'web_search_preview' }],
-      input: `Research the following topic and provide a concise summary with sources:\n\n${query}`,
+      input: buildResearchPrompt(query, context),
     });
 
     const summary: string = response.output_text ?? '';
