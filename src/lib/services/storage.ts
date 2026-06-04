@@ -22,9 +22,15 @@ const API_KEY_STORAGE_KEYS: Record<ApiProvider, string> = {
   openai: 'openaiApiKey',
 };
 
+const API_KEY_SAVED_KEYS: Record<ApiProvider, string> = {
+  claude: 'anthropicApiKeySaved',
+  openai: 'openaiApiKeySaved',
+};
+
 export async function saveApiKey(provider: ApiProvider, key: string): Promise<void> {
   const db = await DB_PROMISE;
   await db.put('settings', key, API_KEY_STORAGE_KEYS[provider]);
+  await db.put('settings', key.trim().length > 0, API_KEY_SAVED_KEYS[provider]);
 }
 
 export async function loadApiKey(provider: ApiProvider): Promise<string> {
@@ -35,6 +41,11 @@ export async function loadApiKey(provider: ApiProvider): Promise<string> {
     return ((await db.get('settings', 'apiKey')) as string | undefined) ?? '';
   }
   return '';
+}
+
+export async function hasExplicitApiKey(provider: ApiProvider): Promise<boolean> {
+  const db = await DB_PROMISE;
+  return ((await db.get('settings', API_KEY_SAVED_KEYS[provider])) as boolean | undefined) ?? false;
 }
 
 export async function savePipelineFolderPath(path: string): Promise<void> {

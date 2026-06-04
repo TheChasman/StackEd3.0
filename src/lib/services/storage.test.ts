@@ -33,6 +33,7 @@ vi.mock('idb', () => {
 import {
   saveApiKey,
   loadApiKey,
+  hasExplicitApiKey,
   savePipelineFolderPath,
   loadPipelineFolderPath,
   addRecentFile,
@@ -52,6 +53,12 @@ describe('storage service', () => {
 
     expect(await loadApiKey('claude')).toBe('sk-ant-test');
     expect(await loadApiKey('openai')).toBe('sk-openai-test');
+    expect(await hasExplicitApiKey('openai')).toBe(true);
+  });
+
+  it('clearing an API key marks it as not explicitly saved', async () => {
+    await saveApiKey('openai', '');
+    expect(await hasExplicitApiKey('openai')).toBe(false);
   });
 
   it('returns empty string when no API key stored', async () => {

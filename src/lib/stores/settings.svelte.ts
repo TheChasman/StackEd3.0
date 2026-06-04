@@ -1,4 +1,4 @@
-import { loadApiKey, saveApiKey, type ApiProvider } from '$lib/services/storage';
+import { hasExplicitApiKey, loadApiKey, saveApiKey, type ApiProvider } from '$lib/services/storage';
 
 function getLocalStorage(): Storage | null {
   try {
@@ -60,10 +60,16 @@ class SettingsStore {
     if (sidebar !== null) {
       this.sidebarVisible = sidebar === 'true';
     }
-    [this.anthropicApiKey, this.openaiApiKey] = await Promise.all([
+    const [anthropicApiKey, openaiApiKey, hasOpenAIKey] = await Promise.all([
       loadApiKey('claude'),
       loadApiKey('openai'),
+      hasExplicitApiKey('openai'),
     ]);
+    this.anthropicApiKey = anthropicApiKey;
+    this.openaiApiKey = !hasOpenAIKey && openaiApiKey === anthropicApiKey ? '' : openaiApiKey;
+    if (!hasOpenAIKey && openaiApiKey && openaiApiKey === anthropicApiKey) {
+      saveApiKey('openai', '').catch(console.error);
+    }
   }
 
   reset(): void {
