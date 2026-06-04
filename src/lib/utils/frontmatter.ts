@@ -28,16 +28,37 @@ function removeEtlArtifacts(body: string): { body: string; removed: boolean } {
 function extractSection(body: string, sectionName: string): string {
   const pattern = new RegExp(`^#+\\s*${sectionName}\\s*:?\\s*$`, 'im');
   const match = body.match(pattern);
-  if (!match) return '';
 
-  const startIdx = match.index! + match[0].length;
-  const remainingText = body.substring(startIdx);
+  if (match) {
+    const startIdx = match.index! + match[0].length;
+    const remainingText = body.substring(startIdx);
 
-  // Find next heading (# or ##, etc.) or end of string
-  const nextHeading = remainingText.match(/\n#+\s/);
-  const endIdx = nextHeading ? nextHeading.index! : remainingText.length;
+    // Find next heading (# or ##, etc.) or end of string
+    const nextHeading = remainingText.match(/\n#+\s/);
+    const endIdx = nextHeading ? nextHeading.index! : remainingText.length;
 
-  return remainingText.substring(0, endIdx).trim();
+    return remainingText.substring(0, endIdx).trim();
+  }
+
+  return extractInlineLabel(body, sectionName);
+}
+
+function extractInlineLabel(body: string, sectionName: string): string {
+  const labelPattern = new RegExp(`(?:^|\\s)${sectionName}\\s*:\\s*`);
+  const nextLabelPattern = new RegExp(`\\s(?:${ARTICLE_SECTIONS.join('|')})\\s*:\\s*`);
+
+  const match = body.match(labelPattern);
+  if (!match || match.index === undefined) return '';
+
+  const startIndex = match.index + match[0].length;
+  const remainingText = body.substring(startIndex);
+  const nextLabel = remainingText.match(nextLabelPattern);
+  const blankLine = remainingText.match(/\r?\n\s*\r?\n/);
+  const endIndexes = [nextLabel?.index, blankLine?.index]
+    .filter((index): index is number => index !== undefined);
+  const endIndex = endIndexes.length > 0 ? Math.min(...endIndexes) : remainingText.length;
+
+  return remainingText.substring(0, endIndex).trim();
 }
 
 export function backfillArticleFrontmatter(

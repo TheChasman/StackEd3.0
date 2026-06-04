@@ -29,6 +29,16 @@ Refined opening for reader attention.
 Closing thoughts.
 `;
 
+const SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS = `SPARK: Initial idea here.
+TITLE: My Article Title
+SUBTITLE: The subtitle or hook promise.
+HOOK: Refined opening for reader attention.
+
+This remains article body copy, not part of HOOK.
+`;
+
+const SAMPLE_FLATTENED_INLINE_LABELS = 'SPARK: Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket. TITLE: Partial Solution SUBTITLE: What does impartiality look like? HOOK: The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"';
+
 const EVERNOTE_TASKS_ARTIFACT = `Content not supported
 
 This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote.`;
@@ -57,6 +67,22 @@ describe('parseMarkdownFile', () => {
     expect(String(frontmatter.SUBTITLE)).toContain('The subtitle or hook promise');
     expect(String(frontmatter.HOOK)).toContain('Refined opening for reader attention');
     expect(String(frontmatter.LANDING)).toContain('Closing thoughts');
+  });
+
+  it('extracts StackEd fields from inline body labels when YAML is empty', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS);
+    expect(frontmatter.SPARK).toBe('Initial idea here.');
+    expect(frontmatter.TITLE).toBe('My Article Title');
+    expect(frontmatter.SUBTITLE).toBe('The subtitle or hook promise.');
+    expect(frontmatter.HOOK).toBe('Refined opening for reader attention.');
+  });
+
+  it('extracts StackEd fields from flattened inline body labels when YAML is empty', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_FLATTENED_INLINE_LABELS);
+    expect(frontmatter.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
+    expect(frontmatter.TITLE).toBe('Partial Solution');
+    expect(frontmatter.SUBTITLE).toBe('What does impartiality look like?');
+    expect(frontmatter.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
   });
 
   it('parses body content', () => {
@@ -182,6 +208,7 @@ Some body content without section headings.
 describe('backfillArticleFrontmatter', () => {
   it('fills blank StackEd fields from body sections on save', () => {
     const frontmatter = {
+      IMAGE: '',
       SPARK: '',
       TITLE: '',
       SUBTITLE: '',
@@ -200,8 +227,49 @@ describe('backfillArticleFrontmatter', () => {
     expect(backfilled.LANDING).toBe('Closing thoughts.');
   });
 
+  it('fills blank StackEd fields from inline body labels on save', () => {
+    const frontmatter = {
+      IMAGE: '',
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      created: '2026-06-04T00:00:00.000Z',
+      updated: '2026-06-04T00:00:00.000Z',
+    };
+
+    const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS);
+
+    expect(backfilled.SPARK).toBe('Initial idea here.');
+    expect(backfilled.TITLE).toBe('My Article Title');
+    expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
+    expect(backfilled.HOOK).toBe('Refined opening for reader attention.');
+  });
+
+  it('fills blank StackEd fields from flattened inline body labels on save', () => {
+    const frontmatter = {
+      IMAGE: '',
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      created: '2026-06-04T00:00:00.000Z',
+      updated: '2026-06-04T00:00:00.000Z',
+    };
+
+    const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_FLATTENED_INLINE_LABELS);
+
+    expect(backfilled.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
+    expect(backfilled.TITLE).toBe('Partial Solution');
+    expect(backfilled.SUBTITLE).toBe('What does impartiality look like?');
+    expect(backfilled.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
+  });
+
   it('does not overwrite populated StackEd fields on save', () => {
     const frontmatter = {
+      IMAGE: '',
       SPARK: '',
       TITLE: 'Manual title',
       SUBTITLE: '',

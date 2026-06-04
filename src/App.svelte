@@ -18,6 +18,7 @@
   import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile } from '$lib/services/files';
   import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
   import { backfillArticleFrontmatter } from '$lib/utils/frontmatter';
+  import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import '$lib/themes/catppuccin.css';
 
@@ -211,6 +212,11 @@
     localStorage.setItem('researchCollapsed', String(researchCollapsed));
     localStorage.setItem('activeToolTab', activeToolTab);
     localStorage.setItem('sidebarWidth', String(sidebarWidth));
+  });
+
+  $effect(() => {
+    const fileName = documentStore.filePath?.split('/').pop() ?? documentStore.fileHandle?.name;
+    document.title = fileName ? `StackEd ${buildLabel} - ${fileName}` : `StackEd ${buildLabel}`;
   });
 
   // Add mouse event listeners when resizing

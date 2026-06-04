@@ -1,6 +1,6 @@
 [package]
 name = "stacked"
-version = "0.1.0"
+version = "0.1.1"
 description = "StackEd — Substack post editor for the StackPipe pipeline"
 authors = ["TheChasman"]
 license = ""

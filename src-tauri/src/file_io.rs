@@ -283,6 +283,15 @@ pub fn read_markdown_file(file_path: String) -> Result<String, String> {
 #[tauri::command]
 pub fn write_markdown_file(file_path: String, content: String) -> Result<(), String> {
     let path = PathBuf::from(file_path);
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            format!(
+                "failed to create directory {}: {}",
+                parent.display(),
+                e
+            )
+        })?;
+    }
     std::fs::write(&path, content).map_err(|e| format!("failed to write {}: {}", path.display(), e))
 }
 
@@ -425,6 +434,28 @@ mod tests {
         let content = read_markdown_file(article_path.to_string_lossy().to_string()).unwrap();
         assert_eq!(content, "changed");
         assert_eq!(std::fs::read_to_string(&backup_path).unwrap(), "original");
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_write_markdown_file_creates_parent_directory() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-write-parent-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let article_path = root.join("Article").join("Article.md");
+
+        write_markdown_file(
+            article_path.to_string_lossy().to_string(),
+            "saved article".to_string(),
+        )
+        .unwrap();
+
+        assert_eq!(std::fs::read_to_string(&article_path).unwrap(), "saved article");
 
         std::fs::remove_dir_all(root).unwrap();
     }
