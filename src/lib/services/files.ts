@@ -29,8 +29,8 @@ function rememberLastSavedFolder(filePath: string): void {
 }
 
 function getSuggestedFileName(frontmatter: ArticleFrontmatter): string {
-  const baseName = frontmatter.title.trim().replace(/[/:*?"<>|\\]/g, '-');
-  return `${baseName || 'document'}.sub`;
+  const baseName = (frontmatter.TITLE || '').trim().replace(/[/:*?"<>|\\]/g, '-');
+  return `${baseName || 'article'}.sub`;
 }
 
 function getDefaultSavePath(frontmatter: ArticleFrontmatter): string {
@@ -61,7 +61,7 @@ export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFil
     ...(raw as Partial<ArticleFrontmatter>),
   };
 
-  await addRecentFile(fileHandle, frontmatter.title || file.name).catch(() => {});
+  await addRecentFile(fileHandle, frontmatter.TITLE || file.name).catch(() => {});
 
   return { frontmatter, body, fieldOrder, fileHandle, filePath: null };
 }
@@ -90,7 +90,7 @@ function parseContent(content: string, fallbackTitle: string): Omit<ParsedFile, 
     ...FRONTMATTER_DEFAULTS,
     ...(raw as Partial<ArticleFrontmatter>),
   };
-  if (!frontmatter.title) frontmatter.title = fallbackTitle;
+  if (!frontmatter.TITLE) frontmatter.TITLE = fallbackTitle;
   return { frontmatter, body, fieldOrder };
 }
 

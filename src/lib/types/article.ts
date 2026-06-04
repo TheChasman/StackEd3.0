@@ -1,72 +1,26 @@
-// Pipeline stage enum — matches article-schema.yaml pipeline_order
-export type PipelineStage =
-  | 'spark' | 'hook' | 'opening' | 'research'
-  | 'writing' | 'final_draft' | 'seo' | 'fact_check'
-  | 'staged' | 'posted';
-
-export type Audience = 'everyone' | 'paid' | 'none';
-
-// All YAML frontmatter fields (stored fields only — body is separate)
+// Simplified YAML frontmatter for .sub articles (7-section Substack structure)
 export interface ArticleFrontmatter {
-  title: string;
-  guid: string;
-  pipeline_stage: PipelineStage;
-  created: string;
-  updated: string;
-  spark_notes: string;
-  hook: string;
-  opening: string;
-  research_notes: string;
-  ai_draft: string;
-  fact_check_notes: string;
-  legal_notes: string;
-  seo_title: string;
-  seo_description: string;
-  seo_slug: string;
-  substack_tags: string[];
-  substack_url: string;
-  subtitle: string;
-  publish_at: string;
-  publication: string;
-  section: string;
-  audience: Audience;
-  allow_comments: Audience;
-  send_email: boolean;
-  content_locked: boolean;
-  overrides: string[];
+  SPARK: string;     // Raw idea seed
+  TITLE: string;     // Article title
+  SUBTITLE: string;  // Hook promise
+  HOOK: string;      // Refined opening
+  LANDING: string;   // Closing thought
+  created: string;   // ISO timestamp
+  updated: string;   // ISO timestamp
 }
 
 // Defaults for a freshly loaded article with missing fields
 export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
-  title: '',
-  guid: '',
-  pipeline_stage: 'spark',
+  SPARK: '',
+  TITLE: '',
+  SUBTITLE: '',
+  HOOK: '',
+  LANDING: '',
   created: '',
   updated: '',
-  spark_notes: '',
-  hook: '',
-  opening: '',
-  research_notes: '',
-  ai_draft: '',
-  fact_check_notes: '',
-  legal_notes: '',
-  seo_title: '',
-  seo_description: '',
-  seo_slug: '',
-  substack_tags: [],
-  substack_url: '',
-  subtitle: '',
-  publish_at: '',
-  publication: '',
-  section: '',
-  audience: 'everyone',
-  allow_comments: 'everyone',
-  send_email: true,
-  content_locked: false,
-  overrides: [],
 };
 
-// From field-permissions.json
+// Field permission types (separate from frontmatter structure)
 export type FieldOwner = 'author' | 'stackpipe' | 'ai';
 export type FieldAccess = 'free' | 'padlocked' | 'readonly';
 
@@ -81,6 +35,7 @@ export interface PermissionsManifest {
   description: string;
   fields: Record<string, FieldPermission>;
 }
+
 
 // Parsed StackEd article file (before loading into the store)
 export interface ParsedFile {

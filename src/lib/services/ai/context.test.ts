@@ -15,11 +15,10 @@ describe('buildResearchPrompt', () => {
     const context: ArticleContext = {
       frontmatter: {
         ...FRONTMATTER_DEFAULTS,
-        title: 'Checkmate',
-        pipeline_stage: 'research',
-        substack_tags: ['strategy'],
+        TITLE: 'Checkmate',
+        HOOK: 'The opening hook',
       },
-      fieldOrder: ['title', 'pipeline_stage', 'substack_tags'],
+      fieldOrder: ['TITLE', 'HOOK'],
       body: '# Opening\n\nThis is the article body.',
       filePath: '/vault/Handshake/Checkmate/Checkmate.sub',
     };
@@ -28,8 +27,7 @@ describe('buildResearchPrompt', () => {
 
     expect(prompt).toContain('Current file: /vault/Handshake/Checkmate/Checkmate.sub');
     expect(prompt).toContain('YAML frontmatter:');
-    expect(prompt).toContain('title: Checkmate');
-    expect(prompt).toContain('pipeline_stage: research');
+    expect(prompt).toContain('TITLE: Checkmate');
     expect(prompt).toContain('# Opening');
     expect(prompt).toContain('What claims need citations?');
   });

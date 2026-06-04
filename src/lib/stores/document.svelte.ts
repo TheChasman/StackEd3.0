@@ -1,4 +1,4 @@
-import type { ArticleFrontmatter, PipelineStage } from '$lib/types/article';
+import type { ArticleFrontmatter } from '$lib/types/article';
 
 class DocumentStore {
   frontmatter = $state<ArticleFrontmatter | null>(null);
@@ -7,15 +7,6 @@ class DocumentStore {
   fileHandle = $state<FileSystemFileHandle | null>(null);
   filePath = $state<string | null>(null);
   dirty = $state(false);
-
-  get isLocked(): boolean {
-    return this.frontmatter?.content_locked ?? false;
-  }
-
-  /** Unlock is only available pre-post (substack_url still empty). */
-  get canUnlock(): boolean {
-    return this.isLocked && !this.frontmatter?.substack_url;
-  }
 
   get wordCount(): number {
     return this.body
@@ -45,49 +36,10 @@ class DocumentStore {
     this.dirty = true;
   }
 
-  /** Update an author-owned (free) field. Does not touch overrides[]. */
+  /** Update a frontmatter field. */
   patchField(field: keyof ArticleFrontmatter, value: unknown): void {
     if (!this.frontmatter) return;
     this.frontmatter = { ...this.frontmatter, [field]: value };
-    this.dirty = true;
-  }
-
-  /** Update an AI-owned (padlocked) field. Appends field name to overrides[]. */
-  patchPadlockedField(field: keyof ArticleFrontmatter, value: unknown): void {
-    if (!this.frontmatter) return;
-    const overrides = this.frontmatter.overrides ?? [];
-    this.frontmatter = {
-      ...this.frontmatter,
-      [field]: value,
-      overrides: overrides.includes(field as string)
-        ? overrides
-        : [...overrides, field as string],
-    };
-    this.dirty = true;
-  }
-
-  /** Remove a field from overrides[] (let AI regenerate it). */
-  clearOverride(field: keyof ArticleFrontmatter): void {
-    if (!this.frontmatter) return;
-    this.frontmatter = {
-      ...this.frontmatter,
-      overrides: this.frontmatter.overrides.filter(f => f !== (field as string)),
-    };
-    this.dirty = true;
-  }
-
-  /**
-   * Unlock content after F&L review. Writes content_locked=false and
-   * resets pipeline_stage to fact_check for re-review.
-   * Only valid while canUnlock is true.
-   */
-  unlock(): void {
-    if (!this.frontmatter || !this.canUnlock) return;
-    this.frontmatter = {
-      ...this.frontmatter,
-      content_locked: false,
-      pipeline_stage: 'fact_check' as PipelineStage,
-    };
     this.dirty = true;
   }
 

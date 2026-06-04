@@ -1,7 +1,6 @@
 <script lang="ts">
   import { documentStore } from '$lib/stores/document.svelte';
 
-  let fm = $derived(documentStore.frontmatter);
   let wordCount = $derived(documentStore.wordCount);
   let dirty = $derived(documentStore.dirty);
   let fileHandle = $derived(documentStore.fileHandle);
@@ -14,8 +13,5 @@
     {fileName}
     {#if dirty}<span class="text-amber-500 ml-1">●</span>{/if}
   </span>
-  <span>{wordCount} words</span>
-  {#if fm}
-    <span class="ml-auto capitalize">{fm.pipeline_stage.replace('_', ' ')}</span>
-  {/if}
+  <span class="ml-auto">{wordCount} words</span>
 </footer>
