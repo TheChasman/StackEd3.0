@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getRecentFiles, type RecentFile } from '$lib/services/storage';
-  import { openFile } from '$lib/services/files';
+  import { openFilePath } from '$lib/services/files';
   import { documentStore } from '$lib/stores/document.svelte';
 
   let { onclose }: { onclose: () => void } = $props();
@@ -12,13 +12,8 @@
 
   async function open(file: RecentFile) {
     try {
-      // Re-request permission before opening
-      const perm = await (file.handle as any).queryPermission({ mode: 'readwrite' });
-      if (perm !== 'granted') {
-        await (file.handle as any).requestPermission({ mode: 'readwrite' });
-      }
-      const parsed = await openFile(file.handle);
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle);
+      const parsed = await openFilePath(file.filePath);
+      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
       onclose();
     } catch {
       alert('Could not reopen that file. Try opening it manually.');
@@ -34,14 +29,14 @@
       <p class="text-sm text-dark-400">No recent files.</p>
     {:else}
       <ul class="flex flex-col gap-1 max-h-80 overflow-y-auto">
-        {#each recents as file}
+        {#each recents as file (file.id ?? file.openedAt)}
           <li>
             <button
               onclick={() => open(file)}
               class="w-full text-left px-3 py-2 rounded hover:bg-dark-700 text-sm"
             >
               <p class="font-medium truncate">{file.title}</p>
-              <p class="text-xs text-dark-400">{new Date(file.openedAt).toLocaleDateString()}</p>
+              <p class="text-xs text-dark-400 truncate">{file.filePath}</p>
             </button>
           </li>
         {/each}

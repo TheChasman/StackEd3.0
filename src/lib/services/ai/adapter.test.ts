@@ -24,7 +24,7 @@ describe('ClaudeAdapter', () => {
     expect(() => new ClaudeAdapter('')).toThrow('API key required');
   });
 
-  it('search calls the Anthropic client with web_search tool', async () => {
+  it('search calls the Anthropic client with versioned web_search tool', async () => {
     const mockCreate = vi.fn().mockResolvedValue({
       content: [{ type: 'text', text: 'Summary of result. https://example.com' }],
     });
@@ -38,7 +38,7 @@ describe('ClaudeAdapter', () => {
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         tools: expect.arrayContaining([
-          expect.objectContaining({ type: 'web_search' }),
+          expect.objectContaining({ type: 'web_search_20260209' }),
         ]),
       }),
     );

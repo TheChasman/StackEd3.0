@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, untrack } from 'svelte';
   import { Editor } from '@tiptap/core';
   import StarterKit from '@tiptap/starter-kit';
+  import { TextStyle, FontFamily, FontSize } from '@tiptap/extension-text-style';
   import { marked } from 'marked';
   import TurndownService from 'turndown';
   import { Paywall } from './extensions/Paywall';
@@ -11,11 +12,11 @@
   import { Poetry } from './extensions/Poetry';
   import { Latex } from './extensions/LaTeX';
   import { Footnote } from './extensions/Footnote';
-import Image from '@tiptap/extension-image';
-import { FinancialChart } from './extensions/FinancialChart';
-import { PredictionMarket } from './extensions/PredictionMarket';
-import { Recipe } from './extensions/Recipe';
-import { documentStore } from '$lib/stores/document.svelte';
+  import Image from '@tiptap/extension-image';
+  import { FinancialChart } from './extensions/FinancialChart';
+  import { PredictionMarket } from './extensions/PredictionMarket';
+  import { Recipe } from './extensions/Recipe';
+  import { documentStore } from '$lib/stores/document.svelte';
   import Toolbar from './Toolbar.svelte';
 
   let element: HTMLDivElement;
@@ -26,6 +27,7 @@ import { documentStore } from '$lib/stores/document.svelte';
   turndown.keep((node) => {
     const el = node as HTMLElement;
     return (
+      (el.nodeName === 'SPAN' && Boolean(el.getAttribute('style'))) ||
       el.dataset?.type === 'paywall' ||
       el.dataset?.type === 'subscribe-button' ||
       el.dataset?.type === 'share-button' ||
@@ -52,6 +54,9 @@ import { documentStore } from '$lib/stores/document.svelte';
     editor = new Editor({
       element,
       extensions: [
+        TextStyle,
+        FontFamily,
+        FontSize,
         StarterKit,
         Image,
         Paywall,
@@ -83,8 +88,9 @@ import { documentStore } from '$lib/stores/document.svelte';
 
   // When a new file is opened, reload editor content
   $effect(() => {
-    const body = documentStore.body;
-    if (editor && !documentStore.dirty) {
+    documentStore.loadVersion;
+    const body = untrack(() => documentStore.body);
+    if (editor) {
       setMarkdown(body);
     }
   });

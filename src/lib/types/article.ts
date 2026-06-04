@@ -1,4 +1,4 @@
-// Simplified YAML frontmatter for .sub articles (7-section Substack structure)
+// Simplified YAML frontmatter for Markdown articles (7-section Substack structure)
 export interface ArticleFrontmatter {
   SPARK: string;     // Raw idea seed
   TITLE: string;     // Article title
@@ -19,6 +19,16 @@ export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
   created: '',
   updated: '',
 };
+
+export const FRONTMATTER_FIELD_ORDER: (keyof ArticleFrontmatter)[] = [
+  'SPARK',
+  'TITLE',
+  'SUBTITLE',
+  'HOOK',
+  'LANDING',
+  'created',
+  'updated',
+];
 
 // Field permission types (separate from frontmatter structure)
 export type FieldOwner = 'author' | 'stackpipe' | 'ai';
@@ -44,4 +54,5 @@ export interface ParsedFile {
   fieldOrder: string[];
   fileHandle: FileSystemFileHandle | null;
   filePath: string | null;
+  dirty?: boolean;
 }

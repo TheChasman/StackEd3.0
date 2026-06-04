@@ -5,9 +5,24 @@ export interface ParsedMarkdown {
   frontmatter: Record<string, unknown>;
   body: string;
   fieldOrder: string[];
+  hasFrontmatter: boolean;
+  removedArtifacts: boolean;
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
+const EVERNOTE_TASKS_ARTIFACT_RE = /(?:^|\n)\s*Content not supported\s*\n+\s*This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.\s*(?=\n|$)/g;
+const EVERNOTE_TASKS_HTML_ARTIFACT_RE = /<div\b[^>]*--en-task-group:true;[\s\S]*?This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.[\s\S]*?<\/div>\s*<\/div>/g;
+const EVERNOTE_ENML_WRAPPER_RE = /^\s*<!DOCTYPE en-note SYSTEM "http:\/\/xml\.evernote\.com\/pub\/enml2\.dtd">\s*<en-note>([\s\S]*)<\/en-note>\s*$/;
+const ARTICLE_SECTIONS = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
+
+function removeEtlArtifacts(body: string): { body: string; removed: boolean } {
+  const unwrapped = body.replace(EVERNOTE_ENML_WRAPPER_RE, '$1');
+  const cleaned = unwrapped
+    .replace(EVERNOTE_TASKS_HTML_ARTIFACT_RE, '\n')
+    .replace(EVERNOTE_TASKS_ARTIFACT_RE, '\n')
+    .replace(/\n{3,}/g, '\n\n');
+  return { body: cleaned, removed: cleaned !== body };
+}
 
 // Extract content from markdown section heading (e.g., "# SPARK" or "## TITLE:")
 function extractSection(body: string, sectionName: string): string {
@@ -23,6 +38,22 @@ function extractSection(body: string, sectionName: string): string {
   const endIdx = nextHeading ? nextHeading.index! : remainingText.length;
 
   return remainingText.substring(0, endIdx).trim();
+}
+
+export function backfillArticleFrontmatter(
+  frontmatter: ArticleFrontmatter,
+  body: string,
+): ArticleFrontmatter {
+  const backfilled = { ...frontmatter };
+
+  for (const section of ARTICLE_SECTIONS) {
+    if (!backfilled[section]) {
+      const extracted = extractSection(body, section);
+      if (extracted) backfilled[section] = extracted;
+    }
+  }
+
+  return backfilled;
 }
 
 export function parseMarkdownFile(content: string): ParsedMarkdown {
@@ -47,9 +78,11 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
       .map(line => line.split(':')[0].trim());
   }
 
+  const cleaned = removeEtlArtifacts(body);
+  body = cleaned.body;
+
   // Auto-populate empty YAML fields from markdown body sections
-  const sections = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
-  for (const section of sections) {
+  for (const section of ARTICLE_SECTIONS) {
     if (!frontmatter[section] || frontmatter[section] === '') {
       const extracted = extractSection(body, section);
       if (extracted) {
@@ -58,7 +91,13 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
     }
   }
 
-  return { frontmatter, body, fieldOrder };
+  return {
+    frontmatter,
+    body,
+    fieldOrder,
+    hasFrontmatter: Boolean(match),
+    removedArtifacts: cleaned.removed,
+  };
 }
 
 function serializeLine(key: string, value: unknown): string {

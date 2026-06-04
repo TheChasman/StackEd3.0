@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Editor } from '@tiptap/core';
   import StyleDropdown from './toolbar/StyleDropdown.svelte';
+  import FontDropdown from './toolbar/FontDropdown.svelte';
+  import FontSizeDropdown from './toolbar/FontSizeDropdown.svelte';
   import ButtonDropdown from './toolbar/ButtonDropdown.svelte';
   import MoreDropdown from './toolbar/MoreDropdown.svelte';
 
@@ -94,6 +96,8 @@
 
   <!-- Style dropdown (Heading 1-6 / Normal text) -->
   <StyleDropdown {editor} />
+  <FontDropdown {editor} />
+  <FontSizeDropdown {editor} />
 
   <div class="w-px h-4 bg-dark-600 mx-1"></div>
 

@@ -35,17 +35,13 @@
     ],
     "fileAssociations": [
       {
-        "ext": ["sub"],
-        "name": "StackEd Article",
-        "description": "StackEd article with YAML frontmatter and Markdown body",
+        "ext": ["md"],
+        "name": "Markdown Document",
+        "description": "Markdown document",
         "role": "Editor",
-        "rank": "Owner",
+        "rank": "Alternate",
         "mimeType": "text/markdown",
-        "contentTypes": ["com.thechasman.stacked.sub"],
-        "exportedType": {
-          "identifier": "com.thechasman.stacked.sub",
-          "conformsTo": ["public.text", "public.plain-text"]
-        }
+        "contentTypes": ["public.markdown", "net.daringfireball.markdown"]
       }
     ],
     "android": {

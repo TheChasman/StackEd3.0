@@ -23,6 +23,8 @@ describe('settings store', () => {
 
   it('defaults to empty API key', () => {
     expect(settingsStore.apiKey).toBe('');
+    expect(settingsStore.anthropicApiKey).toBe('');
+    expect(settingsStore.openaiApiKey).toBe('');
   });
 
   it('hasValidKey is false with empty key', () => {
@@ -42,6 +44,16 @@ describe('settings store', () => {
   it('setApiKey updates the key', () => {
     settingsStore.setApiKey('sk-abc');
     expect(settingsStore.apiKey).toBe('sk-abc');
+    expect(settingsStore.anthropicApiKey).toBe('sk-abc');
+  });
+
+  it('stores separate API keys per provider', () => {
+    settingsStore.setAnthropicApiKey('sk-ant-test');
+    settingsStore.setOpenAIApiKey('sk-openai-test');
+
+    expect(settingsStore.apiKey).toBe('sk-ant-test');
+    settingsStore.setProvider('openai');
+    expect(settingsStore.apiKey).toBe('sk-openai-test');
   });
 
   it('sidebar is visible by default', () => {

@@ -14,7 +14,7 @@ export class ClaudeAdapter implements AIAdapter {
     const response = await this.client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
-      tools: [{ type: 'web_search', name: 'web_search' } as any],
+      tools: [{ type: 'web_search_20260209', name: 'web_search' } as any],
       tool_choice: { type: 'auto' as const },
       messages: [
         {

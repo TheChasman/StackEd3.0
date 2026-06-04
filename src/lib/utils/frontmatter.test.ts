@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseMarkdownFile, serializeMarkdownFile } from './frontmatter';
+import { backfillArticleFrontmatter, parseMarkdownFile, serializeMarkdownFile } from './frontmatter';
 
 const SAMPLE_WITH_FRONTMATTER = `---
 TITLE: "Test Article"
@@ -28,6 +28,11 @@ Refined opening for reader attention.
 # LANDING
 Closing thoughts.
 `;
+
+const EVERNOTE_TASKS_ARTIFACT = `Content not supported
+
+This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote.`;
+const EVERNOTE_TASKS_HTML_ARTIFACT = `<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"><en-note><div style="--en-task-group:true; --en-id:abc"><div style="font-weight:600">Content not supported</div><div>This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote.</div></div><div>Real article text.</div></en-note>`;
 
 describe('parseMarkdownFile', () => {
   it('parses TITLE from frontmatter', () => {
@@ -66,10 +71,42 @@ describe('parseMarkdownFile', () => {
     expect(fieldOrder[1]).toBe('created');
   });
 
+  it('reports whether YAML frontmatter was present', () => {
+    expect(parseMarkdownFile(SAMPLE_WITH_FRONTMATTER).hasFrontmatter).toBe(true);
+    expect(parseMarkdownFile('Just a body').hasFrontmatter).toBe(false);
+  });
+
   it('handles missing frontmatter gracefully', () => {
     const { frontmatter, body } = parseMarkdownFile('Just a body');
     expect(frontmatter.SPARK ?? '').toBe('');
     expect(body).toBe('Just a body');
+  });
+
+  it('removes Evernote Tasks ETL artifacts from the body', () => {
+    const { body, removedArtifacts } = parseMarkdownFile(`# Title
+
+Before.
+
+${EVERNOTE_TASKS_ARTIFACT}
+
+After.
+`);
+
+    expect(removedArtifacts).toBe(true);
+    expect(body).toContain('Before.');
+    expect(body).toContain('After.');
+    expect(body).not.toContain('Content not supported');
+    expect(body).not.toContain('placeholder for Tasks');
+  });
+
+  it('removes Evernote Tasks HTML artifacts and unwraps ENML', () => {
+    const { body, removedArtifacts } = parseMarkdownFile(EVERNOTE_TASKS_HTML_ARTIFACT);
+
+    expect(removedArtifacts).toBe(true);
+    expect(body).toContain('Real article text.');
+    expect(body).not.toContain('Content not supported');
+    expect(body).not.toContain('placeholder for Tasks');
+    expect(body).not.toContain('<en-note>');
   });
 
   it('does not override explicit YAML values with body sections', () => {
@@ -139,5 +176,44 @@ Some body content without section headings.
     const reparsed = parseMarkdownFile(serialized);
     // YAML loader may add trailing newline for block scalars
     expect(String(reparsed.frontmatter.SPARK).trim()).toBe('This is a\nmultiline\ntext block');
+  });
+});
+
+describe('backfillArticleFrontmatter', () => {
+  it('fills blank StackEd fields from body sections on save', () => {
+    const frontmatter = {
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      created: '2026-06-04T00:00:00.000Z',
+      updated: '2026-06-04T00:00:00.000Z',
+    };
+
+    const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_SECTIONS);
+
+    expect(backfilled.SPARK).toBe('Initial idea here.');
+    expect(backfilled.TITLE).toBe('My Article Title');
+    expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
+    expect(backfilled.HOOK).toBe('Refined opening for reader attention.');
+    expect(backfilled.LANDING).toBe('Closing thoughts.');
+  });
+
+  it('does not overwrite populated StackEd fields on save', () => {
+    const frontmatter = {
+      SPARK: '',
+      TITLE: 'Manual title',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      created: '2026-06-04T00:00:00.000Z',
+      updated: '2026-06-04T00:00:00.000Z',
+    };
+
+    const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_SECTIONS);
+
+    expect(backfilled.TITLE).toBe('Manual title');
+    expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
   });
 });

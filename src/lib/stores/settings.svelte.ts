@@ -1,4 +1,4 @@
-import { loadApiKey, saveApiKey } from '$lib/services/storage';
+import { loadApiKey, saveApiKey, type ApiProvider } from '$lib/services/storage';
 
 function getLocalStorage(): Storage | null {
   try {
@@ -9,23 +9,39 @@ function getLocalStorage(): Storage | null {
 }
 
 class SettingsStore {
-  provider = $state<'claude' | 'openai'>('claude');
-  apiKey = $state('');
+  provider = $state<ApiProvider>('claude');
+  anthropicApiKey = $state('');
+  openaiApiKey = $state('');
   sidebarVisible = $state(true);
+
+  get apiKey(): string {
+    return this.provider === 'claude' ? this.anthropicApiKey : this.openaiApiKey;
+  }
 
   get hasValidKey(): boolean {
     return this.apiKey.trim().length > 0;
   }
 
-  setProvider(provider: 'claude' | 'openai'): void {
+  setProvider(provider: ApiProvider): void {
     this.provider = provider;
     getLocalStorage()?.setItem('provider', provider);
   }
 
-  setApiKey(key: string): void {
-    this.apiKey = key;
-    // Fire-and-forget to IndexedDB
-    saveApiKey(key).catch(console.error);
+  setApiKey(key: string, provider: ApiProvider = this.provider): void {
+    if (provider === 'claude') {
+      this.anthropicApiKey = key;
+    } else {
+      this.openaiApiKey = key;
+    }
+    saveApiKey(provider, key).catch(console.error);
+  }
+
+  setAnthropicApiKey(key: string): void {
+    this.setApiKey(key, 'claude');
+  }
+
+  setOpenAIApiKey(key: string): void {
+    this.setApiKey(key, 'openai');
   }
 
   toggleSidebar(): void {
@@ -44,12 +60,16 @@ class SettingsStore {
     if (sidebar !== null) {
       this.sidebarVisible = sidebar === 'true';
     }
-    this.apiKey = await loadApiKey();
+    [this.anthropicApiKey, this.openaiApiKey] = await Promise.all([
+      loadApiKey('claude'),
+      loadApiKey('openai'),
+    ]);
   }
 
   reset(): void {
     this.provider = 'claude';
-    this.apiKey = '';
+    this.anthropicApiKey = '';
+    this.openaiApiKey = '';
     this.sidebarVisible = true;
   }
 }

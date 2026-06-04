@@ -7,6 +7,7 @@ class DocumentStore {
   fileHandle = $state<FileSystemFileHandle | null>(null);
   filePath = $state<string | null>(null);
   dirty = $state(false);
+  loadVersion = $state(0);
 
   get wordCount(): number {
     return this.body
@@ -22,13 +23,15 @@ class DocumentStore {
     fieldOrder: string[],
     fileHandle: FileSystemFileHandle | null,
     filePath: string | null = null,
+    dirty = false,
   ): void {
     this.frontmatter = frontmatter;
     this.body = body;
     this.fieldOrder = fieldOrder;
     this.fileHandle = fileHandle;
     this.filePath = filePath;
-    this.dirty = false;
+    this.dirty = dirty;
+    this.loadVersion += 1;
   }
 
   setBody(body: string): void {
@@ -43,6 +46,10 @@ class DocumentStore {
     this.dirty = true;
   }
 
+  replaceFrontmatter(frontmatter: ArticleFrontmatter): void {
+    this.frontmatter = frontmatter;
+  }
+
   markClean(): void {
     this.dirty = false;
   }
@@ -54,6 +61,7 @@ class DocumentStore {
     this.fileHandle = null;
     this.filePath = null;
     this.dirty = false;
+    this.loadVersion += 1;
   }
 }
 

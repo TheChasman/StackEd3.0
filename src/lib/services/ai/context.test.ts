@@ -20,12 +20,12 @@ describe('buildResearchPrompt', () => {
       },
       fieldOrder: ['TITLE', 'HOOK'],
       body: '# Opening\n\nThis is the article body.',
-      filePath: '/vault/Handshake/Checkmate/Checkmate.sub',
+      filePath: '/vault/Handshake/Checkmate/Checkmate.md',
     };
 
     const prompt = buildResearchPrompt('What claims need citations?', context);
 
-    expect(prompt).toContain('Current file: /vault/Handshake/Checkmate/Checkmate.sub');
+    expect(prompt).toContain('Current file: /vault/Handshake/Checkmate/Checkmate.md');
     expect(prompt).toContain('YAML frontmatter:');
     expect(prompt).toContain('TITLE: Checkmate');
     expect(prompt).toContain('# Opening');

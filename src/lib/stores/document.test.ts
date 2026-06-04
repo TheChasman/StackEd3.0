@@ -30,6 +30,11 @@ describe('document store', () => {
     expect(documentStore.dirty).toBe(false);
   });
 
+  it('load() can mark a normalized file dirty', () => {
+    documentStore.load(BASE, '# Body', ['TITLE'], FAKE_HANDLE, null, true);
+    expect(documentStore.dirty).toBe(true);
+  });
+
   it('setBody() marks dirty', () => {
     documentStore.load(BASE, '# Body', [], FAKE_HANDLE);
     documentStore.setBody('# Updated');

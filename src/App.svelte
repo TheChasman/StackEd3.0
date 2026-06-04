@@ -15,9 +15,9 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { openFile, openFilePath, saveFile, saveFilePath, saveAsFile } from '$lib/services/files';
+  import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile } from '$lib/services/files';
   import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
-  import { loadFolderHandle } from '$lib/services/storage';
+  import { backfillArticleFrontmatter } from '$lib/utils/frontmatter';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import '$lib/themes/catppuccin.css';
 
@@ -32,15 +32,31 @@
 
   async function loadFilePath(filePath: string) {
     const parsed = await openFilePath(filePath);
-    documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+    documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
   }
 
   onMount(() => {
     let unlistenOpenFile: (() => void) | undefined;
+    let unlistenMenuNew: (() => void) | undefined;
+    let unlistenMenuOpen: (() => void) | undefined;
+    let unlistenMenuSave: (() => void) | undefined;
+    let unlistenMenuSaveAs: (() => void) | undefined;
     void listen<string>('stacked:open-file', (event) => {
       void loadFilePath(event.payload);
     }).then((unlisten) => {
       unlistenOpenFile = unlisten;
+    });
+    void listen('stacked:menu-new', () => { void handleNew(); }).then((unlisten) => {
+      unlistenMenuNew = unlisten;
+    });
+    void listen('stacked:menu-open', () => { void handleOpen(); }).then((unlisten) => {
+      unlistenMenuOpen = unlisten;
+    });
+    void listen('stacked:menu-save', () => { void handleSave(); }).then((unlisten) => {
+      unlistenMenuSave = unlisten;
+    });
+    void listen('stacked:menu-save-as', () => { void handleSaveAs(); }).then((unlisten) => {
+      unlistenMenuSaveAs = unlisten;
     });
 
     void (async () => {
@@ -49,8 +65,6 @@
       if (initialPath) {
         await loadFilePath(initialPath);
       }
-      // Try to restore folder handle (does not auto-open a file)
-      await loadFolderHandle().catch(() => {});
       yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
       researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
       activeToolTab = localStorage.getItem('activeToolTab') === 'artwork' ? 'artwork' : 'research';
@@ -61,6 +75,10 @@
 
     return () => {
       unlistenOpenFile?.();
+      unlistenMenuNew?.();
+      unlistenMenuOpen?.();
+      unlistenMenuSave?.();
+      unlistenMenuSaveAs?.();
     };
   });
 
@@ -83,10 +101,28 @@
   async function handleOpen() {
     try {
       const parsed = await openFile();
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
     } catch {
       // User cancelled picker
     }
+  }
+
+  async function handleNew() {
+    try {
+      const parsed = await createNewFile();
+      if (parsed) {
+        documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
+      }
+    } catch (e) {
+      alert('New file failed: ' + (e instanceof Error ? e.message : e));
+    }
+  }
+
+  function getFrontmatterForSave() {
+    return backfillArticleFrontmatter(
+      documentStore.frontmatter || FRONTMATTER_DEFAULTS,
+      documentStore.body,
+    );
   }
 
   async function handleSave() {
@@ -95,7 +131,7 @@
     // If no file is open yet, prompt for a save location
     if (!documentStore.fileHandle && !documentStore.filePath) {
       try {
-        const frontmatter = documentStore.frontmatter || FRONTMATTER_DEFAULTS;
+        const frontmatter = getFrontmatterForSave();
         const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
         if (filePath) {
           documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
@@ -107,14 +143,15 @@
     }
 
     try {
-      const frontmatter = documentStore.frontmatter || FRONTMATTER_DEFAULTS;
+      const frontmatter = getFrontmatterForSave();
       if (documentStore.filePath) {
-        await saveFilePath(
+        const filePath = await saveFilePath(
           documentStore.filePath,
           frontmatter,
           documentStore.fieldOrder,
           documentStore.body,
         );
+        documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
       } else if (documentStore.fileHandle) {
         await saveFile(
           documentStore.fileHandle,
@@ -123,9 +160,24 @@
           documentStore.body,
         );
       }
+      documentStore.replaceFrontmatter(frontmatter);
       documentStore.markClean();
     } catch (e) {
       alert('Save failed: ' + (e instanceof Error ? e.message : e));
+    }
+  }
+
+  async function handleSaveAs() {
+    if (!documentStore.body && !documentStore.frontmatter) return;
+
+    try {
+      const frontmatter = getFrontmatterForSave();
+      const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
+      if (filePath) {
+        documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
+      }
+    } catch (e) {
+      alert('Save As failed: ' + (e instanceof Error ? e.message : e));
     }
   }
 
@@ -187,35 +239,43 @@
 
 <!-- App chrome: header -->
 <header class="flex items-center gap-3 px-5 py-3 border-b border-dark-700 bg-dark-800 shrink-0">
-  <h1 class="font-semibold text-dark-50 text-lg">StackEd</h1>
-  <div class="flex-1"></div>
-
-  <button onclick={handleOpen} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
-    Open
-  </button>
-  <button
-    onclick={handleSave}
-    disabled={!documentStore.dirty}
-    class="px-4 py-2.5 text-base bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:opacity-40"
-  >
-    Save
-  </button>
-  <ThemeSwitcher onBrowse={() => (showThemeBrowser = true)} />
-  <button
-    onclick={() => showRecents = true}
-    class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-    title="Recent files"
-  >⏱</button>
-  <button
-    onclick={() => settingsStore.toggleSidebar()}
-    class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-    title="Toggle sidebar"
-  >⊞</button>
+  <img src="/stacked-icon.png" alt="StackEd" class="h-8 w-8 rounded-lg object-contain" />
   <button
     onclick={() => showSettings = true}
     class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
     title="Settings"
   >⚙</button>
+  <div class="flex items-center gap-2">
+    <button onclick={handleNew} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
+      New...
+    </button>
+    <button onclick={handleOpen} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
+      Open
+    </button>
+    <button
+      onclick={handleSave}
+      disabled={!documentStore.dirty}
+      class="px-4 py-2.5 text-base bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:bg-green-600 disabled:hover:bg-green-600 disabled:opacity-50 disabled:cursor-default"
+    >
+      Save
+    </button>
+    <button onclick={handleSaveAs} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
+      Save as...
+    </button>
+    <button
+      onclick={() => showRecents = true}
+      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
+      title="Recent files"
+    >⏱</button>
+  </div>
+  <div class="flex-1"></div>
+
+  <ThemeSwitcher onBrowse={() => (showThemeBrowser = true)} />
+  <button
+    onclick={() => settingsStore.toggleSidebar()}
+    class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
+    title="Toggle sidebar"
+  >⊞</button>
 </header>
 
 <!-- Main area -->
