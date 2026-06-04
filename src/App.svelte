@@ -2,9 +2,11 @@
   import { onMount } from 'svelte';
   import type { SvelteHTMLElements } from 'svelte/elements';
   import { invoke } from '@tauri-apps/api/core';
+  import { listen } from '@tauri-apps/api/event';
   import Editor from '$lib/components/editor/Editor.svelte';
   import YamlPanel from '$lib/components/yaml/YamlPanel.svelte';
   import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
+  import ArtworkPanel from '$lib/components/artwork/ArtworkPanel.svelte';
   import StatusBar from '$lib/components/StatusBar.svelte';
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import RecentFiles from '$lib/components/RecentFiles.svelte';
@@ -24,25 +26,42 @@
   let showThemeBrowser = $state(false);
   let yamlCollapsed = $state(false);
   let researchCollapsed = $state(false);
+  let activeToolTab = $state<'research' | 'artwork'>('research');
   let sidebarWidth = $state(288);
   let isResizing = $state(false);
 
+  async function loadFilePath(filePath: string) {
+    const parsed = await openFilePath(filePath);
+    documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+  }
+
   onMount(() => {
+    let unlistenOpenFile: (() => void) | undefined;
+    void listen<string>('stacked:open-file', (event) => {
+      void loadFilePath(event.payload);
+    }).then((unlisten) => {
+      unlistenOpenFile = unlisten;
+    });
+
     void (async () => {
       await settingsStore.loadFromStorage();
       const initialPath = await invoke<string | null>('initial_file_path').catch(() => null);
       if (initialPath) {
-        const parsed = await openFilePath(initialPath);
-        documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath);
+        await loadFilePath(initialPath);
       }
       // Try to restore folder handle (does not auto-open a file)
       await loadFolderHandle().catch(() => {});
       yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
       researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
+      activeToolTab = localStorage.getItem('activeToolTab') === 'artwork' ? 'artwork' : 'research';
       const savedWidth = localStorage.getItem('sidebarWidth');
       if (savedWidth) sidebarWidth = parseInt(savedWidth, 10);
       setupZoomShortcuts();
     })();
+
+    return () => {
+      unlistenOpenFile?.();
+    };
   });
 
   function handleMouseDown() {
@@ -138,6 +157,7 @@
   $effect(() => {
     localStorage.setItem('yamlCollapsed', String(yamlCollapsed));
     localStorage.setItem('researchCollapsed', String(researchCollapsed));
+    localStorage.setItem('activeToolTab', activeToolTab);
     localStorage.setItem('sidebarWidth', String(sidebarWidth));
   });
 
@@ -227,18 +247,40 @@
         {/if}
       </div>
 
-      <!-- Research panel -->
+      <!-- Tools panel -->
       <div class="flex flex-col {researchCollapsed ? 'h-auto' : 'flex-1'} min-h-0">
         <button
           onclick={() => researchCollapsed = !researchCollapsed}
           class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-dark-300 uppercase tracking-wide hover:bg-dark-700 shrink-0"
         >
-          Research
+          Tools
           <span>{researchCollapsed ? '▾' : '▴'}</span>
         </button>
         {#if !researchCollapsed}
-          <div class="flex-1 overflow-y-auto">
-            <ResearchPanel />
+          <div class="flex border-b border-dark-600 bg-dark-800 px-2 pt-2">
+            <button
+              onclick={() => activeToolTab = 'research'}
+              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
+                ? 'border-dark-600 bg-dark-900 text-dark-100'
+                : 'border-transparent text-dark-400 hover:text-dark-200'}"
+            >
+              Research
+            </button>
+            <button
+              onclick={() => activeToolTab = 'artwork'}
+              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
+                ? 'border-dark-600 bg-dark-900 text-dark-100'
+                : 'border-transparent text-dark-400 hover:text-dark-200'}"
+            >
+              Artwork
+            </button>
+          </div>
+          <div class="flex-1 overflow-y-auto min-h-0">
+            {#if activeToolTab === 'research'}
+              <ResearchPanel />
+            {:else}
+              <ArtworkPanel />
+            {/if}
           </div>
         {/if}
       </div>

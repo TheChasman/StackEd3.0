@@ -39,6 +39,7 @@
         "name": "StackEd Article",
         "description": "StackEd article with YAML frontmatter and Markdown body",
         "role": "Editor",
+        "rank": "Owner",
         "mimeType": "text/markdown",
         "contentTypes": ["com.thechasman.stacked.sub"],
         "exportedType": {

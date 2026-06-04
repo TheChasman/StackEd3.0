@@ -1,8 +1,10 @@
 mod file_io;
 
+use tauri::Emitter;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
+  let app = tauri::Builder::default()
     .plugin(tauri_plugin_dialog::init())
     .setup(|app| {
       if cfg!(debug_assertions) {
@@ -22,8 +24,26 @@ pub fn run() {
       file_io::write_file,
       file_io::delete_file,
       file_io::list_files,
+      file_io::list_artwork_images,
       file_io::create_dir_recursive,
     ])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    .build(tauri::generate_context!())
+    .expect("error while building tauri application");
+
+  app.run(|app_handle, event| {
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
+    if let tauri::RunEvent::Opened { urls } = event {
+      for url in urls {
+        let Ok(path) = url.to_file_path() else {
+          continue;
+        };
+        let path = path.to_string_lossy().to_string();
+        if file_io::is_article_path(&path) {
+          file_io::set_pending_open_file_path(path.clone());
+          let _ = app_handle.emit("stacked:open-file", path);
+          break;
+        }
+      }
+    }
+  });
 }

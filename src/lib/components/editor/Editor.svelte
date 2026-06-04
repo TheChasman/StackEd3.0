@@ -104,11 +104,19 @@ import { documentStore } from '$lib/stores/document.svelte';
 
   // Listen for insert events from ResearchPanel (colon in event name can't use svelte:window binding)
   $effect(() => {
-    const handler = (e: Event) => {
+    const textHandler = (e: Event) => {
       editor?.commands.insertContent((e as CustomEvent).detail.text);
     };
-    window.addEventListener('stacked:insert', handler);
-    return () => window.removeEventListener('stacked:insert', handler);
+    const imageHandler = (e: Event) => {
+      const { src, alt } = (e as CustomEvent).detail;
+      editor?.chain().focus().setImage({ src, alt }).run();
+    };
+    window.addEventListener('stacked:insert', textHandler);
+    window.addEventListener('stacked:insert-image', imageHandler);
+    return () => {
+      window.removeEventListener('stacked:insert', textHandler);
+      window.removeEventListener('stacked:insert-image', imageHandler);
+    };
   });
 </script>
 
