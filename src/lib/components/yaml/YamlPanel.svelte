@@ -24,6 +24,7 @@
     <section>
       <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Article Structure</h3>
       <div class="flex flex-col gap-3">
+        <FieldFree label="Hero Image" field="IMAGE" type="text" />
         <FieldFree label="Spark" field="SPARK" type="textarea" rows={3} />
         <FieldFree label="Title" field="TITLE" type="textarea" rows={2} />
         <FieldFree label="Subtitle" field="SUBTITLE" type="textarea" rows={2} />

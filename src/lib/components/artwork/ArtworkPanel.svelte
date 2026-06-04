@@ -34,6 +34,7 @@
       detail: {
         src: image.data_url,
         alt: image.name.replace(/\.[^.]+$/, ''),
+        hero: true,
       },
     }));
   }

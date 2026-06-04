@@ -3,6 +3,7 @@ import { documentStore } from './document.svelte';
 import type { ArticleFrontmatter } from '$lib/types/article';
 
 const BASE: ArticleFrontmatter = {
+  IMAGE: '',
   SPARK: 'Raw idea',
   TITLE: 'Test Article',
   SUBTITLE: 'A test',

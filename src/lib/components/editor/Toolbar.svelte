@@ -51,7 +51,10 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result && editor) {
-          editor.chain().focus().setImage({ src: e.target.result as string }).run();
+          const src = e.target.result as string;
+          const caption = window.prompt('Caption (optional):', '');
+          const isHero = window.confirm('Set as hero image?');
+          editor.chain().focus().insertCaptionedImage({ src, topImage: isHero }, caption || undefined).run();
         }
       };
       reader.readAsDataURL(file);

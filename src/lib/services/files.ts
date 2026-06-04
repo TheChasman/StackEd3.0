@@ -182,6 +182,7 @@ function parseContent(content: string, fallbackTitle: string): Omit<ParsedFile, 
   };
 
   const frontmatter: ArticleFrontmatter = {
+    IMAGE: value('IMAGE') || FRONTMATTER_DEFAULTS.IMAGE,
     SPARK: value('SPARK') || value('spark_notes') || FRONTMATTER_DEFAULTS.SPARK,
     TITLE: value('TITLE') || value('title') || fallbackTitleFromName || FRONTMATTER_DEFAULTS.TITLE,
     SUBTITLE: value('SUBTITLE') || value('subtitle') || FRONTMATTER_DEFAULTS.SUBTITLE,

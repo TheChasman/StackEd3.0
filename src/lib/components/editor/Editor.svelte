@@ -12,7 +12,9 @@
   import { Poetry } from './extensions/Poetry';
   import { Latex } from './extensions/LaTeX';
   import { Footnote } from './extensions/Footnote';
-  import Image from '@tiptap/extension-image';
+  import { CaptionedImage } from './extensions/CaptionedImage';
+  import { Image2 } from './extensions/Image2';
+  import { Caption } from './extensions/Caption';
   import { FinancialChart } from './extensions/FinancialChart';
   import { PredictionMarket } from './extensions/PredictionMarket';
   import { Recipe } from './extensions/Recipe';
@@ -34,6 +36,12 @@
       el.dataset?.type === 'poll' ||
       el.dataset?.type === 'latex' ||
       el.dataset?.type === 'footnote' ||
+      el.dataset?.type === 'financial-chart' ||
+      el.dataset?.type === 'prediction-market' ||
+      el.dataset?.type === 'recipe' ||
+      el.dataset?.type === 'captioned-image' ||
+      el.dataset?.type === 'image2' ||
+      el.dataset?.type === 'caption' ||
       el.className === 'poetry-block'
     );
   });
@@ -58,7 +66,9 @@
         FontFamily,
         FontSize,
         StarterKit,
-        Image,
+        CaptionedImage,
+        Image2,
+        Caption,
         Paywall,
         SubscribeButton,
         ShareButton,
@@ -114,8 +124,8 @@
       editor?.commands.insertContent((e as CustomEvent).detail.text);
     };
     const imageHandler = (e: Event) => {
-      const { src, alt } = (e as CustomEvent).detail;
-      editor?.chain().focus().setImage({ src, alt }).run();
+      const { src, alt, hero } = (e as CustomEvent).detail || {};
+      editor?.chain().focus().insertCaptionedImage({ src: src ?? '', alt: alt ?? '', topImage: hero ?? false }).run();
     };
     window.addEventListener('stacked:insert', textHandler);
     window.addEventListener('stacked:insert-image', imageHandler);

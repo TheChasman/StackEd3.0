@@ -1,5 +1,6 @@
-// Simplified YAML frontmatter for Markdown articles (7-section Substack structure)
+// Simplified YAML frontmatter for Markdown articles (8-section Substack structure)
 export interface ArticleFrontmatter {
+  IMAGE: string;     // Hero image src (URL or data-URI)
   SPARK: string;     // Raw idea seed
   TITLE: string;     // Article title
   SUBTITLE: string;  // Hook promise
@@ -11,6 +12,7 @@ export interface ArticleFrontmatter {
 
 // Defaults for a freshly loaded article with missing fields
 export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
+  IMAGE: '',
   SPARK: '',
   TITLE: '',
   SUBTITLE: '',
@@ -21,6 +23,7 @@ export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
 };
 
 export const FRONTMATTER_FIELD_ORDER: (keyof ArticleFrontmatter)[] = [
+  'IMAGE',
   'SPARK',
   'TITLE',
   'SUBTITLE',
