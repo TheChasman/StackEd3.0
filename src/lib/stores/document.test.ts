@@ -9,6 +9,10 @@ const BASE: ArticleFrontmatter = {
   SUBTITLE: 'A test',
   HOOK: 'The opening hook',
   LANDING: 'The closing thought',
+  SEO_TITLE: '',
+  SEO_DESCRIPTION: '',
+  SEO_SLUG: '',
+  SEO_TAGS: [],
   created: '2026-05-22',
   updated: '2026-05-22',
 };

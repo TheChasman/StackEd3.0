@@ -1,13 +1,17 @@
-// Simplified YAML frontmatter for Markdown articles (8-section Substack structure)
+// Simplified YAML frontmatter for Markdown articles (Substack structure + pre-posting SEO)
 export interface ArticleFrontmatter {
-  IMAGE: string;     // Hero image src (URL or data-URI)
-  SPARK: string;     // Raw idea seed
-  TITLE: string;     // Article title
-  SUBTITLE: string;  // Hook promise
-  HOOK: string;      // Refined opening
-  LANDING: string;   // Closing thought
-  created: string;   // ISO timestamp
-  updated: string;   // ISO timestamp
+  IMAGE: string;            // Hero image src (URL or data-URI)
+  SPARK: string;            // Raw idea seed
+  TITLE: string;            // Article title
+  SUBTITLE: string;         // Hook promise
+  HOOK: string;             // Refined opening
+  LANDING: string;          // Closing thought
+  SEO_TITLE: string;        // Search/social title
+  SEO_DESCRIPTION: string;  // Search/social description
+  SEO_SLUG: string;         // URL-safe slug
+  SEO_TAGS: string[];       // Short topical tags
+  created: string;          // ISO timestamp
+  updated: string;          // ISO timestamp
 }
 
 // Defaults for a freshly loaded article with missing fields
@@ -18,6 +22,10 @@ export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
   SUBTITLE: '',
   HOOK: '',
   LANDING: '',
+  SEO_TITLE: '',
+  SEO_DESCRIPTION: '',
+  SEO_SLUG: '',
+  SEO_TAGS: [],
   created: '',
   updated: '',
 };
@@ -29,6 +37,10 @@ export const FRONTMATTER_FIELD_ORDER: (keyof ArticleFrontmatter)[] = [
   'SUBTITLE',
   'HOOK',
   'LANDING',
+  'SEO_TITLE',
+  'SEO_DESCRIPTION',
+  'SEO_SLUG',
+  'SEO_TAGS',
   'created',
   'updated',
 ];

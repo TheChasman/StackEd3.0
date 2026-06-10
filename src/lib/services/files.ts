@@ -181,6 +181,18 @@ function parseContent(content: string, fallbackTitle: string): Omit<ParsedFile, 
     return typeof field === 'string' ? field : '';
   };
 
+  const arrayValue = (key: string): string[] => {
+    const field = raw[key];
+    if (Array.isArray(field)) return field.filter((item): item is string => typeof item === 'string');
+    if (typeof field === 'string') {
+      return field
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
   const frontmatter: ArticleFrontmatter = {
     IMAGE: value('IMAGE') || FRONTMATTER_DEFAULTS.IMAGE,
     SPARK: value('SPARK') || value('spark_notes') || FRONTMATTER_DEFAULTS.SPARK,
@@ -188,6 +200,14 @@ function parseContent(content: string, fallbackTitle: string): Omit<ParsedFile, 
     SUBTITLE: value('SUBTITLE') || value('subtitle') || FRONTMATTER_DEFAULTS.SUBTITLE,
     HOOK: value('HOOK') || value('hook') || value('opening') || FRONTMATTER_DEFAULTS.HOOK,
     LANDING: value('LANDING') || FRONTMATTER_DEFAULTS.LANDING,
+    SEO_TITLE: value('SEO_TITLE') || value('seo_title') || FRONTMATTER_DEFAULTS.SEO_TITLE,
+    SEO_DESCRIPTION: value('SEO_DESCRIPTION') || value('seo_description') || FRONTMATTER_DEFAULTS.SEO_DESCRIPTION,
+    SEO_SLUG: value('SEO_SLUG') || value('seo_slug') || FRONTMATTER_DEFAULTS.SEO_SLUG,
+    SEO_TAGS: arrayValue('SEO_TAGS').length
+      ? arrayValue('SEO_TAGS')
+      : arrayValue('substack_tags').length
+        ? arrayValue('substack_tags')
+        : FRONTMATTER_DEFAULTS.SEO_TAGS,
     created: value('created') || now,
     updated: value('updated') || now,
   };

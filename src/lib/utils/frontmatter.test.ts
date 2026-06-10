@@ -203,6 +203,20 @@ Some body content without section headings.
     // YAML loader may add trailing newline for block scalars
     expect(String(reparsed.frontmatter.SPARK).trim()).toBe('This is a\nmultiline\ntext block');
   });
+
+  it('serializes SEO_TAGS as a YAML array', () => {
+    const serialized = serializeMarkdownFile(
+      {
+        SEO_TAGS: ['policing', 'justice', 'civil liberties'],
+      },
+      ['SEO_TAGS'],
+      '',
+    );
+
+    expect(serialized).toContain('SEO_TAGS:\n  - "policing"\n  - "justice"\n  - "civil liberties"');
+    const reparsed = parseMarkdownFile(serialized);
+    expect(reparsed.frontmatter.SEO_TAGS).toEqual(['policing', 'justice', 'civil liberties']);
+  });
 });
 
 describe('backfillArticleFrontmatter', () => {
@@ -214,6 +228,10 @@ describe('backfillArticleFrontmatter', () => {
       SUBTITLE: '',
       HOOK: '',
       LANDING: '',
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
       created: '2026-06-04T00:00:00.000Z',
       updated: '2026-06-04T00:00:00.000Z',
     };
@@ -235,6 +253,10 @@ describe('backfillArticleFrontmatter', () => {
       SUBTITLE: '',
       HOOK: '',
       LANDING: '',
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
       created: '2026-06-04T00:00:00.000Z',
       updated: '2026-06-04T00:00:00.000Z',
     };
@@ -255,6 +277,10 @@ describe('backfillArticleFrontmatter', () => {
       SUBTITLE: '',
       HOOK: '',
       LANDING: '',
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
       created: '2026-06-04T00:00:00.000Z',
       updated: '2026-06-04T00:00:00.000Z',
     };
@@ -275,6 +301,10 @@ describe('backfillArticleFrontmatter', () => {
       SUBTITLE: '',
       HOOK: '',
       LANDING: '',
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
       created: '2026-06-04T00:00:00.000Z',
       updated: '2026-06-04T00:00:00.000Z',
     };
