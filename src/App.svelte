@@ -16,6 +16,8 @@
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile } from '$lib/services/files';
+  import { createAdapter } from '$lib/services/ai/adapter';
+  import { isSeoComplete, mergeSeoDraft } from '$lib/services/seo';
   import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
   import { backfillArticleFrontmatter } from '$lib/utils/frontmatter';
   import { buildLabel } from '$lib/utils/buildInfo';
@@ -30,6 +32,7 @@
   let activeToolTab = $state<'research' | 'artwork'>('research');
   let sidebarWidth = $state(288);
   let isResizing = $state(false);
+  let seoLoading = $state(false);
 
   async function loadFilePath(filePath: string) {
     const parsed = await openFilePath(filePath);
@@ -124,6 +127,38 @@
       documentStore.frontmatter || FRONTMATTER_DEFAULTS,
       documentStore.body,
     );
+  }
+
+  async function handlePrepareSeo() {
+    if (!documentStore.frontmatter) return;
+    if (isSeoComplete(documentStore.frontmatter)) {
+      alert('SEO fields are already complete.');
+      return;
+    }
+    if (!settingsStore.hasValidKey) {
+      alert('Add an AI API key in Settings before generating SEO.');
+      return;
+    }
+
+    seoLoading = true;
+    try {
+      const frontmatter = getFrontmatterForSave();
+      const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
+      const draft = await adapter.generateSeoDraft({
+        frontmatter,
+        fieldOrder: documentStore.fieldOrder,
+        body: documentStore.body,
+        filePath: documentStore.filePath,
+      });
+      const merged = mergeSeoDraft(frontmatter, draft);
+      documentStore.replaceFrontmatter(merged);
+      documentStore.patchField('SEO_TAGS', merged.SEO_TAGS);
+      alert('SEO draft generated. Review the SEO fields in the YAML panel, then save before export/posting.');
+    } catch (e) {
+      alert('SEO generation failed: ' + (e instanceof Error ? e.message : e));
+    } finally {
+      seoLoading = false;
+    }
   }
 
   async function handleSave() {
@@ -267,6 +302,14 @@
     </button>
     <button onclick={handleSaveAs} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
       Save as...
+    </button>
+    <button
+      onclick={handlePrepareSeo}
+      disabled={!documentStore.frontmatter || seoLoading}
+      class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700 disabled:opacity-50 disabled:cursor-default"
+      title="Generate SEO metadata before export/posting"
+    >
+      {seoLoading ? 'SEO…' : 'Prepare SEO'}
     </button>
     <button
       onclick={() => showRecents = true}
