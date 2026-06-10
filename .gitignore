@@ -6,6 +6,7 @@ npm-debug.log*
 node_modules
 dist
 dist-ssr
+.worktrees
 *.local
 
 # Environment variables with secrets
