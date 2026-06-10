@@ -108,7 +108,6 @@ export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFil
     const selected = await openDialog({
       title: 'Open Markdown File',
       multiple: false,
-      filters: [{ name: 'Markdown', extensions: STACKED_ARTICLE_SAVE_EXTENSIONS }],
     });
     const filePath = Array.isArray(selected) ? selected[0] : selected;
     if (!filePath) throw new Error('No file selected');
