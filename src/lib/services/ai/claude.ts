@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
 import { buildResearchPrompt } from './context';
 import type { AIAdapter, SearchResult, Citation, ArticleContext } from './adapter';
 
@@ -33,5 +34,22 @@ export class ClaudeAdapter implements AIAdapter {
     const citations: Citation[] = urls.map(url => ({ title: url, url, snippet: '' }));
 
     return { summary: summary.trim(), citations, query };
+  }
+
+  async generateSeoDraft(context: ArticleContext) {
+    const response = await this.client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      messages: [
+        {
+          role: 'user',
+          content: buildSeoPrompt(context),
+        },
+      ],
+    });
+
+    const textBlocks = response.content.filter(b => b.type === 'text');
+    const raw = textBlocks.map(b => (b as { type: 'text'; text: string }).text).join('\n');
+    return parseSeoDraftJson(raw);
   }
 }

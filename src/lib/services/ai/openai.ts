@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
 import { buildResearchPrompt } from './context';
 import type { AIAdapter, SearchResult, Citation, ArticleContext } from './adapter';
 
@@ -31,5 +32,14 @@ export class OpenAIAdapter implements AIAdapter {
       );
 
     return { summary: summary.trim(), citations, query };
+  }
+
+  async generateSeoDraft(context: ArticleContext) {
+    const response = await (this.client as any).responses.create({
+      model: 'gpt-4o-mini',
+      input: buildSeoPrompt(context),
+    });
+
+    return parseSeoDraftJson(response.output_text ?? '');
   }
 }

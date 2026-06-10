@@ -1,4 +1,5 @@
 import type { ArticleFrontmatter } from '$lib/types/article';
+import type { SeoDraft } from '$lib/services/seo';
 
 export interface Citation {
   title: string;
@@ -21,6 +22,7 @@ export interface ArticleContext {
 
 export interface AIAdapter {
   search(query: string, context?: ArticleContext): Promise<SearchResult>;
+  generateSeoDraft(context: ArticleContext): Promise<SeoDraft>;
 }
 
 // Static imports — both are small; the unused adapter is tree-shaken at build time.
