@@ -44,7 +44,7 @@
   <div class="flex items-center justify-between gap-2 p-3 border-b border-dark-600">
     <div>
       <h3 class="text-xs font-semibold text-dark-300 uppercase tracking-wide">Hero Artwork</h3>
-      <p class="text-xs text-dark-500">./_artwork/hero</p>
+      <p class="text-xs text-dark-500">./artwork</p>
     </div>
     <button
       onclick={() => loadArtwork(currentFilePath)}
@@ -61,7 +61,7 @@
     {:else if error}
       <p class="text-sm text-red-500">{error}</p>
     {:else if images.length === 0}
-      <p class="text-sm text-dark-400">No images found in <code>./_artwork/hero</code>.</p>
+      <p class="text-sm text-dark-400">No images found in <code>./artwork</code>.</p>
     {:else}
       <div class="grid grid-cols-2 gap-3">
         {#each images as image (image.path)}

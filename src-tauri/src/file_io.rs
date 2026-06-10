@@ -125,26 +125,19 @@ fn base64_encode(bytes: &[u8]) -> String {
 fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, String> {
     if let Some(article_path) = article_path {
         let article_path = PathBuf::from(article_path);
-        let start_dir = if article_path.is_dir() {
-            article_path.as_path()
+        let article_dir = if article_path.is_dir() {
+            article_path
         } else {
-            article_path.parent().unwrap_or_else(|| Path::new(""))
+            article_path.parent().unwrap_or_else(|| Path::new("")).to_path_buf()
         };
 
-        for ancestor in start_dir.ancestors() {
-            let candidate = ancestor.join("_artwork").join("hero");
-            if candidate.is_dir() {
-                return Ok(Some(candidate));
-            }
+        let candidate = article_dir.join("artwork");
+        if candidate.is_dir() {
+            return Ok(Some(candidate));
         }
     }
 
-    let candidate = std::env::current_dir()
-        .map_err(|e| format!("failed to resolve current directory: {}", e))?
-        .join("_artwork")
-        .join("hero");
-
-    Ok(candidate.is_dir().then_some(candidate))
+    Ok(None)
 }
 
 #[tauri::command]
@@ -390,7 +383,7 @@ mod tests {
     }
 
     #[test]
-    fn test_find_artwork_dir_walks_up_from_article_path() {
+    fn test_find_artwork_dir_finds_article_own_folder() {
         let root = std::env::temp_dir().join(format!(
             "stacked-artwork-test-{}",
             std::time::SystemTime::now()
@@ -398,15 +391,37 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
-        let article_dir = root.join("Checkmate");
-        let artwork_dir = root.join("_artwork").join("hero");
-        std::fs::create_dir_all(&article_dir).unwrap();
+        // Article folder contains its own artwork subfolder
+        let article_dir = root.join("I Can Burn a Rainbow");
+        let artwork_dir = article_dir.join("artwork");
+        // Section-level artwork folder should NOT be picked up
+        let section_artwork_dir = root.join("artwork");
         std::fs::create_dir_all(&artwork_dir).unwrap();
+        std::fs::create_dir_all(&section_artwork_dir).unwrap();
 
-        let article_path = article_dir.join("Checkmate.md");
+        let article_path = article_dir.join("I Can Burn a Rainbow.md");
         let found = find_artwork_dir(Some(article_path.to_str().unwrap())).unwrap();
 
         assert_eq!(found, Some(artwork_dir));
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_find_artwork_dir_returns_none_when_missing() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-artwork-test-none-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let article_dir = root.join("My Article");
+        std::fs::create_dir_all(&article_dir).unwrap();
+
+        let article_path = article_dir.join("My Article.md");
+        let found = find_artwork_dir(Some(article_path.to_str().unwrap())).unwrap();
+
+        assert_eq!(found, None);
         std::fs::remove_dir_all(root).unwrap();
     }
 
