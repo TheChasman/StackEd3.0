@@ -51,15 +51,6 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            // Forward the file path from the second instance to this one
-            if let Some(path) = file_io::first_markdown_arg(argv.into_iter()) {
-                let _ = app.emit("stacked:open-file", path);
-            }
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.set_focus();
-            }
-        }))
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
@@ -71,6 +62,14 @@ pub fn run() {
             }
             #[cfg(desktop)]
             {
+                app.handle().plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+                    if let Some(path) = file_io::first_markdown_arg(argv.into_iter()) {
+                        let _ = app.emit("stacked:open-file", path);
+                    }
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.set_focus();
+                    }
+                }))?;
                 let menu = build_menu(app.handle())?;
                 app.handle().set_menu(menu)?;
             }
