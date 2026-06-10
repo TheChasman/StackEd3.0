@@ -223,13 +223,20 @@
   function handleSaveEvent() { handleSave(); }
 
   function handleKeyDown(e: KeyboardEvent) {
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey) {
-      if (e.key === 'ArrowRight') {
+    if (e.metaKey || e.ctrlKey) {
+      if (e.key === 't') {
         e.preventDefault();
-        themeStore.cycleNext();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        themeStore.cyclePrev();
+        void handleNew();
+        return;
+      }
+      if (e.shiftKey) {
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          themeStore.cycleNext();
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          themeStore.cyclePrev();
+        }
       }
     }
   }

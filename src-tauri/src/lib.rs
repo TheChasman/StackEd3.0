@@ -8,6 +8,7 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let menu = Menu::default(app)?;
 
     let new_item = MenuItem::with_id(app, "file-new", "New…", true, Some("CmdOrCtrl+N"))?;
+    let new_tab_item = MenuItem::with_id(app, "file-new-tab", "New Tab", true, Some("CmdOrCtrl+T"))?;
     let open_item = MenuItem::with_id(app, "file-open", "Open…", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(app, "file-save", "Save", true, Some("CmdOrCtrl+S"))?;
     let save_as_item = MenuItem::with_id(
@@ -25,6 +26,7 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         true,
         &[
             &new_item,
+            &new_tab_item,
             &open_item,
             &PredefinedMenuItem::separator(app)?,
             &save_item,
@@ -77,6 +79,7 @@ pub fn run() {
         .on_menu_event(|app, event| {
             let event_name = match event.id().as_ref() {
                 "file-new" => Some("stacked:menu-new"),
+                "file-new-tab" => Some("stacked:menu-new"),
                 "file-open" => Some("stacked:menu-open"),
                 "file-save" => Some("stacked:menu-save"),
                 "file-save-as" => Some("stacked:menu-save-as"),
