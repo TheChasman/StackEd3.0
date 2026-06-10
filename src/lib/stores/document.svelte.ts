@@ -1,22 +1,98 @@
 import type { ArticleFrontmatter } from '$lib/types/article';
+import type { ParsedFile } from '$lib/types/article';
+
+interface TabState {
+  frontmatter: ArticleFrontmatter | null;
+  body: string;
+  fieldOrder: string[];
+  fileHandle: FileSystemFileHandle | null;
+  filePath: string | null;
+  dirty: boolean;
+  loadVersion: number;
+}
+
+export interface TabMeta {
+  title: string;
+  filePath: string | null;
+  dirty: boolean;
+}
+
+function emptyTab(): TabState {
+  return {
+    frontmatter: null,
+    body: '',
+    fieldOrder: [],
+    fileHandle: null,
+    filePath: null,
+    dirty: false,
+    loadVersion: 0,
+  };
+}
+
+function tabTitle(tab: TabState): string {
+  if (tab.frontmatter?.TITLE?.trim()) return tab.frontmatter.TITLE.trim();
+  if (tab.filePath) return tab.filePath.split('/').pop()?.replace(/\.md$/i, '') ?? 'Untitled';
+  return 'Untitled';
+}
 
 class DocumentStore {
-  frontmatter = $state<ArticleFrontmatter | null>(null);
-  body = $state('');
-  fieldOrder = $state<string[]>([]);
-  fileHandle = $state<FileSystemFileHandle | null>(null);
-  filePath = $state<string | null>(null);
-  dirty = $state(false);
-  loadVersion = $state(0);
+  private _tabs = $state<TabState[]>([emptyTab()]);
+  private _activeIndex = $state(0);
+
+  get activeIndex(): number {
+    return this._activeIndex;
+  }
+
+  get tabCount(): number {
+    return this._tabs.length;
+  }
+
+  get tabMetas(): TabMeta[] {
+    return this._tabs.map(tab => ({
+      title: tabTitle(tab),
+      filePath: tab.filePath,
+      dirty: tab.dirty,
+    }));
+  }
+
+  // Active-tab proxy getters
+  get frontmatter(): ArticleFrontmatter | null {
+    return this._tabs[this._activeIndex].frontmatter;
+  }
+
+  get body(): string {
+    return this._tabs[this._activeIndex].body;
+  }
+
+  get fieldOrder(): string[] {
+    return this._tabs[this._activeIndex].fieldOrder;
+  }
+
+  get fileHandle(): FileSystemFileHandle | null {
+    return this._tabs[this._activeIndex].fileHandle;
+  }
+
+  get filePath(): string | null {
+    return this._tabs[this._activeIndex].filePath;
+  }
+
+  get dirty(): boolean {
+    return this._tabs[this._activeIndex].dirty;
+  }
+
+  get loadVersion(): number {
+    return this._tabs[this._activeIndex].loadVersion;
+  }
 
   get wordCount(): number {
-    return this.body
-      .replace(/#{1,6}\s/g, '')       // strip heading markers
-      .replace(/<[^>]+>/g, ' ')        // strip HTML tags
+    return this._tabs[this._activeIndex].body
+      .replace(/#{1,6}\s/g, '')
+      .replace(/<[^>]+>/g, ' ')
       .split(/\s+/)
       .filter(Boolean).length;
   }
 
+  /** Load a file into the active tab (used for saves / initial load). */
   load(
     frontmatter: ArticleFrontmatter,
     body: string,
@@ -25,44 +101,90 @@ class DocumentStore {
     filePath: string | null = null,
     dirty = false,
   ): void {
-    this.frontmatter = frontmatter;
-    this.body = body;
-    this.fieldOrder = fieldOrder;
-    this.fileHandle = fileHandle;
-    this.filePath = filePath;
-    this.dirty = dirty;
-    this.loadVersion += 1;
+    const tab = this._tabs[this._activeIndex];
+    tab.frontmatter = frontmatter;
+    tab.body = body;
+    tab.fieldOrder = fieldOrder;
+    tab.fileHandle = fileHandle;
+    tab.filePath = filePath;
+    tab.dirty = dirty;
+    tab.loadVersion += 1;
+  }
+
+  /** Open a parsed file in a new tab.  Reuses the active tab if it is blank and untouched. */
+  openInNewTab(parsed: ParsedFile): void {
+    const current = this._tabs[this._activeIndex];
+    const reuseEmpty =
+      this._tabs.length === 1 &&
+      current.frontmatter === null &&
+      current.body === '' &&
+      !current.dirty;
+
+    if (reuseEmpty) {
+      this.load(
+        parsed.frontmatter,
+        parsed.body,
+        parsed.fieldOrder,
+        parsed.fileHandle ?? null,
+        parsed.filePath ?? null,
+        parsed.dirty ?? false,
+      );
+      return;
+    }
+
+    this._tabs.push({
+      frontmatter: parsed.frontmatter,
+      body: parsed.body,
+      fieldOrder: parsed.fieldOrder,
+      fileHandle: parsed.fileHandle ?? null,
+      filePath: parsed.filePath ?? null,
+      dirty: parsed.dirty ?? false,
+      loadVersion: 1,
+    });
+    this._activeIndex = this._tabs.length - 1;
+  }
+
+  switchTab(index: number): void {
+    if (index >= 0 && index < this._tabs.length) {
+      this._activeIndex = index;
+    }
+  }
+
+  closeTab(index: number): void {
+    if (this._tabs.length === 1) {
+      this._tabs[0] = emptyTab();
+      return;
+    }
+    this._tabs.splice(index, 1);
+    if (this._activeIndex >= this._tabs.length) {
+      this._activeIndex = this._tabs.length - 1;
+    }
   }
 
   setBody(body: string): void {
-    this.body = body;
-    this.dirty = true;
+    this._tabs[this._activeIndex].body = body;
+    this._tabs[this._activeIndex].dirty = true;
   }
 
-  /** Update a frontmatter field. */
   patchField(field: keyof ArticleFrontmatter, value: unknown): void {
-    if (!this.frontmatter) return;
-    this.frontmatter = { ...this.frontmatter, [field]: value };
-    this.dirty = true;
+    const tab = this._tabs[this._activeIndex];
+    if (!tab.frontmatter) return;
+    tab.frontmatter = { ...tab.frontmatter, [field]: value };
+    tab.dirty = true;
   }
 
   replaceFrontmatter(frontmatter: ArticleFrontmatter): void {
-    this.frontmatter = frontmatter;
-    this.dirty = true;
+    this._tabs[this._activeIndex].frontmatter = frontmatter;
+    this._tabs[this._activeIndex].dirty = true;
   }
 
   markClean(): void {
-    this.dirty = false;
+    this._tabs[this._activeIndex].dirty = false;
   }
 
   reset(): void {
-    this.frontmatter = null;
-    this.body = '';
-    this.fieldOrder = [];
-    this.fileHandle = null;
-    this.filePath = null;
-    this.dirty = false;
-    this.loadVersion += 1;
+    this._tabs = [emptyTab()];
+    this._activeIndex = 0;
   }
 }
 

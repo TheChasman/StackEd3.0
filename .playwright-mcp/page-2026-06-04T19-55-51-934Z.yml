@@ -1,0 +1,187 @@
+- generic [ref=e2]:
+  - iframe
+  - generic [ref=e3]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - heading "Just the FAQs" [level=1] [ref=e9]:
+          - link "Just the FAQs" [ref=e10] [cursor=pointer]:
+            - /url: /
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - button "Search" [ref=e16] [cursor=pointer]:
+              - img [ref=e17]
+            - button "Share Publication" [ref=e20] [cursor=pointer]:
+              - img [ref=e21]
+          - button "Subscribe" [ref=e24] [cursor=pointer]
+          - button "Sign in" [ref=e25] [cursor=pointer]
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - button "Home" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]: Home
+          - button "☕ Support me on Ko-fi!" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34]: ☕ Support me on Ko-fi!
+          - button "Archive" [ref=e36] [cursor=pointer]:
+            - generic [ref=e37]: Archive
+          - button "About" [ref=e39] [cursor=pointer]:
+            - generic [ref=e40]: About
+        - generic:
+          - button:
+            - img
+        - generic:
+          - button:
+            - img
+    - generic [ref=e44]:
+      - heading "Page not found" [level=2] [ref=e45]
+      - generic [ref=e47]:
+        - 'article "Post preview for Video Game FAQ: Does Steam Delete Video Game Reviews?" [ref=e50] [cursor=pointer]':
+          - generic [ref=e52]:
+            - 'link "Video Game FAQ: Does Steam Delete Video Game Reviews?" [ref=e54]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/video-game-faq-does-steam-delete-reviews
+            - 'link "Q: Does Valve delete Steam video game reviews? A: Yes. But stringent requirements need to be met before a user review of a video game can be considered…" [ref=e56]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/video-game-faq-does-steam-delete-reviews
+            - time [ref=e58]: Mar 5, 2024
+            - generic [ref=e60]:
+              - button "Like" [ref=e62]:
+                - img [ref=e63]:
+                  - img [ref=e65]
+              - button "View comments (0)" [ref=e67]:
+                - img [ref=e68]:
+                  - img [ref=e70]
+              - button [ref=e72]:
+                - img [ref=e73]
+              - button [ref=e76]:
+                - img [ref=e77]
+        - heading "February 2024" [level=3] [ref=e86]
+        - 'article "Post preview for Personal Finance FAQ: What is the TFSA Limit for 2024?" [ref=e89] [cursor=pointer]':
+          - generic [ref=e91]:
+            - 'link "Personal Finance FAQ: What is the TFSA Limit for 2024?" [ref=e93]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/personal-finance-faq-what-is-the
+            - 'link "Q: What is the tax-free savings account limit for 2024?" [ref=e95]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/personal-finance-faq-what-is-the
+            - time [ref=e97]: Feb 17, 2024
+            - generic [ref=e99]:
+              - button "Like" [ref=e101]:
+                - img [ref=e102]:
+                  - img [ref=e104]
+              - button "View comments (0)" [ref=e106]:
+                - img [ref=e107]:
+                  - img [ref=e109]
+              - button "1" [ref=e111]:
+                - img [ref=e112]
+                - generic [ref=e115]: "1"
+              - button [ref=e116]:
+                - img [ref=e117]
+        - heading "August 2023" [level=3] [ref=e126]
+        - generic [ref=e128]:
+          - 'article "Post preview for Comic Book FAQ: Who Is Eric July?" [ref=e129] [cursor=pointer]':
+            - generic [ref=e131]:
+              - 'link "Comic Book FAQ: Who Is Eric July?" [ref=e133]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/comic-book-faq-who-is-eric-july
+              - 'link "Q: Who is Eric July? A: Eric July is an American comic book writer, as well as a musician, YouTuber, and political commentator. He’s the founder and…" [ref=e135]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/comic-book-faq-who-is-eric-july
+              - time [ref=e137]: Aug 25, 2023
+              - generic [ref=e139]:
+                - button "Like" [ref=e141]:
+                  - img [ref=e142]:
+                    - img [ref=e144]
+                - button "View comments (0)" [ref=e146]:
+                  - img [ref=e147]:
+                    - img [ref=e149]
+                - button [ref=e151]:
+                  - img [ref=e152]
+                - button [ref=e155]:
+                  - img [ref=e156]
+          - 'article "Post preview for Comic Book FAQ: What is Comicsgate?" [ref=e162] [cursor=pointer]':
+            - generic [ref=e164]:
+              - 'link "Comic Book FAQ: What is Comicsgate?" [ref=e166]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/comic-book-faq-what-is-comicsgate
+              - 'link "Q: What is Comicsgate? A: Objectively, Comicsgate is an astroturfing campaign designed to cater to and take advantage of an underserved portion of the…" [ref=e168]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/comic-book-faq-what-is-comicsgate
+              - time [ref=e170]: Aug 16, 2023
+              - generic [ref=e172]:
+                - button "Like" [ref=e174]:
+                  - img [ref=e175]:
+                    - img [ref=e177]
+                - button "View comments (0)" [ref=e179]:
+                  - img [ref=e180]:
+                    - img [ref=e182]
+                - button [ref=e184]:
+                  - img [ref=e185]
+                - button [ref=e188]:
+                  - img [ref=e189]
+          - 'article "Post preview for Substack Image Size FAQ: The Definitive Guide" [ref=e195] [cursor=pointer]':
+            - generic [ref=e197]:
+              - 'link "Substack Image Size FAQ: The Definitive Guide" [ref=e199]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/substack-image-size-faq-the-definitive
+              - 'link "Hero Layout Q: What is the Feature layout image size? A: The featured image for the Feature layout is 642 × 362 pixels. Q: What are the Newspaper layout…" [ref=e201]':
+                - /url: https://frequentlyaskedquestions.substack.com/p/substack-image-size-faq-the-definitive
+              - time [ref=e203]: Aug 6, 2023
+              - generic [ref=e205]:
+                - button "Like (70)" [ref=e207]:
+                  - img [ref=e208]:
+                    - img [ref=e210]
+                  - generic [ref=e212]: "70"
+                - button "View comments (20)" [ref=e213]:
+                  - img [ref=e214]:
+                    - img [ref=e216]
+                  - generic [ref=e218]: "20"
+                - button "3" [ref=e219]:
+                  - img [ref=e220]
+                  - generic [ref=e223]: "3"
+                - button [ref=e224]:
+                  - img [ref=e225]
+        - heading "July 2023" [level=3] [ref=e234]
+        - 'article "Post preview for World of Warcraft FAQ: What is Glorbo?" [ref=e237] [cursor=pointer]':
+          - generic [ref=e239]:
+            - 'link "World of Warcraft FAQ: What is Glorbo?" [ref=e241]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/world-of-warcraft-faq-what-is-glorbo
+            - 'link "Q: What is Glorbo? A: Glorbo is a fake character that was alleged to have been introduced to the game World of Warcraft (WoW) in a thread full of…" [ref=e243]':
+              - /url: https://frequentlyaskedquestions.substack.com/p/world-of-warcraft-faq-what-is-glorbo
+            - time [ref=e245]: Jul 25, 2023
+            - generic [ref=e247]:
+              - button "Like" [ref=e249]:
+                - img [ref=e250]:
+                  - img [ref=e252]
+              - button "View comments (0)" [ref=e254]:
+                - img [ref=e255]:
+                  - img [ref=e257]
+              - button [ref=e259]:
+                - img [ref=e260]
+              - button [ref=e263]:
+                - img [ref=e264]
+    - generic [ref=e271]:
+      - generic [ref=e272]:
+        - generic [ref=e273]: © 2026 Substack Inc
+        - text: ·
+        - link "Privacy" [ref=e274] [cursor=pointer]:
+          - /url: https://substack.com/privacy
+        - text: ∙
+        - link "Terms" [ref=e275] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: ∙
+        - link "Collection notice" [ref=e276] [cursor=pointer]:
+          - /url: https://substack.com/ccpa#personal-data-collected
+      - generic [ref=e277]:
+        - link "Start your Substack" [ref=e278] [cursor=pointer]:
+          - /url: https://substack.com/signup?utm_source=substack&utm_medium=web&utm_content=footer
+          - img [ref=e279]
+          - text: Start your Substack
+        - link "Get the app" [ref=e284] [cursor=pointer]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=web-footer-button
+      - generic [ref=e285]:
+        - link "Substack" [ref=e286] [cursor=pointer]:
+          - /url: https://substack.com
+        - text: is the home for great culture
+    - generic [ref=e288]:
+      - heading "Cookie Policy" [level=4] [ref=e289]
+      - generic [ref=e290]:
+        - text: We use cookies to improve your experience, for analytics, and for marketing. You can accept, reject, or manage your preferences. See our
+        - link "privacy policy" [ref=e291] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: .
+      - generic [ref=e292]:
+        - button "Manage" [ref=e293] [cursor=pointer]
+        - button "Reject" [ref=e294] [cursor=pointer]
+        - button "Accept" [ref=e295] [cursor=pointer]
+  - region "Notifications (F8)":
+    - list

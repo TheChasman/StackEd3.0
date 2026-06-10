@@ -1,0 +1,755 @@
+- generic [ref=e2]:
+  - iframe
+  - generic [ref=e3]:
+    - generic [ref=e7]:
+      - link "Dude I'm Writing" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "Dude I'm Writing" [ref=e13]
+      - heading "Dude I'm Writing" [level=1] [ref=e16]:
+        - link "Dude I'm Writing" [ref=e17] [cursor=pointer]:
+          - /url: /
+          - img "Dude I'm Writing" [ref=e18]
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - button "Search" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+          - button "Share Publication" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+        - button "Subscribe" [ref=e32] [cursor=pointer]
+        - button "Sign in" [ref=e33] [cursor=pointer]
+    - main "Post" [ref=e36]:
+      - article [ref=e40]:
+        - dialog "Subscribe modal" [ref=e42]:
+          - generic [ref=e43]:
+            - button "close" [ref=e44] [cursor=pointer]:
+              - img [ref=e45]
+            - generic "User" [ref=e50]:
+              - img "User's avatar" [ref=e52]
+            - generic [ref=e53]:
+              - generic [ref=e54]: Discover more from Dude I'm Writing
+              - generic [ref=e55]: A community of UC Santa Barbara undergraduate writers and content creators.
+            - generic [ref=e57]:
+              - textbox "Enter your email..." [ref=e59]
+              - button "Subscribe" [ref=e60] [cursor=pointer]
+              - generic [ref=e63]:
+                - text: By subscribing, you agree Substack's
+                - link "Terms of Use" [ref=e64] [cursor=pointer]:
+                  - /url: https://substack.com/tos
+                - text: ", and acknowledge its"
+                - link "Information Collection Notice" [ref=e65] [cursor=pointer]:
+                  - /url: https://substack.com/ccpa#personal-data-collected
+                - text: and
+                - link "Privacy Policy" [ref=e66] [cursor=pointer]:
+                  - /url: https://substack.com/privacy
+                - text: .
+          - generic [ref=e68]: Already have an account? Sign in
+        - region "Post header" [ref=e69]:
+          - heading "How to Use the Substack Editor" [level=1] [ref=e70]
+          - heading "A brief run through, with links!" [level=3] [ref=e71]
+          - region "Post UFI" [ref=e72]:
+            - generic [ref=e74]:
+              - link "View Alison Williams's profile" [ref=e79] [cursor=pointer]:
+                - /url: https://substack.com/@alisonwilliams
+                - generic "Alison Williams" [ref=e81]:
+                  - img "Alison Williams's avatar" [ref=e83]
+              - generic [ref=e84]:
+                - link "Alison Williams" [ref=e87] [cursor=pointer]:
+                  - /url: https://substack.com/@alisonwilliams
+                - generic [ref=e89]: Feb 17, 2026
+            - generic [ref=e90]:
+              - generic [ref=e91]:
+                - button "Like (1)" [ref=e93] [cursor=pointer]:
+                  - img [ref=e94]:
+                    - img [ref=e96]
+                  - generic [ref=e98]: "1"
+                - button "View comments (0)" [ref=e99] [cursor=pointer]:
+                  - img [ref=e100]:
+                    - img [ref=e102]
+                - button "1" [ref=e104] [cursor=pointer]:
+                  - img [ref=e105]
+                  - generic [ref=e108]: "1"
+              - button "Share" [ref=e110] [cursor=pointer]:
+                - generic [ref=e111]: Share
+        - generic [ref=e112]:
+          - button "Table of Contents" [ref=e113] [cursor=pointer]
+          - generic [ref=e126]:
+            - figure [ref=e128]:
+              - link "photo of black and brown cassette tape" [ref=e129]:
+                - /url: https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzMDAzMzh8MHwxfHNlYXJjaHw1MXx8cmFuZG9tfGVufDB8fHx8MTc3MTI4NjY0Nnww&ixlib=rb-4.1.0&q=80&w=1080
+                - generic [ref=e130]:
+                  - img "photo of black and brown cassette tape" [ref=e132]
+                  - generic [ref=e134]:
+                    - button [ref=e135] [cursor=pointer]:
+                      - img [ref=e136]
+                    - button [ref=e138] [cursor=pointer]:
+                      - img [ref=e139]
+            - separator [ref=e141]
+            - heading "Hi! I'm writing this in a Draft Post on my Dashboard. Link" [level=3] [ref=e142]:
+              - text: Hi! I'm writing this in a
+              - strong [ref=e143]: Draft Post
+              - text: on my
+              - strong [ref=e144]: Dashboard.
+              - button "Link" [ref=e147] [cursor=pointer]:
+                - img [ref=e148]
+            - paragraph [ref=e151]:
+              - text: It will be a
+              - strong [ref=e152]: Draft
+              - text: until I
+              - strong [ref=e153]: Publish
+              - text: it!
+            - separator [ref=e155]
+            - paragraph [ref=e156]:
+              - strong [ref=e157]: Substack Post formatting is pretty simple
+              - text: "- even fewer bells and whistles than Google Docs. It’s"
+              - strong [ref=e158]: linear
+              - text: ", meaning you have to go straight down when you add content and then when you read. You can’t add any side windows or stack two images side-by-side."
+            - paragraph [ref=e159]: But there are still a bunch of nice formatting options!
+            - heading "For example, quotes. Link" [level=3] [ref=e160]:
+              - text: For example,
+              - strong [ref=e161]: quotes
+              - text: .
+              - button "Link" [ref=e164] [cursor=pointer]:
+                - img [ref=e165]
+            - paragraph [ref=e168]: I like a good quote. Who doesn’t?
+            - blockquote [ref=e169]:
+              - paragraph [ref=e170]:
+                - strong [ref=e171]: Block quotes
+                - text: are a nice way to put a quote or excerpt from a source. They make it clear that it is a quote by the thick line to the left of the text.
+              - paragraph [ref=e172]: You can use this function beyond a quote. You can use it if you want to make a section of text stand out.
+            - generic [ref=e173]:
+              - paragraph [ref=e174]:
+                - strong [ref=e175]: Pull quotes
+                - text: are a bit more elegant, literary.
+              - paragraph [ref=e176]: The double line break is great for longer quotes.
+            - paragraph [ref=e177]:
+              - text: Of course, you can also do
+              - strong [ref=e178]: bold,
+              - emphasis [ref=e179]: italic
+              - text: ", hyper"
+              - link "links" [ref=e180] [cursor=pointer]:
+                - /url: https://www.substack.com
+              - text: ","
+              - strong [ref=e181]
+              - text: and all that good stuff. You’ve got
+              - strong [ref=e182]: Bullet Points
+              - text: and
+              - strong [ref=e183]: Numbering
+              - text: ", and the"
+              - strong [ref=e184]: Style
+              - text: dropdown has six different types of fonts. More on that below.
+            - separator [ref=e186]
+            - heading "A note on spacing & consistency Link" [level=4] [ref=e187]:
+              - text: A note on spacing & consistency
+              - button "Link" [ref=e190] [cursor=pointer]:
+                - img [ref=e191]
+            - paragraph [ref=e194]: Before we go on, a few items to keep in mind.
+            - list [ref=e195]:
+              - listitem [ref=e196]:
+                - paragraph [ref=e197]:
+                  - text: There should
+                  - strong [ref=e198]: only be one space
+                  - text: between a period at the end of a sentence and the following sentence.
+              - listitem [ref=e199]:
+                - paragraph [ref=e200]:
+                  - strong [ref=e201]: Do not indent the first line
+                  - text: of a paragraph. Substack will automatically add a space between your paragraphs, which removes the need for an indent.
+              - listitem [ref=e202]:
+                - paragraph [ref=e203]:
+                  - strong [ref=e204]: Extra spaces between paragraphs
+                  - text: are always an easy way to create sections and/or differentiate between time/space, but you can also add a line instead. Go to the More dropdown on the top right and click
+                  - strong [ref=e205]: Divider
+                  - text: .
+              - listitem [ref=e206]:
+                - paragraph [ref=e207]:
+                  - text: The most important tool in public facing (or any) writing is
+                  - strong [ref=e208]: consistency
+                  - text: . Even if it’s “wrong,” if you use it consistently then I (the reader) may not notice.
+                  - emphasis [ref=e209]: The goal of all writing is to keep the reader’s eyes moving down the page.
+                  - text: Not annoyed by your inconsistent use of double and single spacing or random indentations.
+            - separator [ref=e211]
+            - heading "Headings and Embeddings and Space Between Link" [level=3] [ref=e212]:
+              - text: Headings and Embeddings and Space Between
+              - button "Link" [ref=e215] [cursor=pointer]:
+                - img [ref=e216]
+            - paragraph [ref=e219]:
+              - text: You’ve got your
+              - strong [ref=e220]: Header
+              - text: at the top of the piece, aka the title. Then, you’ve got your
+              - strong [ref=e221]: Subheader
+              - text: .
+              - emphasis [ref=e222]: These two short bits, plus your opening image, are the three most important key visual elements that draw your reader in from the homepage.
+            - paragraph [ref=e223]:
+              - strong [ref=e224]: Think of the text of the Header and Subheader as visual elements rather than words.
+              - text: Remember, you have just a few seconds to engage your reader and get them to click on your post. Those few words need to make a big impact.
+            - paragraph [ref=e225]:
+              - text: Then,you’ve got your
+              - strong [ref=e226]: Headings
+              - text: . Find these up at the
+              - strong [ref=e227]: Style
+              - text: dropdown to the far right of the nav. Style is your basic text. Your body text. You can jeuje up the Style font with
+              - strong [ref=e228]: bold
+              - text: ","
+              - emphasis [ref=e229]: italics
+              - text: ", and the somewhat pointless strikethrough."
+            - heading "You can use different types of Headings in the body of your post to differentiate types, importance and impact of content. Just use the “Style” list in the toolbar and play around. Link" [level=4] [ref=e230]:
+              - text: You can use different types of
+              - strong [ref=e231]: Headings
+              - text: in the body of your post to differentiate types, importance and impact of content. Just use the “Style”
+              - emphasis
+              - text: list in the toolbar and play around.
+              - button "Link" [ref=e234] [cursor=pointer]:
+                - img [ref=e235]
+            - separator [ref=e239]
+            - heading "You can also Embed different types of content, including images, audio, and video. Link" [level=2] [ref=e240]:
+              - text: You can also Embed different types of content, including images, audio, and video.
+              - button "Link" [ref=e243] [cursor=pointer]:
+                - img [ref=e244]
+            - heading "To add an image, just drag it in to the body of the post, or use the image selector tool in the toolbar." [level=5] [ref=e247]
+            - paragraph [ref=e248]:
+              - text: What’s great about Substack and images is that you can add
+              - strong [ref=e249]: an individual image
+              - text: ", or create"
+              - strong [ref=e250]: a gallery of images
+              - text: .
+            - paragraph [ref=e251]:
+              - text: You can add your own images from your
+              - strong [ref=e252]: Photo Library
+              - text: or do a search for open-source images on
+              - link "Openverse" [ref=e253] [cursor=pointer]:
+                - /url: https://openverse.org/
+              - text: or
+              - link "Creative Commons Search" [ref=e254] [cursor=pointer]:
+                - /url: https://search.creativecommons.org/
+              - text: .
+            - paragraph [ref=e255]:
+              - text: Or, they have
+              - strong [ref=e256]: two fab functions
+              - text: ": you can search a"
+              - strong [ref=e257]: Stock Image
+              - text: from
+              - link "Unsplash" [ref=e258] [cursor=pointer]:
+                - /url: https://unsplash.com/
+              - text: (owned by Squarespace), or
+              - strong [ref=e259]: Generate an AI Image
+              - text: . (The AI images can take quite some time to generate.)
+            - paragraph [ref=e260]: Coming from back in the day where I used to have to spend hours searching the interwebs for just the perfect photo for a music video treatment for a director, I love that I can just search up a stock image and voila! It’s there, free, captioned and credited for me.
+            - figure "A single image chosen from the Stock image function." [ref=e262]:
+              - link:
+                - /url: https://substackcdn.com/image/fetch/$s_!2WtI!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Ffec21723-9bb2-4ea6-8fc2-09d17ba3bd1a_4032x3024
+              - generic [ref=e263]: A single image chosen from the Stock image function.
+            - figure [ref=e264]:
+              - generic [ref=e274]: A gallery of editorial roles, including for Magazine Writing 2026
+            - paragraph [ref=e275]:
+              - strong [ref=e276]: For social media embeds
+              - text: like a tweet (X), YouTube video, Vimeo video, Spotify track, or SoundCloud embed, just paste the relevant link on a new line. (Don’t grab the embed code; it won’t work).
+            - link "X avatar for @hamishmckenzie Hamish McKenzie @hamishmckenzie Twitter is an amazing tool and an awful place. 3:40 PM · Dec 15, 2017 1 Repost · 5 Likes" [ref=e277] [cursor=pointer]:
+              - /url: https://twitter.com/hamishmckenzie/status/941694455853101056
+              - generic [ref=e278]:
+                - generic [ref=e279]:
+                  - generic "User" [ref=e281]:
+                    - img "X avatar for @hamishmckenzie" [ref=e283]
+                  - generic [ref=e284]:
+                    - generic [ref=e285]: Hamish McKenzie
+                    - generic [ref=e286]: "@hamishmckenzie"
+                  - img [ref=e287]
+                - generic [ref=e290]: Twitter is an amazing tool and an awful place.
+                - img [ref=e295]
+                - generic [ref=e298]:
+                  - generic [ref=e299]: 3:40 PM · Dec 15, 2017
+                  - separator [ref=e300]
+                  - generic [ref=e301]:
+                    - generic [ref=e302]: 1 Repost
+                    - text: ·
+                    - generic [ref=e303]: 5 Likes
+            - iframe [ref=e306]:
+              - generic [active] [ref=f7e1]:
+                - generic "YouTube Video Player" [ref=f7e3]
+                - generic [ref=f7e5]:
+                  - generic:
+                    - generic:
+                      - button "Play video" [ref=f7e10] [cursor=pointer]
+                      - button "Hide player controls" [ref=f7e12] [cursor=pointer]
+                      - generic [ref=f7e14]:
+                        - generic [ref=f7e19]:
+                          - generic [ref=f7e20]:
+                            - link "How to publish a post on Substack" [ref=f7e21] [cursor=pointer]:
+                              - /url: https://www.youtube.com/watch?v=ZoEUu1XHL7U
+                            - link "Substack" [ref=f7e22] [cursor=pointer]:
+                              - /url: /channel/UCm1ilvByQlcDkuVq1VAxxBg
+                              - generic [ref=f7e23]: Substack
+                          - generic [ref=f7e24]:
+                            - button [ref=f7e25] [cursor=pointer]
+                            - generic [ref=f7e27]:
+                              - generic: Substack
+                              - generic: 23.5k subscribers
+                        - generic [ref=f7e28]:
+                          - button "Copy link" [ref=f7e31] [cursor=pointer]:
+                            - generic [ref=f7e35]:
+                              - img
+                          - link "Watch on YouTube" [ref=f7e42] [cursor=pointer]:
+                            - /url: https://www.youtube.com/watch?v=ZoEUu1XHL7U
+                            - generic [ref=f7e45]:
+                              - text: Watch on
+                              - img [ref=f7e47]:
+                                - generic [ref=f7e49]:
+                                  - img
+            - iframe [ref=e309]:
+              
+            - paragraph
+            - iframe [ref=e310]:
+              - generic [active] [ref=f9e1]:
+                - generic [ref=f9e4]:
+                  - generic [ref=f9e5]:
+                    - img "DAMN. cover" [ref=f9e8] [cursor=pointer]
+                    - button "Play on Spotify" [ref=f9e10] [cursor=pointer]:
+                      - img [ref=f9e11]
+                    - generic [ref=f9e13]:
+                      - heading "DAMN." [level=1] [ref=f9e14]:
+                        - link "DAMN." [ref=f9e18] [cursor=pointer]:
+                          - /url: https://open.spotify.com/album/4eLPsYPBmXABThSJ821sqY?go=1&sp_cid=882b1eff326a2060cd0a11b0c4680c28&utm_source=embed_player_p&utm_medium=desktop
+                      - generic [ref=f9e19]:
+                        - list "Tags" [ref=f9e20]:
+                          - generic "Preview" [ref=f9e21]
+                        - heading "Kendrick Lamar" [level=2] [ref=f9e22]:
+                          - link "Kendrick Lamar" [ref=f9e27] [cursor=pointer]:
+                            - /url: https://open.spotify.com/album/4eLPsYPBmXABThSJ821sqY?go=1&sp_cid=882b1eff326a2060cd0a11b0c4680c28&utm_source=embed_player_p&utm_medium=desktop
+                      - button "Save on Spotify" [ref=f9e29] [cursor=pointer]:
+                        - img [ref=f9e31]
+                        - generic [ref=f9e34]: Save on Spotify
+                    - generic [ref=f9e36]:
+                      - generic [ref=f9e37]:
+                        - button "Previous" [disabled] [ref=f9e38]:
+                          - img [ref=f9e40]
+                        - button "Next" [disabled] [ref=f9e42]:
+                          - img [ref=f9e44]
+                      - button "More" [ref=f9e46] [cursor=pointer]:
+                        - img [ref=f9e47]
+                      - button "Play" [ref=f9e50] [cursor=pointer]:
+                        - img [ref=f9e51]
+                  - list "Track list" [ref=f9e56]:
+                    - listitem [ref=f9e57]:
+                      - button "Play track" [ref=f9e59] [cursor=pointer]:
+                        - generic [ref=f9e60]: "1"
+                      - heading "BLOOD." [level=3] [ref=f9e61]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e62]:
+                        - generic "Explicit" [ref=f9e63]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e64]: 01:58
+                    - listitem [ref=f9e65]:
+                      - button "Play track" [ref=f9e67] [cursor=pointer]:
+                        - generic [ref=f9e68]: "2"
+                      - heading "DNA." [level=3] [ref=f9e69]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e70]:
+                        - generic "Explicit" [ref=f9e71]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e72]: 03:05
+                    - listitem [ref=f9e73]:
+                      - button "Play track" [ref=f9e75] [cursor=pointer]:
+                        - generic [ref=f9e76]: "3"
+                      - heading "YAH." [level=3] [ref=f9e77]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e78]:
+                        - generic "Explicit" [ref=f9e79]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e80]: 02:40
+                    - listitem [ref=f9e81]:
+                      - button "Play track" [ref=f9e83] [cursor=pointer]:
+                        - generic [ref=f9e84]: "4"
+                      - heading "ELEMENT." [level=3] [ref=f9e85]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e86]:
+                        - generic "Explicit" [ref=f9e87]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e88]: 03:28
+                    - listitem [ref=f9e89]:
+                      - button "Play track" [ref=f9e91] [cursor=pointer]:
+                        - generic [ref=f9e92]: "5"
+                      - heading "FEEL." [level=3] [ref=f9e93]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e94]:
+                        - generic "Explicit" [ref=f9e95]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e96]: 03:34
+                    - listitem [ref=f9e97]:
+                      - button "Play track" [ref=f9e99] [cursor=pointer]:
+                        - generic [ref=f9e100]: "6"
+                      - heading "LOYALTY. FEAT. RIHANNA." [level=3] [ref=f9e101]
+                      - heading "Explicit Kendrick Lamar, Rihanna" [level=4] [ref=f9e102]:
+                        - generic "Explicit" [ref=f9e103]: E
+                        - text: Kendrick Lamar, Rihanna
+                      - generic [ref=f9e104]: 03:47
+                    - listitem [ref=f9e105]:
+                      - button "Play track" [ref=f9e107] [cursor=pointer]:
+                        - generic [ref=f9e108]: "7"
+                      - heading "PRIDE." [level=3] [ref=f9e109]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e110]:
+                        - generic "Explicit" [ref=f9e111]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e112]: 04:35
+                    - listitem [ref=f9e113]:
+                      - button "Play track" [ref=f9e115] [cursor=pointer]:
+                        - generic [ref=f9e116]: "8"
+                      - heading "HUMBLE." [level=3] [ref=f9e117]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e118]:
+                        - generic "Explicit" [ref=f9e119]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e120]: 02:57
+                    - listitem [ref=f9e121]:
+                      - button "Play track" [ref=f9e123] [cursor=pointer]:
+                        - generic [ref=f9e124]: "9"
+                      - heading "LUST." [level=3] [ref=f9e125]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e126]:
+                        - generic "Explicit" [ref=f9e127]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e128]: 05:07
+                    - listitem [ref=f9e129]:
+                      - button "Play track" [ref=f9e131] [cursor=pointer]:
+                        - generic [ref=f9e132]: "10"
+                      - heading "LOVE. FEAT. ZACARI." [level=3] [ref=f9e133]
+                      - heading "Kendrick Lamar, Zacari" [level=4] [ref=f9e134]
+                      - generic [ref=f9e135]: 03:33
+                    - listitem [ref=f9e136]:
+                      - button "Play track" [ref=f9e138] [cursor=pointer]:
+                        - generic [ref=f9e139]: "11"
+                      - heading "XXX. FEAT. U2." [level=3] [ref=f9e140]
+                      - heading "Explicit Kendrick Lamar, U2" [level=4] [ref=f9e141]:
+                        - generic "Explicit" [ref=f9e142]: E
+                        - text: Kendrick Lamar, U2
+                      - generic [ref=f9e143]: 04:14
+                    - listitem [ref=f9e144]:
+                      - button "Play track" [ref=f9e146] [cursor=pointer]:
+                        - generic [ref=f9e147]: "12"
+                      - heading "FEAR." [level=3] [ref=f9e148]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e149]:
+                        - generic "Explicit" [ref=f9e150]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e151]: 07:40
+                    - listitem [ref=f9e152]:
+                      - button "Play track" [ref=f9e154] [cursor=pointer]:
+                        - generic [ref=f9e155]: "13"
+                      - heading "GOD." [level=3] [ref=f9e156]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e157]:
+                        - generic "Explicit" [ref=f9e158]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e159]: 04:08
+                    - listitem [ref=f9e160]:
+                      - button "Play track" [ref=f9e162] [cursor=pointer]:
+                        - generic [ref=f9e163]: "14"
+                      - heading "DUCKWORTH." [level=3] [ref=f9e164]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f9e165]:
+                        - generic "Explicit" [ref=f9e166]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f9e167]: 04:08
+                - alert [ref=f9e168]
+            - iframe [ref=e312]:
+              - generic [ref=f10e1]:
+                - generic [ref=f10e5]:
+                  - 'link "UBI, Automation &amp; Society in the US: Andrew Yang &amp; Azeem Azhar in Conversation" [ref=f10e9] [cursor=pointer]':
+                    - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                    - 'generic "UBI, Automation &amp; Society in the US: Andrew Yang &amp; Azeem Azhar in Conversation" [ref=f10e11]'
+                  - generic [ref=f10e14]:
+                    - application "Play" [ref=f10e16] [cursor=pointer]:
+                      - img [ref=f10e17]
+                    - generic [ref=f10e21]:
+                      - link "Exponential View" [ref=f10e22] [cursor=pointer]:
+                        - /url: https://soundcloud.com/exponentialview
+                      - 'link "UBI, Automation & Society in the US: Andrew Yang & Azeem Azhar in Conversation" [ref=f10e23] [cursor=pointer]':
+                        - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                    - link "Play on SoundCloud" [ref=f10e26] [cursor=pointer]:
+                      - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                      - img [ref=f10e27]
+                - link "SoundCloud privacy policy" [ref=f10e35] [cursor=pointer]:
+                  - /url: https://soundcloud.com/pages/privacy
+                  - generic [ref=f10e36]: SoundCloud privacy policy
+                  - text: Privacy policy
+            - separator [ref=e314]
+            - heading "Other neat stuff Link" [level=3] [ref=e315]:
+              - text: Other neat stuff
+              - button "Link" [ref=e318] [cursor=pointer]:
+                - img [ref=e319]
+            - paragraph [ref=e322]:
+              - text: You can also add a
+              - strong [ref=e323]: Button
+              - text: ", with options they give you, like “Subscribe.”"
+            - paragraph [ref=e324]:
+              - text: Or a
+              - strong [ref=e325]: custom Button
+              - text: ", like this one that takes you to my website. (Notice how the spacing on the post gets annoying. Spacing and content positioning on Squarespace leaves rather much to be desired, one of the sacrifices for the ease of the interface for novice users.)"
+            - paragraph [ref=e326] [cursor=pointer]:
+              - link "Check Me Out" [ref=e327]:
+                - /url: https://aliwilliams.info/
+            - paragraph [ref=e328]:
+              - text: They also have functional formatting including
+              - strong [ref=e329]: Financial Chart, LaTeX, Poll
+              - text: and
+              - strong [ref=e330]: Recipe
+              - text: . And my two favorites,
+              - strong [ref=e331]: Poetry
+              - text: and
+              - strong [ref=e332]: Footnote
+              - text: "! (Check out my footnote"
+              - link "1" [ref=e334] [cursor=pointer]:
+                - /url: "#footnote-1"
+              - text: for some important info on
+              - link "attribution" [ref=e335] [cursor=pointer]:
+                - /url: https://www.npr.org/sections/npr-training/2025/05/28/g-s1-64301/if-you-want-people-to-trust-your-reporting-attribute-your-sources
+              - text: ", aka source notation the journalism way.)"
+            - generic [ref=e337]:
+              - text: You can use them as they were intended - but also, you might find a new use for them. As I am doing now with the
+              - strong [ref=e338]: Poetry
+              - text: function Which keeps text in its original spacing
+            - separator [ref=e340]
+            - heading "Publishing Your Post Link" [level=3] [ref=e341]:
+              - text: Publishing Your Post
+              - button "Link" [ref=e344] [cursor=pointer]:
+                - img [ref=e345]
+            - paragraph [ref=e348]: The publishing options can be confusing at first, until you understand why they’re there.
+            - paragraph [ref=e349]:
+              - text: It used to be that the main driver of this platform was as a newsletter subscription. So when you click on
+              - strong [ref=e350]: the Continue Button
+              - emphasis [ref=e351]:
+                - strong [ref=e352]
+              - text: on the top right, you’ll see options for
+              - strong [ref=e353]: Audience, Comments, Tags, Delivery,
+              - text: and
+              - strong [ref=e354]: Scheduling.
+            - paragraph [ref=e355]:
+              - emphasis [ref=e356]:
+                - strong [ref=e357]: For our class, you won’t need any of those.
+            - paragraph [ref=e358]:
+              - text: All you need to do is hit
+              - strong [ref=e359]: Publish
+              - text: ", and your post will go live on your Substack site!"
+            - paragraph [ref=e360]:
+              - text: Then you will be redirected to your Dashboard, where you can continue to make changes and edit to your heart’s content. Every time you make a change, you will click Continue and the same screen will pop up - but this time instead of Publish it will say
+              - strong [ref=e361]: Update
+              - emphasis [ref=e362]:
+                - strong [ref=e363]: .
+            - paragraph [ref=e364]: You can Update as many times as you like.
+            - paragraph [ref=e365]:
+              - text: If you want to
+              - strong [ref=e366]: Delete
+              - text: your post, go to
+              - strong [ref=e367]: Settings
+              - text: on the bottom right, and scroll all the way down. Substack saves everything automatically, but
+              - strong [ref=e368]: once you delete your post, it is gone.
+            - heading "For more information, check out the Help Center. Otherwise, dive in! Link" [level=3] [ref=e369]:
+              - text: For more information, check out the
+              - link "Help Center" [ref=e370] [cursor=pointer]:
+                - /url: https://support.substack.com/hc/en-us
+              - text: . Otherwise, dive in!
+              - button "Link" [ref=e373] [cursor=pointer]:
+                - img [ref=e374]
+            - paragraph
+            - generic [ref=e377]:
+              - link "1" [ref=e378] [cursor=pointer]:
+                - /url: "#footnote-anchor-1"
+              - generic [ref=e379]:
+                - paragraph [ref=e380]:
+                  - text: This is a footnote. Isn’t it cute? Note that magazine and newspaper articles do not, as a rule, use footnotes for sources the same way academic articles and papers do. Rather, they use
+                  - strong [ref=e381]:
+                    - link "attribution" [ref=e382] [cursor=pointer]:
+                      - /url: https://www.npr.org/sections/npr-training/2025/05/28/g-s1-64301/if-you-want-people-to-trust-your-reporting-attribute-your-sources
+                  - text: ", which basically means showing and telling where you got the facts for your story,"
+                  - emphasis [ref=e383]: within the body of the story.
+                - paragraph
+          - separator [ref=e384]
+          - generic [ref=e385]:
+            - generic [ref=e386]:
+              - heading "Subscribe to Dude I'm Writing" [level=4] [ref=e387]
+              - generic [ref=e388]: By Ali Williams · Launched 2 years ago
+              - generic [ref=e389]: A community of UC Santa Barbara undergraduate writers and content creators.
+            - generic [ref=e390]:
+              - generic [ref=e395]:
+                - textbox "Type your email..." [ref=e398]
+                - button "Subscribe" [disabled] [ref=e399]
+              - generic [ref=e402]:
+                - text: By subscribing, you agree Substack's
+                - link "Terms of Use" [ref=e403] [cursor=pointer]:
+                  - /url: https://substack.com/tos
+                - text: ", and acknowledge its"
+                - link "Information Collection Notice" [ref=e404] [cursor=pointer]:
+                  - /url: https://substack.com/ccpa#personal-data-collected
+                - text: and
+                - link "Privacy Policy" [ref=e405] [cursor=pointer]:
+                  - /url: https://substack.com/privacy
+                - text: .
+          - generic [ref=e407]:
+            - generic [ref=e409]:
+              - link "View Ali Williams's profile" [ref=e411] [cursor=pointer]:
+                - /url: https://substack.com/profile/16257196-ali-williams
+                - generic "Ali Williams" [ref=e413]:
+                  - img "Ali Williams's avatar" [ref=e415]
+              - link "View darth.redheadd's profile" [ref=e417] [cursor=pointer]:
+                - /url: https://substack.com/profile/14118063-darthredheadd
+                - generic "darth.redheadd" [ref=e419]:
+                  - img "darth.redheadd's avatar" [ref=e421]
+            - generic [ref=e423]:
+              - generic [ref=e424] [cursor=pointer]: 1 Like
+              - text: ∙
+              - link "1 Restack" [ref=e426] [cursor=pointer]:
+                - /url: https://substack.com/note/p-144919337/restacks?utm_source=substack&utm_content=facepile-restacks
+          - generic [ref=e428]:
+            - generic [ref=e429]:
+              - button "Like (1)" [ref=e431] [cursor=pointer]:
+                - img [ref=e432]:
+                  - img [ref=e434]
+                - generic [ref=e436]: "1"
+              - button "View comments (0)" [ref=e437] [cursor=pointer]:
+                - img [ref=e438]:
+                  - img [ref=e440]
+              - button "1" [ref=e442] [cursor=pointer]:
+                - img [ref=e443]
+                - generic [ref=e446]: "1"
+            - button "Share" [ref=e448] [cursor=pointer]:
+              - generic [ref=e449]: Share
+          - generic [ref=e451]:
+            - button "Previous" [ref=e452] [cursor=pointer]:
+              - img [ref=e453]
+              - text: Previous
+            - button "Next" [ref=e455] [cursor=pointer]:
+              - text: Next
+              - img [ref=e456]
+      - generic [ref=e458]:
+        - generic [ref=e459]:
+          - generic [ref=e460]:
+            - heading "Discussion about this post" [level=4] [ref=e461]
+            - tablist "Select discussion type" [ref=e465]:
+              - tab "Comments" [selected] [ref=e466] [cursor=pointer]
+              - tab "Restacks" [ref=e467] [cursor=pointer]
+          - generic [ref=e472]:
+            - generic "User" [ref=e474]:
+              - img "User's avatar" [ref=e476]
+            - textbox "Write a comment..." [ref=e479]
+        - region "Top Posts Footer" [ref=e482]:
+          - generic [ref=e483]:
+            - navigation "Archive sort tabs" [ref=e484]:
+              - tablist "Tabs" [ref=e487]:
+                - tab "Top" [selected] [ref=e488] [cursor=pointer]
+                - tab "Latest" [ref=e489] [cursor=pointer]
+                - tab "Discussions" [ref=e490] [cursor=pointer]
+              - button "Search" [ref=e492] [cursor=pointer]:
+                - img [ref=e493]
+            - generic [ref=e496]:
+              - generic [ref=e498]:
+                - article "Post preview for Three magazines!" [ref=e499] [cursor=pointer]:
+                  - generic [ref=e501]:
+                    - link "Three magazines!" [ref=e503]:
+                      - /url: https://dudeimwriting.substack.com/p/three-magazines
+                    - link "My proof-of-magazine-life. And now yours!" [ref=e505]:
+                      - /url: https://dudeimwriting.substack.com/p/three-magazines
+                    - generic [ref=e506]:
+                      - time [ref=e507]: Jan 21
+                      - text: •
+                      - link "Ali Williams" [ref=e510]:
+                        - /url: https://substack.com/@alimwilliams
+                    - generic [ref=e512]:
+                      - button "Like (6)" [ref=e514]:
+                        - img [ref=e515]:
+                          - img [ref=e517]
+                        - generic [ref=e519]: "6"
+                      - button "View comments (0)" [ref=e520]:
+                        - img [ref=e521]:
+                          - img [ref=e523]
+                      - button [ref=e525]:
+                        - img [ref=e526]
+                      - button [ref=e529]:
+                        - img [ref=e530]
+                - 'article "Post preview for Reading Response: Designing for Synthesis (Part I)" [ref=e536] [cursor=pointer]':
+                  - generic [ref=e538]:
+                    - 'link "Reading Response: Designing for Synthesis (Part I)" [ref=e540]':
+                      - /url: https://dudeimwriting.substack.com/p/designing-for-synthesis-reading-response
+                    - link "Finding the right format for our forms...starting with the past." [ref=e542]:
+                      - /url: https://dudeimwriting.substack.com/p/designing-for-synthesis-reading-response
+                    - generic [ref=e543]:
+                      - time [ref=e544]: Feb 12
+                      - text: •
+                      - link "Ali Williams" [ref=e547]:
+                        - /url: https://substack.com/@alimwilliams
+                    - generic [ref=e549]:
+                      - button "Like (1)" [ref=e551]:
+                        - img [ref=e552]:
+                          - img [ref=e554]
+                        - generic [ref=e556]: "1"
+                      - button "View comments (3)" [ref=e557]:
+                        - img [ref=e558]:
+                          - img [ref=e560]
+                        - generic [ref=e562]: "3"
+                      - button "2" [ref=e563]:
+                        - img [ref=e564]
+                        - generic [ref=e567]: "2"
+                      - button [ref=e568]:
+                        - img [ref=e569]
+                - article "Post preview for Careers and trends in publishing" [ref=e575] [cursor=pointer]:
+                  - generic [ref=e576]:
+                    - generic [ref=e577]:
+                      - link "Careers and trends in publishing" [ref=e579]:
+                        - /url: https://dudeimwriting.substack.com/p/careers-and-trends-in-publishing
+                      - link "What is the current (& continuously evolving) ecosystem of publishing - be it in print or digital?" [ref=e581]:
+                        - /url: https://dudeimwriting.substack.com/p/careers-and-trends-in-publishing
+                      - generic [ref=e582]:
+                        - time [ref=e583]: Mar 30
+                        - text: •
+                        - link "Ali Williams" [ref=e586]:
+                          - /url: https://substack.com/@alimwilliams
+                      - generic [ref=e588]:
+                        - button "Like (1)" [ref=e590]:
+                          - img [ref=e591]:
+                            - img [ref=e593]
+                          - generic [ref=e595]: "1"
+                        - button "View comments (32)" [ref=e596]:
+                          - img [ref=e597]:
+                            - img [ref=e599]
+                          - generic [ref=e601]: "32"
+                        - button "3" [ref=e602]:
+                          - img [ref=e603]
+                          - generic [ref=e606]: "3"
+                        - button [ref=e607]:
+                          - img [ref=e608]
+                    - generic [ref=e611]:
+                      - button "s" [ref=e613]:
+                        - img "Play" [ref=e614]
+                      - generic [ref=e618]:
+                        - img [ref=e619]
+                        - generic [ref=e622]: 6:47
+              - button "See all" [ref=e624] [cursor=pointer]:
+                - text: See all
+                - img [ref=e625]
+        - generic [ref=e629]:
+          - heading "Ready for more?" [level=3] [ref=e630]
+          - generic [ref=e633]:
+            - textbox "Type your email..." [ref=e636]
+            - button "Subscribe" [disabled] [ref=e637]
+    - generic [ref=e641]:
+      - generic [ref=e643]:
+        - generic [ref=e644]: © 2026 Alison Williams
+        - text: ·
+        - link "Privacy" [ref=e645] [cursor=pointer]:
+          - /url: https://substack.com/privacy
+        - text: ∙
+        - link "Terms" [ref=e646] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: ∙
+        - link "Collection notice" [ref=e647] [cursor=pointer]:
+          - /url: https://substack.com/ccpa#personal-data-collected
+      - generic [ref=e649]:
+        - link "Start your Substack" [ref=e650] [cursor=pointer]:
+          - /url: https://substack.com/signup?utm_source=substack&utm_medium=web&utm_content=footer
+          - img [ref=e651]
+          - text: Start your Substack
+        - link "Get the app" [ref=e656] [cursor=pointer]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=web-footer-button
+      - generic [ref=e658]:
+        - link "Substack" [ref=e659] [cursor=pointer]:
+          - /url: https://substack.com
+        - text: is the home for great culture
+    - generic [ref=e661]:
+      - heading "Cookie Policy" [level=4] [ref=e662]
+      - generic [ref=e663]:
+        - text: We use cookies to improve your experience, for analytics, and for marketing. You can accept, reject, or manage your preferences. See our
+        - link "privacy policy" [ref=e664] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: .
+      - generic [ref=e665]:
+        - button "Manage" [ref=e666] [cursor=pointer]
+        - button "Reject" [ref=e667] [cursor=pointer]
+        - button "Accept" [ref=e668] [cursor=pointer]
+  - region "Notifications (F8)":
+    - list

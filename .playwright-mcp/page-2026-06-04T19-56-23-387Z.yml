@@ -1,0 +1,1250 @@
+- generic [ref=e2]:
+  - iframe
+  - generic [ref=e3]:
+    - generic [ref=e7]:
+      - link "On Substack" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "On Substack" [ref=e13]
+      - heading "On Substack" [level=1] [ref=e16]:
+        - link "On Substack" [ref=e17] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - button "Search" [ref=e23] [cursor=pointer]:
+            - img [ref=e24]
+          - button "Share Publication" [ref=e27] [cursor=pointer]:
+            - img [ref=e28]
+        - button "Subscribe" [ref=e31] [cursor=pointer]
+        - button "Sign in" [ref=e32] [cursor=pointer]
+    - main "Post" [ref=e35]:
+      - article [ref=e39]:
+        - dialog "Subscribe modal" [ref=e41]:
+          - generic [ref=e42]:
+            - button "close" [ref=e43] [cursor=pointer]:
+              - img [ref=e44]
+            - generic "User" [ref=e49]:
+              - img "User's avatar" [ref=e51]
+            - generic [ref=e52]:
+              - generic [ref=e53]: Discover more from On Substack
+              - generic [ref=e54]: Resources, stories, and news for the writers, podcasters, musicians, video creators, and culture makers publishing on Substack.
+            - generic [ref=e56]:
+              - textbox "Enter your email..." [ref=e58]
+              - button "Subscribe" [ref=e59] [cursor=pointer]
+              - generic [ref=e62]:
+                - text: By subscribing, you agree Substack's
+                - link "Terms of Use" [ref=e63] [cursor=pointer]:
+                  - /url: https://substack.com/tos
+                - text: ", and acknowledge its"
+                - link "Information Collection Notice" [ref=e64] [cursor=pointer]:
+                  - /url: https://substack.com/ccpa#personal-data-collected
+                - text: and
+                - link "Privacy Policy" [ref=e65] [cursor=pointer]:
+                  - /url: https://substack.com/privacy
+                - text: .
+          - generic [ref=e67]: Already have an account? Sign in
+        - region "Post header" [ref=e68]:
+          - link "Resources" [ref=e70] [cursor=pointer]:
+            - /url: https://on.substack.com/s/resources/?utm_source=substack&utm_medium=menu
+          - heading "How to use the Substack editor" [level=1] [ref=e71]
+          - region "Post UFI" [ref=e72]:
+            - generic [ref=e77]: Apr 26, 2018
+            - generic [ref=e78]:
+              - generic [ref=e79]:
+                - button "Like (473)" [ref=e81] [cursor=pointer]:
+                  - img [ref=e82]:
+                    - img [ref=e84]
+                  - generic [ref=e86]: "473"
+                - button "View comments (26)" [ref=e87] [cursor=pointer]:
+                  - img [ref=e88]:
+                    - img [ref=e90]
+                  - generic [ref=e92]: "26"
+                - button "20" [ref=e93] [cursor=pointer]:
+                  - img [ref=e94]
+                  - generic [ref=e97]: "20"
+              - button "Share" [ref=e99] [cursor=pointer]:
+                - generic [ref=e100]: Share
+        - generic [ref=e101]:
+          - button "Table of Contents" [ref=e102] [cursor=pointer]
+          - generic [ref=e109]:
+            - paragraph [ref=e110]:
+              - text: Hi! This is a draft post. Did you know that there are a bunch of nice formatting options in this editor?
+              - link "1" [ref=e112] [cursor=pointer]:
+                - /url: "#footnote-1"
+              - text: "For example:"
+            - blockquote [ref=e113]:
+              - paragraph [ref=e114]: Block quotes are a nice way to put a quote or excerpt from a source. They make it clear that it is a quote.
+            - paragraph [ref=e115]:
+              - text: Of course, you can also do
+              - strong [ref=e116]: bold,
+              - emphasis [ref=e117]: italic
+              - text: ","
+              - link "links" [ref=e118] [cursor=pointer]:
+                - /url: https://www.substack.com
+              - text: ", and all that good stuff."
+            - heading "Headings and Embeddings Link" [level=3] [ref=e119]:
+              - text: Headings and Embeddings
+              - button "Link" [ref=e122] [cursor=pointer]:
+                - img [ref=e123]
+            - paragraph [ref=e126]: You can add headings to your posts. Just use the “Style…” dropdown in the toolbar. You can also embed different types of content. To add an image, just drag it in here or use the image selector tool in the toolbar.
+            - paragraph [ref=e127]: You can resize an image by selecting it and dragging the arrows on the bottom-right of the image. Add captions and alt text by clicking on the image, then clicking the three dots on the upper-right.
+            - figure "Check out this caption." [ref=e129]:
+              - link "You can add alt text, too!" [ref=e130]:
+                - /url: https://substackcdn.com/image/fetch/$s_!OM6n!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Fb40f205d-1787-4738-88fa-3ad8e1e70ddc_1536x1024.jpeg
+                - generic [ref=e131]:
+                  - img "You can add alt text, too!" [ref=e133]
+                  - generic [ref=e135]:
+                    - button [ref=e136] [cursor=pointer]:
+                      - img [ref=e137]
+                    - button [ref=e139] [cursor=pointer]:
+                      - img [ref=e140]
+              - generic [ref=e141]: Check out this caption.
+            - paragraph [ref=e142]: To embed a tweet, Instagram photo; YouTube or Vimeo video; Spotify, SoundCloud, or Bandcamp audio track; or GitHub Gist, just paste the relevant link on a new line (don’t grab the embed code; it won’t work).
+            - link "X avatar for @hamishmckenzie Hamish McKenzie @hamishmckenzie Twitter is an amazing tool and an awful place. 3:40 PM · Dec 15, 2017 1 Repost · 5 Likes" [ref=e143] [cursor=pointer]:
+              - /url: https://twitter.com/hamishmckenzie/status/941694455853101056
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - generic "User" [ref=e147]:
+                    - img "X avatar for @hamishmckenzie" [ref=e149]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Hamish McKenzie
+                    - generic [ref=e152]: "@hamishmckenzie"
+                  - img [ref=e153]
+                - generic [ref=e156]: Twitter is an amazing tool and an awful place.
+                - img [ref=e161]
+                - generic [ref=e164]:
+                  - generic [ref=e165]: 3:40 PM · Dec 15, 2017
+                  - separator [ref=e166]
+                  - generic [ref=e167]:
+                    - generic [ref=e168]: 1 Repost
+                    - text: ·
+                    - generic [ref=e169]: 5 Likes
+            - iframe [ref=e172]:
+              - generic [active] [ref=f29e1]:
+                - generic "YouTube Video Player" [ref=f29e3]
+                - generic [ref=f29e5]:
+                  - generic:
+                    - generic:
+                      - button "Play video" [ref=f29e10] [cursor=pointer]
+                      - button "Hide player controls" [ref=f29e12] [cursor=pointer]
+                      - generic [ref=f29e14]:
+                        - generic [ref=f29e19]:
+                          - generic [ref=f29e20]:
+                            - link "How to publish a post on Substack" [ref=f29e21] [cursor=pointer]:
+                              - /url: https://www.youtube.com/watch?v=ZoEUu1XHL7U
+                            - link "Substack" [ref=f29e22] [cursor=pointer]:
+                              - /url: /channel/UCm1ilvByQlcDkuVq1VAxxBg
+                              - generic [ref=f29e23]: Substack
+                          - generic [ref=f29e24]:
+                            - button [ref=f29e25] [cursor=pointer]
+                            - generic [ref=f29e27]:
+                              - generic: Substack
+                              - generic: 23.5k subscribers
+                        - generic [ref=f29e28]:
+                          - button "Copy link" [ref=f29e31] [cursor=pointer]:
+                            - generic [ref=f29e35]:
+                              - img
+                          - link "Watch on YouTube" [ref=f29e42] [cursor=pointer]:
+                            - /url: https://www.youtube.com/watch?v=ZoEUu1XHL7U
+                            - generic [ref=f29e45]:
+                              - text: Watch on
+                              - img [ref=f29e47]:
+                                - generic [ref=f29e49]:
+                                  - img
+            - iframe [ref=e173]:
+              - generic [active] [ref=f30e1]:
+                - generic [ref=f30e4]:
+                  - generic [ref=f30e5]:
+                    - img "DAMN. cover" [ref=f30e8] [cursor=pointer]
+                    - button "Play on Spotify" [ref=f30e10] [cursor=pointer]:
+                      - img [ref=f30e11]
+                    - generic [ref=f30e13]:
+                      - heading "DAMN." [level=1] [ref=f30e14]:
+                        - link "DAMN." [ref=f30e18] [cursor=pointer]:
+                          - /url: https://open.spotify.com/album/4eLPsYPBmXABThSJ821sqY?go=1&sp_cid=882b1eff326a2060cd0a11b0c4680c28&utm_source=embed_player_p&utm_medium=desktop
+                      - generic [ref=f30e19]:
+                        - list "Tags" [ref=f30e20]:
+                          - generic "Preview" [ref=f30e21]
+                        - heading "Kendrick Lamar" [level=2] [ref=f30e22]:
+                          - link "Kendrick Lamar" [ref=f30e27] [cursor=pointer]:
+                            - /url: https://open.spotify.com/album/4eLPsYPBmXABThSJ821sqY?go=1&sp_cid=882b1eff326a2060cd0a11b0c4680c28&utm_source=embed_player_p&utm_medium=desktop
+                      - button "Save on Spotify" [ref=f30e29] [cursor=pointer]:
+                        - img [ref=f30e31]
+                        - generic [ref=f30e34]: Save on Spotify
+                    - generic [ref=f30e36]:
+                      - generic [ref=f30e37]:
+                        - button "Previous" [disabled] [ref=f30e38]:
+                          - img [ref=f30e40]
+                        - button "Next" [disabled] [ref=f30e42]:
+                          - img [ref=f30e44]
+                      - button "More" [ref=f30e46] [cursor=pointer]:
+                        - img [ref=f30e47]
+                      - button "Play" [ref=f30e50] [cursor=pointer]:
+                        - img [ref=f30e51]
+                  - list "Track list" [ref=f30e56]:
+                    - listitem [ref=f30e57]:
+                      - button "Play track" [ref=f30e59] [cursor=pointer]:
+                        - generic [ref=f30e60]: "1"
+                      - heading "BLOOD." [level=3] [ref=f30e61]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e62]:
+                        - generic "Explicit" [ref=f30e63]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e64]: 01:58
+                    - listitem [ref=f30e65]:
+                      - button "Play track" [ref=f30e67] [cursor=pointer]:
+                        - generic [ref=f30e68]: "2"
+                      - heading "DNA." [level=3] [ref=f30e69]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e70]:
+                        - generic "Explicit" [ref=f30e71]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e72]: 03:05
+                    - listitem [ref=f30e73]:
+                      - button "Play track" [ref=f30e75] [cursor=pointer]:
+                        - generic [ref=f30e76]: "3"
+                      - heading "YAH." [level=3] [ref=f30e77]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e78]:
+                        - generic "Explicit" [ref=f30e79]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e80]: 02:40
+                    - listitem [ref=f30e81]:
+                      - button "Play track" [ref=f30e83] [cursor=pointer]:
+                        - generic [ref=f30e84]: "4"
+                      - heading "ELEMENT." [level=3] [ref=f30e85]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e86]:
+                        - generic "Explicit" [ref=f30e87]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e88]: 03:28
+                    - listitem [ref=f30e89]:
+                      - button "Play track" [ref=f30e91] [cursor=pointer]:
+                        - generic [ref=f30e92]: "5"
+                      - heading "FEEL." [level=3] [ref=f30e93]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e94]:
+                        - generic "Explicit" [ref=f30e95]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e96]: 03:34
+                    - listitem [ref=f30e97]:
+                      - button "Play track" [ref=f30e99] [cursor=pointer]:
+                        - generic [ref=f30e100]: "6"
+                      - heading "LOYALTY. FEAT. RIHANNA." [level=3] [ref=f30e101]
+                      - heading "Explicit Kendrick Lamar, Rihanna" [level=4] [ref=f30e102]:
+                        - generic "Explicit" [ref=f30e103]: E
+                        - text: Kendrick Lamar, Rihanna
+                      - generic [ref=f30e104]: 03:47
+                    - listitem [ref=f30e105]:
+                      - button "Play track" [ref=f30e107] [cursor=pointer]:
+                        - generic [ref=f30e108]: "7"
+                      - heading "PRIDE." [level=3] [ref=f30e109]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e110]:
+                        - generic "Explicit" [ref=f30e111]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e112]: 04:35
+                    - listitem [ref=f30e113]:
+                      - button "Play track" [ref=f30e115] [cursor=pointer]:
+                        - generic [ref=f30e116]: "8"
+                      - heading "HUMBLE." [level=3] [ref=f30e117]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e118]:
+                        - generic "Explicit" [ref=f30e119]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e120]: 02:57
+                    - listitem [ref=f30e121]:
+                      - button "Play track" [ref=f30e123] [cursor=pointer]:
+                        - generic [ref=f30e124]: "9"
+                      - heading "LUST." [level=3] [ref=f30e125]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e126]:
+                        - generic "Explicit" [ref=f30e127]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e128]: 05:07
+                    - listitem [ref=f30e129]:
+                      - button "Play track" [ref=f30e131] [cursor=pointer]:
+                        - generic [ref=f30e132]: "10"
+                      - heading "LOVE. FEAT. ZACARI." [level=3] [ref=f30e133]
+                      - heading "Kendrick Lamar, Zacari" [level=4] [ref=f30e134]
+                      - generic [ref=f30e135]: 03:33
+                    - listitem [ref=f30e136]:
+                      - button "Play track" [ref=f30e138] [cursor=pointer]:
+                        - generic [ref=f30e139]: "11"
+                      - heading "XXX. FEAT. U2." [level=3] [ref=f30e140]
+                      - heading "Explicit Kendrick Lamar, U2" [level=4] [ref=f30e141]:
+                        - generic "Explicit" [ref=f30e142]: E
+                        - text: Kendrick Lamar, U2
+                      - generic [ref=f30e143]: 04:14
+                    - listitem [ref=f30e144]:
+                      - button "Play track" [ref=f30e146] [cursor=pointer]:
+                        - generic [ref=f30e147]: "12"
+                      - heading "FEAR." [level=3] [ref=f30e148]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e149]:
+                        - generic "Explicit" [ref=f30e150]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e151]: 07:40
+                    - listitem [ref=f30e152]:
+                      - button "Play track" [ref=f30e154] [cursor=pointer]:
+                        - generic [ref=f30e155]: "13"
+                      - heading "GOD." [level=3] [ref=f30e156]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e157]:
+                        - generic "Explicit" [ref=f30e158]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e159]: 04:08
+                    - listitem [ref=f30e160]:
+                      - button "Play track" [ref=f30e162] [cursor=pointer]:
+                        - generic [ref=f30e163]: "14"
+                      - heading "DUCKWORTH." [level=3] [ref=f30e164]
+                      - heading "Explicit Kendrick Lamar" [level=4] [ref=f30e165]:
+                        - generic "Explicit" [ref=f30e166]: E
+                        - text: Kendrick Lamar
+                      - generic [ref=f30e167]: 04:08
+                - alert [ref=f30e168]
+            - iframe [ref=e175]:
+              - generic [ref=f31e1]:
+                - generic [ref=f31e5]:
+                  - 'link "UBI, Automation &amp; Society in the US: Andrew Yang &amp; Azeem Azhar in Conversation" [ref=f31e9] [cursor=pointer]':
+                    - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                    - 'generic "UBI, Automation &amp; Society in the US: Andrew Yang &amp; Azeem Azhar in Conversation" [ref=f31e11]'
+                  - generic [ref=f31e14]:
+                    - application "Play" [ref=f31e16] [cursor=pointer]:
+                      - img [ref=f31e17]
+                    - generic [ref=f31e21]:
+                      - link "Exponential View" [ref=f31e22] [cursor=pointer]:
+                        - /url: https://soundcloud.com/exponentialview
+                      - 'link "UBI, Automation & Society in the US: Andrew Yang & Azeem Azhar in Conversation" [ref=f31e23] [cursor=pointer]':
+                        - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                    - link "Play on SoundCloud" [ref=f31e26] [cursor=pointer]:
+                      - /url: https://soundcloud.com/exponentialview/ubi-automation-society-in-the
+                      - img [ref=f31e27]
+                - link "SoundCloud privacy policy" [ref=f31e35] [cursor=pointer]:
+                  - /url: https://soundcloud.com/pages/privacy
+                  - generic [ref=f31e36]: SoundCloud privacy policy
+                  - text: Privacy policy
+            - paragraph [ref=e176]:
+              - text: To delete a post, click on the
+              - strong [ref=e177]: Settings
+              - text: button (just to the left of Publish), and scroll down and find the delete button.
+            - heading "Buttons Link" [level=3] [ref=e178]:
+              - text: Buttons
+              - button "Link" [ref=e181] [cursor=pointer]:
+                - img [ref=e182]
+            - paragraph [ref=e185]: "Add buttons to your post that tell your subscribers to share a post, check out a special offer, or even custom buttons like this one:"
+            - paragraph [ref=e186] [cursor=pointer]:
+              - link "Browse top writers" [ref=e187]:
+                - /url: https://substack.com/home
+            - paragraph [ref=e188]: You can add buttons from the “Buttons…” dropdown in the toolbar.
+            - heading "Publishing your post Link" [level=3] [ref=e189]:
+              - text: Publishing your post
+              - button "Link" [ref=e192] [cursor=pointer]:
+                - img [ref=e193]
+            - paragraph [ref=e196]: "Ready to publish? You have two options:"
+            - list [ref=e197]:
+              - listitem [ref=e198]:
+                - paragraph [ref=e199]:
+                  - strong [ref=e200]: Publish only to the web
+              - listitem [ref=e201]:
+                - paragraph [ref=e202]:
+                  - strong [ref=e203]: Publish to the web & send as email
+            - paragraph [ref=e204]: Substack posts default to publishing to both the web and email. To publish a post only to the web, click the “Publish” button, then, on the next screen, make sure the box beside “Send email to…” is unchecked.
+            - paragraph [ref=e205]:
+              - emphasis [ref=e206]:
+                - strong [ref=e207]: Note
+              - text: ": Posts can only be emailed out once. Once you have sent an email out, the only way to send it again is to create an entirely new post. Any edits you make to a previously-published post will only be reflected on the web. So, there’s no need to worry about accidentally spamming your subscribers with repeat emails."
+            - paragraph [ref=e208]: Finally, if you import posts from some other site’s archives, you can backdate them so they are published in the correct order and associated with the correct publication dates. To do so, after you have published a post, go into that post’s Settings (just to the left of the Publish button) and select the desired date.
+            - generic [ref=e209]:
+              - link "1" [ref=e210] [cursor=pointer]:
+                - /url: "#footnote-anchor-1"
+              - paragraph [ref=e212]: Including footnotes.
+          - separator [ref=e213]
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - heading "Subscribe to On Substack" [level=4] [ref=e216]
+              - generic [ref=e217]: By Substack Team
+              - generic [ref=e218]: Resources, stories, and news for the writers, podcasters, musicians, video creators, and culture makers publishing on Substack.
+            - generic [ref=e219]:
+              - generic [ref=e224]:
+                - textbox "Type your email..." [ref=e227]
+                - button "Subscribe" [disabled] [ref=e228]
+              - generic [ref=e231]:
+                - text: By subscribing, you agree Substack's
+                - link "Terms of Use" [ref=e232] [cursor=pointer]:
+                  - /url: https://substack.com/tos
+                - text: ", and acknowledge its"
+                - link "Information Collection Notice" [ref=e233] [cursor=pointer]:
+                  - /url: https://substack.com/ccpa#personal-data-collected
+                - text: and
+                - link "Privacy Policy" [ref=e234] [cursor=pointer]:
+                  - /url: https://substack.com/privacy
+                - text: .
+          - generic [ref=e236]:
+            - generic [ref=e238]:
+              - link "View Huynh Hoang Nam (HoaNam)'s profile" [ref=e240] [cursor=pointer]:
+                - /url: https://substack.com/profile/36046761-huynh-hoang-nam-hoanam
+                - generic "Huynh Hoang Nam (HoaNam)" [ref=e242]:
+                  - img "Huynh Hoang Nam (HoaNam)'s avatar" [ref=e244]
+              - link "View JunkieGenius's profile" [ref=e246] [cursor=pointer]:
+                - /url: https://substack.com/profile/19521694-junkiegenius
+                - generic "JunkieGenius" [ref=e248]:
+                  - img "JunkieGenius's avatar" [ref=e250]
+              - link "View J.C. King's profile" [ref=e252] [cursor=pointer]:
+                - /url: https://substack.com/profile/79260978-jc-king
+                - generic "J.C. King" [ref=e254]:
+                  - img "J.C. King's avatar" [ref=e256]
+              - link "View Neo77's profile" [ref=e258] [cursor=pointer]:
+                - /url: https://substack.com/profile/69622232-neo77
+                - generic "Neo77" [ref=e260]:
+                  - img "Neo77's avatar" [ref=e262]
+              - link "View Jonipol Fortaliza's profile" [ref=e264] [cursor=pointer]:
+                - /url: https://substack.com/profile/41834444-jonipol-fortaliza
+                - generic "Jonipol Fortaliza" [ref=e266]:
+                  - img "Jonipol Fortaliza's avatar" [ref=e268]
+            - generic [ref=e270]:
+              - generic [ref=e271] [cursor=pointer]: 473 Likes
+              - text: ∙
+              - link "20 Restacks" [ref=e273] [cursor=pointer]:
+                - /url: https://substack.com/note/p-53034/restacks?utm_source=substack&utm_content=facepile-restacks
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - button "Like (473)" [ref=e278] [cursor=pointer]:
+                - img [ref=e279]:
+                  - img [ref=e281]
+                - generic [ref=e283]: "473"
+              - button "View comments (26)" [ref=e284] [cursor=pointer]:
+                - img [ref=e285]:
+                  - img [ref=e287]
+                - generic [ref=e289]: "26"
+              - button "20" [ref=e290] [cursor=pointer]:
+                - img [ref=e291]
+                - generic [ref=e294]: "20"
+            - button "Share" [ref=e296] [cursor=pointer]:
+              - generic [ref=e297]: Share
+          - generic [ref=e299]:
+            - button "Previous" [ref=e300] [cursor=pointer]:
+              - img [ref=e301]
+              - text: Previous
+            - button "Next" [ref=e303] [cursor=pointer]:
+              - text: Next
+              - img [ref=e304]
+      - generic [ref=e306]:
+        - generic [ref=e307]:
+          - generic [ref=e308]:
+            - heading "Discussion about this post" [level=4] [ref=e309]
+            - tablist "Select discussion type" [ref=e313]:
+              - tab "Comments" [selected] [ref=e314] [cursor=pointer]
+              - tab "Restacks" [ref=e315] [cursor=pointer]
+          - generic [ref=e320]:
+            - generic [ref=e321]: Commenting has been turned off for this post
+            - generic [ref=e324]:
+              - article "Comment by Chris Best" [ref=e328]:
+                - link "View Chris Best's profile" [ref=e331] [cursor=pointer]:
+                  - /url: https://substack.com/profile/2-chris-best?utm_source=comment
+                  - generic "Chris Best" [ref=e333]:
+                    - img "Chris Best's avatar" [ref=e335]
+                - generic [ref=e336]:
+                  - generic [ref=e337]:
+                    - generic [ref=e340]:
+                      - generic [ref=e342]:
+                        - link "Chris Best" [ref=e345] [cursor=pointer]:
+                          - /url: https://substack.com/profile/2-chris-best?utm_source=substack-feed-item
+                        - img [ref=e348] [cursor=pointer]
+                      - link "4 May 2019" [ref=e351] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/6835
+                    - button "Ellipsis" [ref=e354] [cursor=pointer]:
+                      - img [ref=e355]
+                  - paragraph [ref=e360]: Testing 123
+                  - generic [ref=e361]:
+                    - link "Like (4)" [ref=e363] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e364]:
+                        - img [ref=e366]:
+                          - img [ref=e368]
+                        - generic [ref=e370]: Like (4)
+                    - generic [ref=e373] [cursor=pointer]:
+                      - img [ref=e374]
+                      - generic [ref=e377]: Share
+              - article "Comment by Serena Chao" [ref=e381]:
+                - link "View Serena Chao's profile" [ref=e384] [cursor=pointer]:
+                  - /url: https://substack.com/profile/1643321-serena-chao?utm_source=comment
+                  - generic "Serena Chao" [ref=e386]:
+                    - img "Serena Chao's avatar" [ref=e388]
+                - generic [ref=e389]:
+                  - generic [ref=e390]:
+                    - generic [ref=e393]:
+                      - link "Serena Chao" [ref=e398] [cursor=pointer]:
+                        - /url: https://substack.com/profile/1643321-serena-chao?utm_source=substack-feed-item
+                      - link "26 Feb 2020" [ref=e399] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/90384
+                    - button "Ellipsis" [ref=e402] [cursor=pointer]:
+                      - img [ref=e403]
+                  - paragraph [ref=e408]: Waiting for strikeout formatting!
+                  - generic [ref=e409]:
+                    - link "Like (19)" [ref=e411] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e412]:
+                        - img [ref=e414]:
+                          - img [ref=e416]
+                        - generic [ref=e418]: Like (19)
+                    - generic [ref=e421] [cursor=pointer]:
+                      - img [ref=e422]
+                      - generic [ref=e425]: Share
+              - article "Comment by Ant Evans" [ref=e429]:
+                - link "View Ant Evans's profile" [ref=e432] [cursor=pointer]:
+                  - /url: https://substack.com/profile/4139316-ant-evans?utm_source=comment
+                  - generic "Ant Evans" [ref=e434]:
+                    - img "Ant Evans's avatar" [ref=e436]
+                - generic [ref=e437]:
+                  - generic [ref=e438]:
+                    - generic [ref=e441]:
+                      - link "Ant Evans" [ref=e446] [cursor=pointer]:
+                        - /url: https://substack.com/profile/4139316-ant-evans?utm_source=substack-feed-item
+                      - link "8 Apr 2020" [ref=e447] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/152461
+                    - button "Ellipsis" [ref=e450] [cursor=pointer]:
+                      - img [ref=e451]
+                  - paragraph [ref=e456]: Is it possible to publish on web only, and then send same article out to email list at a later time?
+                  - generic [ref=e457]:
+                    - link "Like (10)" [ref=e459] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e460]:
+                        - img [ref=e462]:
+                          - img [ref=e464]
+                        - generic [ref=e466]: Like (10)
+                    - generic [ref=e469] [cursor=pointer]:
+                      - img [ref=e470]
+                      - generic [ref=e473]: Share
+              - generic [ref=e474]:
+                - article "Comment by Hannah" [ref=e477]:
+                  - link "View Hannah's profile" [ref=e480] [cursor=pointer]:
+                    - /url: https://substack.com/profile/2355588-hannah?utm_source=comment
+                    - generic "Hannah" [ref=e482]:
+                      - img "Hannah's avatar" [ref=e484]
+                  - generic [ref=e485]:
+                    - generic [ref=e486]:
+                      - generic [ref=e489]:
+                        - link "Hannah" [ref=e494] [cursor=pointer]:
+                          - /url: https://substack.com/profile/2355588-hannah?utm_source=substack-feed-item
+                        - link "9 May 2019" [ref=e495] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/7540
+                      - button "Ellipsis" [ref=e498] [cursor=pointer]:
+                        - img [ref=e499]
+                    - paragraph [ref=e504]: What about GIFs? I can't seem to get them to work.
+                    - generic [ref=e505]:
+                      - link "Like (5)" [ref=e507] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e508]:
+                          - img [ref=e510]:
+                            - img [ref=e512]
+                          - generic [ref=e514]: Like (5)
+                      - generic [ref=e517] [cursor=pointer]:
+                        - img [ref=e518]
+                        - generic [ref=e521]: Share
+                - generic [ref=e523]:
+                  - article "Comment by Chris Best" [ref=e527]:
+                    - link "View Chris Best's profile" [ref=e530] [cursor=pointer]:
+                      - /url: https://substack.com/profile/2-chris-best?utm_source=comment
+                      - generic "Chris Best" [ref=e532]:
+                        - img "Chris Best's avatar" [ref=e534]
+                    - generic [ref=e535]:
+                      - generic [ref=e536]:
+                        - generic [ref=e539]:
+                          - generic [ref=e541]:
+                            - link "Chris Best" [ref=e544] [cursor=pointer]:
+                              - /url: https://substack.com/profile/2-chris-best?utm_source=substack-feed-item
+                            - img [ref=e547] [cursor=pointer]
+                          - link "10 May 2019" [ref=e550] [cursor=pointer]:
+                            - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/7555
+                        - button "Ellipsis" [ref=e553] [cursor=pointer]:
+                          - img [ref=e554]
+                      - paragraph [ref=e559]:
+                        - generic [ref=e560]:
+                          - text: They should work! See, for example,
+                          - link "https://erin.substack.com/p/dance-like-no-one-but-cnbc-is-watching" [ref=e561] [cursor=pointer]:
+                            - /url: https://erin.substack.com/p/dance-like-no-one-but-cnbc-is-watching
+                      - generic [ref=e562]:
+                        - link "Like (3)" [ref=e564] [cursor=pointer]:
+                          - /url: javascript:void(0)
+                          - generic [ref=e565]:
+                            - img [ref=e567]:
+                              - img [ref=e569]
+                            - generic [ref=e571]: Like (3)
+                        - generic [ref=e574] [cursor=pointer]:
+                          - img [ref=e575]
+                          - generic [ref=e578]: Share
+                  - generic [ref=e579]:
+                    - article "Comment by Cherilyn Christen Clough" [ref=e582]:
+                      - link "View Cherilyn Christen Clough's profile" [ref=e585] [cursor=pointer]:
+                        - /url: https://substack.com/profile/5338011-cherilyn-christen-clough?utm_source=comment
+                        - generic "Cherilyn Christen Clough" [ref=e587]:
+                          - img "Cherilyn Christen Clough's avatar" [ref=e589]
+                      - generic [ref=e590]:
+                        - generic [ref=e591]:
+                          - generic [ref=e594]:
+                            - generic [ref=e596]:
+                              - link "Cherilyn Christen Clough" [ref=e599] [cursor=pointer]:
+                                - /url: https://substack.com/profile/5338011-cherilyn-christen-clough?utm_source=substack-feed-item
+                              - img [ref=e602] [cursor=pointer]
+                            - link "21 Nov 2019" [ref=e605] [cursor=pointer]:
+                              - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/42779
+                          - button "Ellipsis" [ref=e608] [cursor=pointer]:
+                            - img [ref=e609]
+                        - paragraph [ref=e614]: Did you figure out how to get gifs to work? I'm still trying and none of them work and I'm simply copying the www.gif etc.
+                        - generic [ref=e615]:
+                          - link "Like (1)" [ref=e617] [cursor=pointer]:
+                            - /url: javascript:void(0)
+                            - generic [ref=e618]:
+                              - img [ref=e620]:
+                                - img [ref=e622]
+                              - generic [ref=e624]: Like (1)
+                          - generic [ref=e627] [cursor=pointer]:
+                            - img [ref=e628]
+                            - generic [ref=e631]: Share
+                    - generic [ref=e634]:
+                      - article "Comment by Hamish McKenzie" [ref=e637]:
+                        - link "View Hamish McKenzie's profile" [ref=e640] [cursor=pointer]:
+                          - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=comment
+                          - generic "Hamish McKenzie" [ref=e642]:
+                            - img "Hamish McKenzie's avatar" [ref=e644]
+                        - generic [ref=e645]:
+                          - generic [ref=e646]:
+                            - generic [ref=e649]:
+                              - generic [ref=e651]:
+                                - link "Hamish McKenzie" [ref=e654] [cursor=pointer]:
+                                  - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=substack-feed-item
+                                - img [ref=e657] [cursor=pointer]
+                              - link "21 Nov 2019" [ref=e660] [cursor=pointer]:
+                                - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/42784
+                            - button "Ellipsis" [ref=e663] [cursor=pointer]:
+                              - img [ref=e664]
+                          - paragraph [ref=e669]: You can drag and drop gifs from your desktop into the Substack editor.
+                          - generic [ref=e670]:
+                            - link "Like (4)" [ref=e672] [cursor=pointer]:
+                              - /url: javascript:void(0)
+                              - generic [ref=e673]:
+                                - img [ref=e675]:
+                                  - img [ref=e677]
+                                - generic [ref=e679]: Like (4)
+                            - generic [ref=e682] [cursor=pointer]:
+                              - img [ref=e683]
+                              - generic [ref=e686]: Share
+                      - article "Comment by Cherilyn Christen Clough" [ref=e692]:
+                        - link "View Cherilyn Christen Clough's profile" [ref=e695] [cursor=pointer]:
+                          - /url: https://substack.com/profile/5338011-cherilyn-christen-clough?utm_source=comment
+                          - generic "Cherilyn Christen Clough" [ref=e697]:
+                            - img "Cherilyn Christen Clough's avatar" [ref=e699]
+                        - generic [ref=e700]:
+                          - generic [ref=e701]:
+                            - generic [ref=e704]:
+                              - generic [ref=e706]:
+                                - link "Cherilyn Christen Clough" [ref=e709] [cursor=pointer]:
+                                  - /url: https://substack.com/profile/5338011-cherilyn-christen-clough?utm_source=substack-feed-item
+                                - img [ref=e712] [cursor=pointer]
+                              - link "22 Nov 2019" [ref=e715] [cursor=pointer]:
+                                - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/42817
+                            - button "Ellipsis" [ref=e718] [cursor=pointer]:
+                              - img [ref=e719]
+                          - paragraph [ref=e724]: Thanks!
+                          - generic [ref=e725]:
+                            - link "Like (1)" [ref=e727] [cursor=pointer]:
+                              - /url: javascript:void(0)
+                              - generic [ref=e728]:
+                                - img [ref=e730]:
+                                  - img [ref=e732]
+                                - generic [ref=e734]: Like (1)
+                            - generic [ref=e737] [cursor=pointer]:
+                              - img [ref=e738]
+                              - generic [ref=e741]: Share
+              - article "Comment by Jeffrey Mills" [ref=e751]:
+                - link "View Jeffrey Mills's profile" [ref=e754] [cursor=pointer]:
+                  - /url: https://substack.com/profile/6269715-jeffrey-mills?utm_source=comment
+                  - generic "Jeffrey Mills" [ref=e756]:
+                    - img "Jeffrey Mills's avatar" [ref=e758]
+                - generic [ref=e759]:
+                  - generic [ref=e760]:
+                    - generic [ref=e763]:
+                      - link "Jeffrey Mills" [ref=e768] [cursor=pointer]:
+                        - /url: https://substack.com/profile/6269715-jeffrey-mills?utm_source=substack-feed-item
+                      - link "30 Mar 2020" [ref=e769] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/136722
+                    - button "Ellipsis" [ref=e772] [cursor=pointer]:
+                      - img [ref=e773]
+                  - paragraph [ref=e778]: How can I import my contacts to build my email list please?
+                  - generic [ref=e779]:
+                    - link "Like (4)" [ref=e781] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e782]:
+                        - img [ref=e784]:
+                          - img [ref=e786]
+                        - generic [ref=e788]: Like (4)
+                    - generic [ref=e791] [cursor=pointer]:
+                      - img [ref=e792]
+                      - generic [ref=e795]: Share
+              - generic [ref=e796]:
+                - article "Comment by Metta" [ref=e799]:
+                  - link "View Metta's profile" [ref=e802] [cursor=pointer]:
+                    - /url: https://substack.com/profile/4188514-metta?utm_source=comment
+                    - generic "Metta" [ref=e804]:
+                      - img "Metta's avatar" [ref=e806]
+                  - generic [ref=e807]:
+                    - generic [ref=e808]:
+                      - generic [ref=e811]:
+                        - link "Metta" [ref=e816] [cursor=pointer]:
+                          - /url: https://substack.com/profile/4188514-metta?utm_source=substack-feed-item
+                        - link "7 Apr 2020" [ref=e817] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/150494
+                      - button "Ellipsis" [ref=e820] [cursor=pointer]:
+                        - img [ref=e821]
+                    - paragraph [ref=e826]: "How can we add a text link that will activate the sharing option? I tried inserting the following code as a text link, but got an error message instead of the pop-up sharing option: %%share_URL%% ~ Thanks in advance!"
+                    - generic [ref=e827]:
+                      - link "Like (1)" [ref=e829] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e830]:
+                          - img [ref=e832]:
+                            - img [ref=e834]
+                          - generic [ref=e836]: Like (1)
+                      - generic [ref=e839] [cursor=pointer]:
+                        - img [ref=e840]
+                        - generic [ref=e843]: Share
+                - article "Comment by Metta" [ref=e849]:
+                  - link "View Metta's profile" [ref=e852] [cursor=pointer]:
+                    - /url: https://substack.com/profile/4188514-metta?utm_source=comment
+                    - generic "Metta" [ref=e854]:
+                      - img "Metta's avatar" [ref=e856]
+                  - generic [ref=e857]:
+                    - generic [ref=e858]:
+                      - generic [ref=e861]:
+                        - link "Metta" [ref=e866] [cursor=pointer]:
+                          - /url: https://substack.com/profile/4188514-metta?utm_source=substack-feed-item
+                        - link "8 Apr 2020" [ref=e867] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/151650
+                      - button "Ellipsis" [ref=e870] [cursor=pointer]:
+                        - img [ref=e871]
+                    - paragraph [ref=e876]: "Just now received a reply from Support. Apparently the share code needs to be all lower case: %%share_url%%"
+                    - generic [ref=e877]:
+                      - link "Like (2)" [ref=e879] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e880]:
+                          - img [ref=e882]:
+                            - img [ref=e884]
+                          - generic [ref=e886]: Like (2)
+                      - generic [ref=e889] [cursor=pointer]:
+                        - img [ref=e890]
+                        - generic [ref=e893]: Share
+              - generic [ref=e896]:
+                - article "Comment by Adventuresinfi" [ref=e899]:
+                  - link "View Adventuresinfi's profile" [ref=e902] [cursor=pointer]:
+                    - /url: https://substack.com/profile/4708367-adventuresinfi?utm_source=comment
+                    - generic "Adventuresinfi" [ref=e904]:
+                      - img "Adventuresinfi's avatar" [ref=e906]
+                  - generic [ref=e907]:
+                    - generic [ref=e908]:
+                      - generic [ref=e911]:
+                        - link "Adventuresinfi" [ref=e916] [cursor=pointer]:
+                          - /url: https://substack.com/profile/4708367-adventuresinfi?utm_source=substack-feed-item
+                        - link "3 Feb 2020" [ref=e917] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/71842
+                      - button "Ellipsis" [ref=e920] [cursor=pointer]:
+                        - img [ref=e921]
+                    - generic [ref=e925]:
+                      - paragraph [ref=e926]: If I've imported a post from my WordPress blog, does that stop me being able to send an email to subscribers?
+                      - paragraph [ref=e927]: The option doesn't appear after I hit publish
+                    - generic [ref=e928]:
+                      - link "Like (1)" [ref=e930] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e931]:
+                          - img [ref=e933]:
+                            - img [ref=e935]
+                          - generic [ref=e937]: Like (1)
+                      - generic [ref=e940] [cursor=pointer]:
+                        - img [ref=e941]
+                        - generic [ref=e944]: Share
+                - article "Comment by Hamish McKenzie" [ref=e950]:
+                  - link "View Hamish McKenzie's profile" [ref=e953] [cursor=pointer]:
+                    - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=comment
+                    - generic "Hamish McKenzie" [ref=e955]:
+                      - img "Hamish McKenzie's avatar" [ref=e957]
+                  - generic [ref=e958]:
+                    - generic [ref=e959]:
+                      - generic [ref=e962]:
+                        - generic [ref=e964]:
+                          - link "Hamish McKenzie" [ref=e967] [cursor=pointer]:
+                            - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=substack-feed-item
+                          - img [ref=e970] [cursor=pointer]
+                        - link "3 Feb 2020" [ref=e973] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/72040
+                      - button "Ellipsis" [ref=e976] [cursor=pointer]:
+                        - img [ref=e977]
+                    - paragraph [ref=e982]: That's correct. Imported posts cannot be sent out by email. But any new post you create on Substack can be emailed out.
+                    - generic [ref=e983]:
+                      - link "Like (2)" [ref=e985] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e986]:
+                          - img [ref=e988]:
+                            - img [ref=e990]
+                          - generic [ref=e992]: Like (2)
+                      - generic [ref=e995] [cursor=pointer]:
+                        - img [ref=e996]
+                        - generic [ref=e999]: Share
+              - generic [ref=e1002]:
+                - article "Comment by Metta" [ref=e1005]:
+                  - link "View Metta's profile" [ref=e1008] [cursor=pointer]:
+                    - /url: https://substack.com/profile/4188514-metta?utm_source=comment
+                    - generic "Metta" [ref=e1010]:
+                      - img "Metta's avatar" [ref=e1012]
+                  - generic [ref=e1013]:
+                    - generic [ref=e1014]:
+                      - generic [ref=e1017]:
+                        - link "Metta" [ref=e1022] [cursor=pointer]:
+                          - /url: https://substack.com/profile/4188514-metta?utm_source=substack-feed-item
+                        - link "7 Apr 2020" [ref=e1023] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/150560
+                      - button "Ellipsis" [ref=e1026] [cursor=pointer]:
+                        - img [ref=e1027]
+                    - paragraph [ref=e1032]: How can we set external links in our "About" page to open in a new window? Right now all the external links I've added to my "About" page are opening in the SAME window and replacing the view of my "About" details.
+                    - generic [ref=e1033]:
+                      - link "Like" [ref=e1035] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1036]:
+                          - img [ref=e1038]:
+                            - img [ref=e1040]
+                          - generic [ref=e1042]: Like
+                      - generic [ref=e1045] [cursor=pointer]:
+                        - img [ref=e1046]
+                        - generic [ref=e1049]: Share
+                - article "Comment by Metta" [ref=e1055]:
+                  - link "View Metta's profile" [ref=e1058] [cursor=pointer]:
+                    - /url: https://substack.com/profile/4188514-metta?utm_source=comment
+                    - generic "Metta" [ref=e1060]:
+                      - img "Metta's avatar" [ref=e1062]
+                  - generic [ref=e1063]:
+                    - generic [ref=e1064]:
+                      - generic [ref=e1067]:
+                        - link "Metta" [ref=e1072] [cursor=pointer]:
+                          - /url: https://substack.com/profile/4188514-metta?utm_source=substack-feed-item
+                        - link "8 Apr 2020" [ref=e1073] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/151651
+                      - button "Ellipsis" [ref=e1076] [cursor=pointer]:
+                        - img [ref=e1077]
+                    - paragraph [ref=e1082]: Just now received a reply from Support. Apparently this problem was a bug which has since been fixed. :-)
+                    - generic [ref=e1083]:
+                      - link "Like (1)" [ref=e1085] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1086]:
+                          - img [ref=e1088]:
+                            - img [ref=e1090]
+                          - generic [ref=e1092]: Like (1)
+                      - generic [ref=e1095] [cursor=pointer]:
+                        - img [ref=e1096]
+                        - generic [ref=e1099]: Share
+              - generic [ref=e1102]:
+                - article "Comment by Gather.is" [ref=e1105]:
+                  - link "View Gather.is's profile" [ref=e1108] [cursor=pointer]:
+                    - /url: https://substack.com/profile/6913663-gatheris?utm_source=comment
+                    - generic "Gather.is" [ref=e1110]:
+                      - img "Gather.is's avatar" [ref=e1112]
+                  - generic [ref=e1113]:
+                    - generic [ref=e1114]:
+                      - generic [ref=e1117]:
+                        - link "Gather.is" [ref=e1122] [cursor=pointer]:
+                          - /url: https://substack.com/profile/6913663-gatheris?utm_source=substack-feed-item
+                        - link "12 Feb 2020" [ref=e1123] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/78232
+                      - button "Ellipsis" [ref=e1126] [cursor=pointer]:
+                        - img [ref=e1127]
+                    - paragraph [ref=e1132]: How can I add a photo by line?
+                    - generic [ref=e1133]:
+                      - link "Like" [ref=e1135] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1136]:
+                          - img [ref=e1138]:
+                            - img [ref=e1140]
+                          - generic [ref=e1142]: Like
+                      - generic [ref=e1145] [cursor=pointer]:
+                        - img [ref=e1146]
+                        - generic [ref=e1149]: Share
+                - article "Comment by Hamish McKenzie" [ref=e1155]:
+                  - link "View Hamish McKenzie's profile" [ref=e1158] [cursor=pointer]:
+                    - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=comment
+                    - generic "Hamish McKenzie" [ref=e1160]:
+                      - img "Hamish McKenzie's avatar" [ref=e1162]
+                  - generic [ref=e1163]:
+                    - generic [ref=e1164]:
+                      - generic [ref=e1167]:
+                        - generic [ref=e1169]:
+                          - link "Hamish McKenzie" [ref=e1172] [cursor=pointer]:
+                            - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=substack-feed-item
+                          - img [ref=e1175] [cursor=pointer]
+                        - link "12 Feb 2020" [ref=e1178] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/78233
+                      - button "Ellipsis" [ref=e1181] [cursor=pointer]:
+                        - img [ref=e1182]
+                    - paragraph [ref=e1187]: You can turn that on in your settings. First, enable bylines. Then you'll see an option to add images to bylines.
+                    - generic [ref=e1188]:
+                      - link "Like (2)" [ref=e1190] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1191]:
+                          - img [ref=e1193]:
+                            - img [ref=e1195]
+                          - generic [ref=e1197]: Like (2)
+                      - generic [ref=e1200] [cursor=pointer]:
+                        - img [ref=e1201]
+                        - generic [ref=e1204]: Share
+              - article "Comment by kin ko" [ref=e1210]:
+                - link "View kin ko's profile" [ref=e1213] [cursor=pointer]:
+                  - /url: https://substack.com/profile/2565860-kin-ko?utm_source=comment
+                  - generic "kin ko" [ref=e1215]:
+                    - img "kin ko's avatar" [ref=e1217]
+                - generic [ref=e1218]:
+                  - generic [ref=e1219]:
+                    - generic [ref=e1222]:
+                      - generic [ref=e1224]:
+                        - link "kin ko" [ref=e1227] [cursor=pointer]:
+                          - /url: https://substack.com/profile/2565860-kin-ko?utm_source=substack-feed-item
+                        - img [ref=e1230] [cursor=pointer]
+                      - link "30 Jan 2020" [ref=e1234] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/69727
+                    - button "Ellipsis" [ref=e1237] [cursor=pointer]:
+                      - img [ref=e1238]
+                  - paragraph [ref=e1243]:
+                    - generic [ref=e1244]:
+                      - text: Is there any way we may submit an embed format to substack? We have it supported by
+                      - link "embed.ly" [ref=e1245] [cursor=pointer]:
+                        - /url: http://embed.ly
+                      - text: which is supported by Medium and a range of platforms but can't include it in substack.
+                  - generic [ref=e1246]:
+                    - link "Like" [ref=e1248] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e1249]:
+                        - img [ref=e1251]:
+                          - img [ref=e1253]
+                        - generic [ref=e1255]: Like
+                    - generic [ref=e1258] [cursor=pointer]:
+                      - img [ref=e1259]
+                      - generic [ref=e1262]: Share
+              - article "Comment by snailcollector🐌🥀🐌🐌🐌🐌" [ref=e1266]:
+                - link "View snailcollector🐌🥀🐌🐌🐌🐌's profile" [ref=e1269] [cursor=pointer]:
+                  - /url: https://substack.com/profile/5473951-snailcollector?utm_source=comment
+                  - generic "snailcollector🐌🥀🐌🐌🐌🐌" [ref=e1271]:
+                    - img "snailcollector🐌🥀🐌🐌🐌🐌's avatar" [ref=e1273]
+                - generic [ref=e1274]:
+                  - generic [ref=e1275]:
+                    - generic [ref=e1278]:
+                      - link "snailcollector🐌🥀🐌🐌🐌🐌" [ref=e1283] [cursor=pointer]:
+                        - /url: https://substack.com/profile/5473951-snailcollector?utm_source=substack-feed-item
+                      - link "30 Nov 2019" [ref=e1284] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/44165
+                    - button "Ellipsis" [ref=e1287] [cursor=pointer]:
+                      - img [ref=e1288]
+                  - paragraph [ref=e1293]: Thanks, this will help, I think.
+                  - generic [ref=e1294]:
+                    - link "Like" [ref=e1296] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e1297]:
+                        - img [ref=e1299]:
+                          - img [ref=e1301]
+                        - generic [ref=e1303]: Like
+                    - generic [ref=e1306] [cursor=pointer]:
+                      - img [ref=e1307]
+                      - generic [ref=e1310]: Share
+              - generic [ref=e1311]:
+                - article "Comment by David Koff" [ref=e1314]:
+                  - link "View David Koff's profile" [ref=e1317] [cursor=pointer]:
+                    - /url: https://substack.com/profile/2255647-david-koff?utm_source=comment
+                    - generic "David Koff" [ref=e1319]:
+                      - img "David Koff's avatar" [ref=e1321]
+                  - generic [ref=e1322]:
+                    - generic [ref=e1323]:
+                      - generic [ref=e1326]:
+                        - link "David Koff" [ref=e1331] [cursor=pointer]:
+                          - /url: https://substack.com/profile/2255647-david-koff?utm_source=substack-feed-item
+                        - link "22 Sept 2019" [ref=e1332] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/32494
+                      - button "Ellipsis" [ref=e1335] [cursor=pointer]:
+                        - img [ref=e1336]
+                    - paragraph [ref=e1341]: I'd love to know how to DELETE an entire draft
+                    - generic [ref=e1342]:
+                      - link "Like" [ref=e1344] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1345]:
+                          - img [ref=e1347]:
+                            - img [ref=e1349]
+                          - generic [ref=e1351]: Like
+                      - generic [ref=e1354] [cursor=pointer]:
+                        - img [ref=e1355]
+                        - generic [ref=e1358]: Share
+                - generic [ref=e1361]:
+                  - article "Comment by Hamish McKenzie" [ref=e1364]:
+                    - link "View Hamish McKenzie's profile" [ref=e1367] [cursor=pointer]:
+                      - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=comment
+                      - generic "Hamish McKenzie" [ref=e1369]:
+                        - img "Hamish McKenzie's avatar" [ref=e1371]
+                    - generic [ref=e1372]:
+                      - generic [ref=e1373]:
+                        - generic [ref=e1376]:
+                          - generic [ref=e1378]:
+                            - link "Hamish McKenzie" [ref=e1381] [cursor=pointer]:
+                              - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=substack-feed-item
+                            - img [ref=e1384] [cursor=pointer]
+                          - link "22 Sept 2019" [ref=e1387] [cursor=pointer]:
+                            - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/32495
+                        - button "Ellipsis" [ref=e1390] [cursor=pointer]:
+                          - img [ref=e1391]
+                      - paragraph [ref=e1396]: Go into settings while editing a post and scroll to the bottom to find delete
+                      - generic [ref=e1397]:
+                        - link "Like" [ref=e1399] [cursor=pointer]:
+                          - /url: javascript:void(0)
+                          - generic [ref=e1400]:
+                            - img [ref=e1402]:
+                              - img [ref=e1404]
+                            - generic [ref=e1406]: Like
+                        - generic [ref=e1409] [cursor=pointer]:
+                          - img [ref=e1410]
+                          - generic [ref=e1413]: Share
+                  - article "Comment by David Koff" [ref=e1419]:
+                    - link "View David Koff's profile" [ref=e1422] [cursor=pointer]:
+                      - /url: https://substack.com/profile/2255647-david-koff?utm_source=comment
+                      - generic "David Koff" [ref=e1424]:
+                        - img "David Koff's avatar" [ref=e1426]
+                    - generic [ref=e1427]:
+                      - generic [ref=e1428]:
+                        - generic [ref=e1431]:
+                          - link "David Koff" [ref=e1436] [cursor=pointer]:
+                            - /url: https://substack.com/profile/2255647-david-koff?utm_source=substack-feed-item
+                          - link "22 Sept 2019" [ref=e1437] [cursor=pointer]:
+                            - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/32525
+                        - button "Ellipsis" [ref=e1440] [cursor=pointer]:
+                          - img [ref=e1441]
+                      - paragraph [ref=e1446]: Rookie mistake. Thank you, @Hamish.
+                      - generic [ref=e1447]:
+                        - link "Like" [ref=e1449] [cursor=pointer]:
+                          - /url: javascript:void(0)
+                          - generic [ref=e1450]:
+                            - img [ref=e1452]:
+                              - img [ref=e1454]
+                            - generic [ref=e1456]: Like
+                        - generic [ref=e1459] [cursor=pointer]:
+                          - img [ref=e1460]
+                          - generic [ref=e1463]: Share
+              - generic [ref=e1468]:
+                - article "Comment by Dan McGirt" [ref=e1471]:
+                  - link "View Dan McGirt's profile" [ref=e1474] [cursor=pointer]:
+                    - /url: https://substack.com/profile/3405538-dan-mcgirt?utm_source=comment
+                    - generic "Dan McGirt" [ref=e1476]:
+                      - img "Dan McGirt's avatar" [ref=e1478]
+                  - generic [ref=e1479]:
+                    - generic [ref=e1480]:
+                      - generic [ref=e1483]:
+                        - link "Dan McGirt" [ref=e1488] [cursor=pointer]:
+                          - /url: https://substack.com/profile/3405538-dan-mcgirt?utm_source=substack-feed-item
+                        - link "4 Sept 2019" [ref=e1489] [cursor=pointer]:
+                          - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/29168
+                      - button "Ellipsis" [ref=e1492] [cursor=pointer]:
+                        - img [ref=e1493]
+                    - paragraph [ref=e1498]: Is there an undo edit function? Or a way to revert to the previous saved version of a draft post? Because I just, somehow, deleted most of a post in progress and I see no way to recover the text one second later. Even Notepad lets you do that. Notepad!
+                    - generic [ref=e1499]:
+                      - link "Like" [ref=e1501] [cursor=pointer]:
+                        - /url: javascript:void(0)
+                        - generic [ref=e1502]:
+                          - img [ref=e1504]:
+                            - img [ref=e1506]
+                          - generic [ref=e1508]: Like
+                      - generic [ref=e1511] [cursor=pointer]:
+                        - img [ref=e1512]
+                        - generic [ref=e1515]: Share
+                - generic [ref=e1518]:
+                  - article "Comment by Hamish McKenzie" [ref=e1521]:
+                    - link "View Hamish McKenzie's profile" [ref=e1524] [cursor=pointer]:
+                      - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=comment
+                      - generic "Hamish McKenzie" [ref=e1526]:
+                        - img "Hamish McKenzie's avatar" [ref=e1528]
+                    - generic [ref=e1529]:
+                      - generic [ref=e1530]:
+                        - generic [ref=e1533]:
+                          - generic [ref=e1535]:
+                            - link "Hamish McKenzie" [ref=e1538] [cursor=pointer]:
+                              - /url: https://substack.com/profile/3567-hamish-mckenzie?utm_source=substack-feed-item
+                            - img [ref=e1541] [cursor=pointer]
+                          - link "4 Sept 2019" [ref=e1544] [cursor=pointer]:
+                            - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/29169
+                        - button "Ellipsis" [ref=e1547] [cursor=pointer]:
+                          - img [ref=e1548]
+                      - paragraph [ref=e1553]:
+                        - generic [ref=e1554]:
+                          - text: Have you tried command+z (or whatever the hotkey for 'undo' is on a PC)? If you're still having trouble recovering the text, please write to
+                          - link "support@substack.com" [ref=e1555] [cursor=pointer]:
+                            - /url: mailto:support@substack.com
+                          - text: and we'll see what we can do.
+                      - generic [ref=e1556]:
+                        - link "Like (1)" [ref=e1558] [cursor=pointer]:
+                          - /url: javascript:void(0)
+                          - generic [ref=e1559]:
+                            - img [ref=e1561]:
+                              - img [ref=e1563]
+                            - generic [ref=e1565]: Like (1)
+                        - generic [ref=e1568] [cursor=pointer]:
+                          - img [ref=e1569]
+                          - generic [ref=e1572]: Share
+                  - article "Comment by Dan McGirt" [ref=e1578]:
+                    - link "View Dan McGirt's profile" [ref=e1581] [cursor=pointer]:
+                      - /url: https://substack.com/profile/3405538-dan-mcgirt?utm_source=comment
+                      - generic "Dan McGirt" [ref=e1583]:
+                        - img "Dan McGirt's avatar" [ref=e1585]
+                    - generic [ref=e1586]:
+                      - generic [ref=e1587]:
+                        - generic [ref=e1590]:
+                          - link "Dan McGirt" [ref=e1595] [cursor=pointer]:
+                            - /url: https://substack.com/profile/3405538-dan-mcgirt?utm_source=substack-feed-item
+                          - link "4 Sept 2019" [ref=e1596] [cursor=pointer]:
+                            - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/29190
+                        - button "Ellipsis" [ref=e1599] [cursor=pointer]:
+                          - img [ref=e1600]
+                      - paragraph [ref=e1605]: I wrote a sad lament to "hello" @substack while you were posting this comment. I'll forward it to "support" Thanks!
+                      - generic [ref=e1606]:
+                        - link "Like" [ref=e1608] [cursor=pointer]:
+                          - /url: javascript:void(0)
+                          - generic [ref=e1609]:
+                            - img [ref=e1611]:
+                              - img [ref=e1613]
+                            - generic [ref=e1615]: Like
+                        - generic [ref=e1618] [cursor=pointer]:
+                          - img [ref=e1619]
+                          - generic [ref=e1622]: Share
+              - article "Comment by TW" [ref=e1630]:
+                - link "View TW's profile" [ref=e1633] [cursor=pointer]:
+                  - /url: https://substack.com/profile/847638-tw?utm_source=comment
+                  - generic "TW" [ref=e1635]:
+                    - img "TW's avatar" [ref=e1637]
+                - generic [ref=e1638]:
+                  - generic [ref=e1639]:
+                    - generic [ref=e1642]:
+                      - link "TW" [ref=e1647] [cursor=pointer]:
+                        - /url: https://substack.com/profile/847638-tw?utm_source=substack-feed-item
+                      - link "4 Jul 2019" [ref=e1648] [cursor=pointer]:
+                        - /url: https://on.substack.com/p/how-to-use-the-substack-editor/comment/19877
+                    - button "Ellipsis" [ref=e1651] [cursor=pointer]:
+                      - img [ref=e1652]
+                  - paragraph [ref=e1657]: Is there any way to SIZE elements we insert via your wysiwg interface, whether imported jpg images of our own or links to external sources, like a YouTube video?
+                  - generic [ref=e1658]:
+                    - link "Like" [ref=e1660] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e1661]:
+                        - img [ref=e1663]:
+                          - img [ref=e1665]
+                        - generic [ref=e1667]: Like
+                    - generic [ref=e1670] [cursor=pointer]:
+                      - img [ref=e1671]
+                      - generic [ref=e1674]: Share
+        - region "Top Posts Footer" [ref=e1677]:
+          - generic [ref=e1678]:
+            - navigation "Archive sort tabs" [ref=e1679]:
+              - tablist "Tabs" [ref=e1682]:
+                - tab "Top" [selected] [ref=e1683] [cursor=pointer]
+                - tab "Latest" [ref=e1684] [cursor=pointer]
+                - tab "Discussions" [ref=e1685] [cursor=pointer]
+              - button "Search" [ref=e1687] [cursor=pointer]:
+                - img [ref=e1688]
+            - generic [ref=e1691]:
+              - generic [ref=e1693]:
+                - article "Post preview for Substack is your corner of the internet" [ref=e1694] [cursor=pointer]:
+                  - generic [ref=e1696]:
+                    - link "Substack is your corner of the internet" [ref=e1698]:
+                      - /url: https://on.substack.com/p/substack-is-your-corner-of-the-internet
+                    - link "Introducing a new way to build custom spaces and deepen relationships with your subscribers" [ref=e1700]:
+                      - /url: https://on.substack.com/p/substack-is-your-corner-of-the-internet
+                    - generic [ref=e1701]:
+                      - time [ref=e1702]: Feb 2
+                      - text: •
+                      - link "Mills Baker" [ref=e1705]:
+                        - /url: https://substack.com/@mills
+                    - generic [ref=e1707]:
+                      - button "Like (2,287)" [ref=e1709]:
+                        - img [ref=e1710]:
+                          - img [ref=e1712]
+                        - generic [ref=e1714]: 2,287
+                      - button "272" [ref=e1715]:
+                        - img [ref=e1716]
+                        - generic [ref=e1719]: "272"
+                      - button [ref=e1720]:
+                        - img [ref=e1721]
+                - 'article "Post preview for New on Substack: Publication design settings, recipe embeds, and live video scheduling on Android and desktop" [ref=e1727] [cursor=pointer]':
+                  - generic [ref=e1729]:
+                    - 'link "New on Substack: Publication design settings, recipe embeds, and live video scheduling on Android and desktop" [ref=e1731]':
+                      - /url: https://on.substack.com/p/new-on-substack-publication-design
+                    - link "Design your space, publish richer posts, and boost turnout for your live video" [ref=e1733]:
+                      - /url: https://on.substack.com/p/new-on-substack-publication-design
+                    - time [ref=e1735]: Feb 12
+                    - generic [ref=e1737]:
+                      - button "Like (1,665)" [ref=e1739]:
+                        - img [ref=e1740]:
+                          - img [ref=e1742]
+                        - generic [ref=e1744]: 1,665
+                      - button "View comments (331)" [ref=e1745]:
+                        - img [ref=e1746]:
+                          - img [ref=e1748]
+                        - generic [ref=e1750]: "331"
+                      - button "173" [ref=e1751]:
+                        - img [ref=e1752]
+                        - generic [ref=e1755]: "173"
+                      - button [ref=e1756]:
+                        - img [ref=e1757]
+                - article "Post preview for Introducing the Substack TV app, now in beta" [ref=e1763] [cursor=pointer]:
+                  - generic [ref=e1765]:
+                    - link "Introducing the Substack TV app, now in beta" [ref=e1767]:
+                      - /url: https://on.substack.com/p/introducing-the-substack-tv-app-now
+                    - link "Taking subscriber video to the bigger screen" [ref=e1769]:
+                      - /url: https://on.substack.com/p/introducing-the-substack-tv-app-now
+                    - generic [ref=e1770]:
+                      - time [ref=e1771]: Jan 22
+                      - text: •
+                      - link "Zach @ Substack" [ref=e1774]:
+                        - /url: https://substack.com/@zach1taylor
+                    - generic [ref=e1776]:
+                      - button "Like (1,744)" [ref=e1778]:
+                        - img [ref=e1779]:
+                          - img [ref=e1781]
+                        - generic [ref=e1783]: 1,744
+                      - button "View comments (817)" [ref=e1784]:
+                        - img [ref=e1785]:
+                          - img [ref=e1787]
+                        - generic [ref=e1789]: "817"
+                      - button "448" [ref=e1790]:
+                        - img [ref=e1791]
+                        - generic [ref=e1794]: "448"
+                      - button [ref=e1795]:
+                        - img [ref=e1796]
+              - button "See all" [ref=e1802] [cursor=pointer]:
+                - text: See all
+                - img [ref=e1803]
+        - generic [ref=e1807]:
+          - heading "Ready for more?" [level=3] [ref=e1808]
+          - generic [ref=e1811]:
+            - textbox "Type your email..." [ref=e1814]
+            - button "Subscribe" [disabled] [ref=e1815]
+    - generic [ref=e1818]:
+      - generic [ref=e1819]:
+        - generic [ref=e1820]: © 2026 Substack
+        - text: ·
+        - link "Privacy" [ref=e1821] [cursor=pointer]:
+          - /url: https://substack.com/privacy
+        - text: ∙
+        - link "Terms" [ref=e1822] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: ∙
+        - link "Collection notice" [ref=e1823] [cursor=pointer]:
+          - /url: https://substack.com/ccpa#personal-data-collected
+      - generic [ref=e1824]:
+        - link "Start your Substack" [ref=e1825] [cursor=pointer]:
+          - /url: https://substack.com/signup?utm_source=substack&utm_medium=web&utm_content=footer
+          - img [ref=e1826]
+          - text: Start your Substack
+        - link "Get the app" [ref=e1831] [cursor=pointer]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=web-footer-button
+      - generic [ref=e1832]:
+        - link "Substack" [ref=e1833] [cursor=pointer]:
+          - /url: https://substack.com
+        - text: is the home for great culture
+    - generic [ref=e1835]:
+      - heading "Cookie Policy" [level=4] [ref=e1836]
+      - generic [ref=e1837]:
+        - text: We use cookies to improve your experience, for analytics, and for marketing. You can accept, reject, or manage your preferences. See our
+        - link "privacy policy" [ref=e1838] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: .
+      - generic [ref=e1839]:
+        - button "Manage" [ref=e1840] [cursor=pointer]
+        - button "Reject" [ref=e1841] [cursor=pointer]
+        - button "Accept" [ref=e1842] [cursor=pointer]
+  - region "Notifications (F8)":
+    - list

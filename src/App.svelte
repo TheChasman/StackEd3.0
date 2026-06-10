@@ -36,7 +36,7 @@
 
   async function loadFilePath(filePath: string) {
     const parsed = await openFilePath(filePath);
-    documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
+    documentStore.openInNewTab(parsed);
   }
 
   onMount(() => {
@@ -105,7 +105,7 @@
   async function handleOpen() {
     try {
       const parsed = await openFile();
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
+      documentStore.openInNewTab(parsed);
     } catch {
       // User cancelled picker
     }
@@ -114,12 +114,16 @@
   async function handleNew() {
     try {
       const parsed = await createNewFile();
-      if (parsed) {
-        documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
-      }
+      if (parsed) documentStore.openInNewTab(parsed);
     } catch (e) {
       alert('New file failed: ' + (e instanceof Error ? e.message : e));
     }
+  }
+
+  function handleCloseTab(index: number) {
+    const meta = documentStore.tabMetas[index];
+    if (meta.dirty && !window.confirm(`Close "${meta.title}" without saving?`)) return;
+    documentStore.closeTab(index);
   }
 
   function getFrontmatterForSave() {
@@ -325,6 +329,31 @@
     title="Toggle sidebar"
   >⊞</button>
 </header>
+
+<!-- Tab bar (visible when 2+ tabs are open) -->
+{#if documentStore.tabCount > 1}
+  <div class="flex items-end gap-0 border-b border-dark-700 bg-dark-800 px-2 shrink-0 overflow-x-auto">
+    {#each documentStore.tabMetas as tab, i}
+      <button
+        onclick={() => documentStore.switchTab(i)}
+        class="flex items-center gap-1.5 px-3 py-1.5 text-sm border-x border-t border-b-0 rounded-t shrink-0 max-w-48
+          {documentStore.activeIndex === i
+            ? 'border-dark-600 bg-dark-900 text-dark-100 -mb-px'
+            : 'border-transparent text-dark-400 hover:text-dark-200'}"
+      >
+        {#if tab.dirty}<span class="text-primary-400 text-xs">●</span>{/if}
+        <span class="truncate">{tab.title}</span>
+        <span
+          role="button"
+          tabindex="0"
+          class="ml-0.5 text-dark-500 hover:text-dark-200 leading-none"
+          onclick={(e) => { e.stopPropagation(); handleCloseTab(i); }}
+          onkeydown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); handleCloseTab(i); } }}
+        >×</span>
+      </button>
+    {/each}
+  </div>
+{/if}
 
 <!-- Main area -->
 <div class="flex flex-1 min-h-0">

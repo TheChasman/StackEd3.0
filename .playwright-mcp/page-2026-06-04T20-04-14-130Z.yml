@@ -1,0 +1,1107 @@
+- generic [ref=e2]:
+  - iframe
+  - generic [ref=e3]:
+    - generic [ref=e7]:
+      - link "Really Good Business Ideas" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "Really Good Business Ideas" [ref=e13]
+      - heading "Really Good Business Ideas" [level=1] [ref=e16]:
+        - link "Really Good Business Ideas" [ref=e17] [cursor=pointer]:
+          - /url: /
+          - img "Really Good Business Ideas" [ref=e18]
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - button "Search" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+          - button "Share Publication" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+        - button "Subscribe" [ref=e32] [cursor=pointer]
+        - button "Sign in" [ref=e33] [cursor=pointer]
+    - main "Post" [ref=e36]:
+      - article [ref=e40]:
+        - dialog "Subscribe modal" [ref=e42]:
+          - generic [ref=e43]:
+            - button "close" [ref=e44] [cursor=pointer]:
+              - img [ref=e45]
+            - generic "User" [ref=e50]:
+              - img "User's avatar" [ref=e52]
+            - generic [ref=e53]:
+              - generic [ref=e54]: Discover more from Really Good Business Ideas
+              - generic [ref=e55]: Really good business ideas to help you start and grow a profitable business (including on Substack). All ideas are backed by research and analysis.
+            - generic [ref=e57]:
+              - textbox "Enter your email..." [ref=e59]
+              - button "Subscribe" [ref=e60] [cursor=pointer]
+              - generic [ref=e63]:
+                - text: By subscribing, you agree Substack's
+                - link "Terms of Use" [ref=e64] [cursor=pointer]:
+                  - /url: https://substack.com/tos
+                - text: ", and acknowledge its"
+                - link "Information Collection Notice" [ref=e65] [cursor=pointer]:
+                  - /url: https://substack.com/ccpa#personal-data-collected
+                - text: and
+                - link "Privacy Policy" [ref=e66] [cursor=pointer]:
+                  - /url: https://substack.com/privacy
+                - text: .
+          - generic [ref=e68]: Already have an account? Sign in
+        - region "Post header" [ref=e69]:
+          - link "The Substack Shortcut" [ref=e71] [cursor=pointer]:
+            - /url: https://www.reallygoodbusinessideas.com/s/substack/?utm_source=substack&utm_medium=menu
+          - heading "A Complete Guide to Substack Visuals" [level=1] [ref=e72]
+          - heading "All the visuals you need to make your Substack look great and feel unmistakably you." [level=3] [ref=e73]
+          - region "Post UFI" [ref=e74]:
+            - generic [ref=e76]:
+              - link "View Casandra Campbell's profile" [ref=e81] [cursor=pointer]:
+                - /url: https://substack.com/@casandracampbell
+                - generic "Casandra Campbell" [ref=e83]:
+                  - img "Casandra Campbell's avatar" [ref=e85]
+              - generic [ref=e86]:
+                - link "Casandra Campbell" [ref=e89] [cursor=pointer]:
+                  - /url: https://substack.com/@casandracampbell
+                - generic [ref=e91]: May 19, 2026
+            - generic [ref=e92]:
+              - generic [ref=e93]:
+                - button "Like (149)" [ref=e95] [cursor=pointer]:
+                  - img [ref=e96]:
+                    - img [ref=e98]
+                  - generic [ref=e100]: "149"
+                - button "View comments (30)" [ref=e101] [cursor=pointer]:
+                  - img [ref=e102]:
+                    - img [ref=e104]
+                  - generic [ref=e106]: "30"
+                - button "13" [ref=e107] [cursor=pointer]:
+                  - img [ref=e108]
+                  - generic [ref=e111]: "13"
+              - button "Share" [ref=e113] [cursor=pointer]:
+                - generic [ref=e114]: Share
+        - generic [ref=e115]:
+          - button "Table of Contents" [ref=e116] [cursor=pointer]
+          - generic [ref=e134]:
+            - paragraph [ref=e135]:
+              - strong [ref=e136]: ✨ The Substack Creator OS is here!
+            - paragraph [ref=e137]: A complete Notion workspace for running and growing your Substack like a pro.
+            - list [ref=e138]:
+              - listitem [ref=e139]:
+                - paragraph [ref=e140]:
+                  - strong [ref=e141]: Publish more consistently
+                  - text: with a streamlined content pipeline that eliminates chaos and guesswork.
+              - listitem [ref=e142]:
+                - paragraph [ref=e143]:
+                  - strong [ref=e144]: Grow faster
+                  - text: by turning your ideas, posts, and outreach into a clear, trackable growth system.
+              - listitem [ref=e145]:
+                - paragraph [ref=e146]:
+                  - strong [ref=e147]: Increase your revenue
+                  - text: with built-in tools for managing sponsors, products, and your paid subscriber strategy.
+            - paragraph [ref=e148]:
+              - text: Right now, it’s free for
+              - link "Premium subscribers" [ref=e149] [cursor=pointer]:
+                - /url: https://www.reallygoodbusinessideas.com/p/premium
+              - text: .
+            - progressbar "Loading" [ref=e152]:
+              - img [ref=e153]
+            - separator [ref=e157]
+            - separator [ref=e159]
+            - paragraph [ref=e160]:
+              - text: You could be the best writer on Substack, but if your newsletter
+              - emphasis [ref=e161]: looks
+              - text: unpolished, cluttered, or hard to read, people won’t stick around long enough to realize it.
+            - paragraph [ref=e162]: Visuals aren’t just decoration; they’re trust signals. The right design choices make your publication feel intentional, professional, and worth subscribing to. They communicate who you are, what your newsletter is about, and why someone should care—all before they’ve read a single sentence.
+            - paragraph [ref=e163]: The good news? You don’t need a design degree (or even Photoshop) to make your Substack look great. You just need to know what to focus on.
+            - paragraph [ref=e164]: "This guide covers every visual asset you should consider, starting with the basics, like your headshot and bio, and moving all the way up to social share images and visual formatting inside your posts. For each one, you’ll get:"
+            - list [ref=e165]:
+              - listitem [ref=e166]:
+                - paragraph [ref=e167]: What it is.
+              - listitem [ref=e168]:
+                - paragraph [ref=e169]: Why it matters.
+              - listitem [ref=e170]:
+                - paragraph [ref=e171]: Image specs.
+              - listitem [ref=e172]:
+                - paragraph [ref=e173]: Tips to make it easy.
+            - paragraph [ref=e174]: Let’s make your newsletter look as good as it reads.
+            - heading "Substack Profile Assets Link" [level=2] [ref=e175]:
+              - text: Substack Profile Assets
+              - button "Link" [ref=e178] [cursor=pointer]:
+                - img [ref=e179]
+            - paragraph [ref=e182]:
+              - text: These are the visuals that represent you as the person behind the publication, because people subscribe to
+              - emphasis [ref=e183]: other people
+              - text: ", not just content."
+            - paragraph [ref=e184]:
+              - text: On Substack, your
+              - emphasis [ref=e185]: profile
+              - text: and your
+              - emphasis [ref=e186]: publication
+              - text: are technically separate. Your profile includes your headshot, handle, and bio. This is what people see when you leave a comment, get mentioned in Notes, or if someone clicks on your name. Even if your newsletter is fully branded, your author identity still shows up
+              - emphasis [ref=e187]: everywhere
+              - text: .
+            - link "How to Customize Your Substack Profile How to Customize Your Substack Profile Casandra Campbell · 19 November 2025 Read full story" [ref=e189] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/substack-profile
+              - generic [ref=e190]:
+                - img "How to Customize Your Substack Profile" [ref=e193]
+                - generic [ref=e194]:
+                  - heading "How to Customize Your Substack Profile" [level=4] [ref=e195]
+                  - generic [ref=e196]:
+                    - link "Casandra Campbell" [ref=e198]:
+                      - /url: https://substack.com/profile/33945162-casandra-campbell
+                    - generic [ref=e199]: ·
+                    - generic [ref=e200]: 19 November 2025
+                  - link "Read full story" [ref=e202]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/substack-profile
+                    - generic [ref=e203]:
+                      - generic [ref=e204]: Read full story
+                      - img [ref=e205]
+            - paragraph [ref=e207]: A strong, consistent personal presence goes a long way. A well-chosen headshot and a scannable bio can help build trust, recognition, and a sense of connection, before a reader even opens your first post.
+            - figure [ref=e209]:
+              - link [ref=e210]:
+                - /url: https://substackcdn.com/image/fetch/$s_!uBYE!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Ff19131b2-3540-4ba7-9145-7e4f9f0a8172_1456x1048.png
+                - generic [ref=e214]:
+                  - button [ref=e215] [cursor=pointer]:
+                    - img [ref=e216]
+                  - button [ref=e218] [cursor=pointer]:
+                    - img [ref=e219]
+            - heading "Profile Photo Link" [level=3] [ref=e220]:
+              - text: Profile Photo
+              - button "Link" [ref=e223] [cursor=pointer]:
+                - img [ref=e224]
+            - paragraph [ref=e227]:
+              - strong [ref=e228]: "What It Is:"
+              - text: Your author photo, visible on your profile page, in Notes, in comments, and at the bottom of your posts.
+            - paragraph [ref=e229]:
+              - strong [ref=e230]: "Why It Matters:"
+              - text: It makes you look real. A clear, approachable photo builds trust and signals you’re active and intentional, not just a ghostwriter behind a brand.
+            - paragraph [ref=e231]:
+              - strong [ref=e232]: Specs
+              - text: ":"
+            - list [ref=e233]:
+              - listitem [ref=e234]:
+                - paragraph [ref=e235]:
+                  - strong [ref=e236]: File Size
+                  - text: ": Use a square, high-resolution image, at least 400 × 400 px."
+              - listitem [ref=e237]:
+                - paragraph [ref=e238]:
+                  - strong [ref=e239]: File Type
+                  - text: ": JPG, PNG, WebP, AVIF, or GIF."
+            - paragraph [ref=e240]:
+              - strong [ref=e241]: "Tips:"
+            - list [ref=e242]:
+              - listitem [ref=e243]:
+                - paragraph [ref=e244]: Natural light and a neutral background work great.
+              - listitem [ref=e245]:
+                - paragraph [ref=e246]: Match the tone of your newsletter (e.g., if you write about cooking, don’t be afraid to include a photo of yourself in the kitchen or wearing an apron!).
+              - listitem [ref=e247]:
+                - paragraph [ref=e248]:
+                  - text: If you don’t have a professional headshot yet, consider editing a selfie with
+                  - link "Nano Banana" [ref=e249] [cursor=pointer]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/gemini-flash-2-5-nano-banana
+                  - text: . It’s really easy to do and the results can be quite good!
+              - listitem [ref=e250]:
+                - paragraph [ref=e251]:
+                  - link "Directions for updating your profile photo on Substack" [ref=e252] [cursor=pointer]:
+                    - /url: https://support.substack.com/hc/en-us/articles/360039415251-How-do-I-update-my-Substack-profile
+                  - text: .
+                - paragraph
+            - figure "Here’s an example of a selfie I was able to edit into a professional headshot using Nano Banana." [ref=e254]:
+              - link [ref=e255]:
+                - /url: https://substackcdn.com/image/fetch/$s_!LK1k!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fbbf3cf61-f671-4926-8941-781d3cfe4601_1260x900.webp
+                - generic [ref=e259]:
+                  - button [ref=e260] [cursor=pointer]:
+                    - img [ref=e261]
+                  - button [ref=e263] [cursor=pointer]:
+                    - img [ref=e264]
+              - generic [ref=e265]:
+                - text: Here’s an example of a selfie I was able to edit into a professional headshot using
+                - link "Nano Banana" [ref=e266] [cursor=pointer]:
+                  - /url: https://www.reallygoodbusinessideas.com/p/gemini-flash-2-5-nano-banana
+                - text: .
+            - link "Photo Editing in Seconds, Not Hours Photo Editing in Seconds, Not Hours Casandra Campbell · 10 September 2025 Read full story" [ref=e268] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/gemini-flash-2-5-nano-banana
+              - generic [ref=e269]:
+                - img "Photo Editing in Seconds, Not Hours" [ref=e272]
+                - generic [ref=e273]:
+                  - heading "Photo Editing in Seconds, Not Hours" [level=4] [ref=e274]
+                  - generic [ref=e275]:
+                    - link "Casandra Campbell" [ref=e277]:
+                      - /url: https://substack.com/profile/33945162-casandra-campbell
+                    - generic [ref=e278]: ·
+                    - generic [ref=e279]: 10 September 2025
+                  - link "Read full story" [ref=e281]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/gemini-flash-2-5-nano-banana
+                    - generic [ref=e282]:
+                      - generic [ref=e283]: Read full story
+                      - img [ref=e284]
+            - link "New Headshots for $35 in Two Hours? New Headshots for $35 in Two Hours? Casandra Campbell · 28 August 2024 Read full story" [ref=e287] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/ai-headshots
+              - generic [ref=e288]:
+                - img "New Headshots for $35 in Two Hours?" [ref=e291]
+                - generic [ref=e292]:
+                  - heading "New Headshots for $35 in Two Hours?" [level=4] [ref=e293]
+                  - generic [ref=e294]:
+                    - link "Casandra Campbell" [ref=e296]:
+                      - /url: https://substack.com/profile/33945162-casandra-campbell
+                    - generic [ref=e297]: ·
+                    - generic [ref=e298]: 28 August 2024
+                  - link "Read full story" [ref=e300]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/ai-headshots
+                    - generic [ref=e301]:
+                      - generic [ref=e302]: Read full story
+                      - img [ref=e303]
+            - heading "Profile Header Image Link" [level=3] [ref=e305]:
+              - text: Profile Header Image
+              - button "Link" [ref=e308] [cursor=pointer]:
+                - img [ref=e309]
+            - paragraph [ref=e312]:
+              - strong [ref=e313]: "What it is:"
+            - paragraph [ref=e314]: Your publication wordmark (explained later in this article) will also be displayed as a header image at the top of your Substack profile page.
+            - paragraph [ref=e315]:
+              - strong [ref=e316]: "Why it matters:"
+            - paragraph [ref=e317]: A wordmark is a great way to personalize your publication and create a recognizable visual brand for your readers. Having it appear automatically at the top of your profile page is an added bonus for reinforcing your brand.
+            - paragraph [ref=e318]:
+              - strong [ref=e319]: Specs
+              - text: ":"
+            - list [ref=e320]:
+              - listitem [ref=e321]:
+                - paragraph [ref=e322]:
+                  - strong [ref=e323]: File Size
+                  - text: ": Use a high-resolution image with an aspect ratio of 21:4, at least 1344 x 256 px or larger"
+              - listitem [ref=e324]:
+                - paragraph [ref=e325]:
+                  - strong [ref=e326]: File Type
+                  - text: ": JPG or PNG; I recommend a transparent PNG."
+            - paragraph [ref=e327]:
+              - strong [ref=e328]: "Tips:"
+            - list [ref=e329]:
+              - listitem [ref=e330]:
+                - paragraph [ref=e331]: It’s best to add your wordmark through your publication’s website editor so you can make sure it looks good there first.
+              - listitem [ref=e332]:
+                - paragraph [ref=e333]:
+                  - text: See the wordmark section below or read my guide to
+                  - link "wordmarks on Substack" [ref=e334] [cursor=pointer]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/substack-publication-wordmark
+                  - text: .
+            - heading "Substack Publication Assets Link" [level=2] [ref=e335]:
+              - text: Substack Publication Assets
+              - button "Link" [ref=e338] [cursor=pointer]:
+                - img [ref=e339]
+            - paragraph [ref=e342]: These visuals shape how your newsletter looks and feels as a standalone brand, on your homepage, in inboxes, and across the web.
+            - paragraph [ref=e343]:
+              - text: Your Substack publication has its own identity, separate from your personal profile. These assets define how polished, professional, and cohesive your publication feels to readers—
+              - emphasis [ref=e344]: especially
+              - text: "first-timers. Think of them as your brand’s storefront: the header, logo, colors, and favicon work together to make a strong first impression."
+            - figure "My publication homepage, which includes my icon logo, my wordmark, and my brand accent color." [ref=e346]:
+              - link [ref=e347]:
+                - /url: https://substackcdn.com/image/fetch/$s_!15ta!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fbff7ae65-b61a-4b74-b560-022c1db725b0_1456x892.png
+                - generic [ref=e351]:
+                  - button [ref=e352] [cursor=pointer]:
+                    - img [ref=e353]
+                  - button [ref=e355] [cursor=pointer]:
+                    - img [ref=e356]
+              - generic [ref=e357]: My publication homepage, which includes my icon logo, my wordmark, and my brand accent color.
+            - heading "Publication Logo Link" [level=3] [ref=e358]:
+              - text: Publication Logo
+              - button "Link" [ref=e361] [cursor=pointer]:
+                - img [ref=e362]
+            - paragraph [ref=e365]:
+              - strong [ref=e366]: "What It Is:"
+              - text: A simple, recognizable graphic that represents your brand. It could be an icon, monogram, or symbol, but it should be clear and consistent.
+            - paragraph [ref=e367]:
+              - strong [ref=e368]: "Why It Matters:"
+              - text: Your logo is the anchor of your visual brand. It shows up everywhere your publication does, and a strong logo makes your newsletter feel like a
+              - emphasis [ref=e369]: real
+              - text: brand.
+            - paragraph [ref=e370]:
+              - strong [ref=e371]: Specs
+              - text: ":"
+            - list [ref=e372]:
+              - listitem [ref=e373]:
+                - paragraph [ref=e374]:
+                  - strong [ref=e375]: File Size
+                  - text: ": Minimum 256 × 256p px or larger."
+              - listitem [ref=e376]:
+                - paragraph [ref=e377]:
+                  - strong [ref=e378]: File Type
+                  - text: ": JPG, PNG, WebP, AVIF, or GIF."
+            - paragraph [ref=e379]:
+              - strong [ref=e380]: "Tips:"
+            - list [ref=e381]:
+              - listitem [ref=e382]:
+                - paragraph [ref=e383]: "Design a logo that works at multiple sizes (especially small). Keep it simple: think shape, not detail."
+              - listitem [ref=e384]:
+                - paragraph [ref=e385]: Use a square format and a transparent background for flexibility.
+              - listitem [ref=e386]:
+                - paragraph [ref=e387]: No need to include your publication’s name in the logo because the name will always automatically appear along with the logo.
+              - listitem [ref=e388]:
+                - paragraph [ref=e389]:
+                  - text: If you don’t have one yet, you can easily
+                  - link "design a logo in Canva" [ref=e390] [cursor=pointer]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/how-to-make-a-logo
+                  - text: for free!
+              - listitem [ref=e391]:
+                - paragraph [ref=e392]:
+                  - link "Directions for updating your publication logo on Substack." [ref=e393] [cursor=pointer]:
+                    - /url: https://faq.substack.com/p/creating-a-visual-identity-for-your
+                - paragraph
+                - figure "My icon logo for Really Good Business Ideas uses a simple arrow moving “up to the right,” signifying the growth that every business chases." [ref=e395]:
+                  - link [ref=e396] [cursor=pointer]:
+                    - /url: https://substackcdn.com/image/fetch/$s_!7GkZ!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F62fdaf14-ccca-409a-acab-f6afc0354661_500x500.png
+                  - generic [ref=e399]: My icon logo for Really Good Business Ideas uses a simple arrow moving “up to the right,” signifying the growth that every business chases.
+                - paragraph
+                - link "How I Create Logos in Five Minutes Using Canva 🎨 How I Create Logos in Five Minutes Using Canva 🎨 Casandra Campbell · 31 July 2024 Read full story" [ref=e401] [cursor=pointer]:
+                  - /url: https://www.reallygoodbusinessideas.com/p/how-to-make-a-logo
+                  - generic [ref=e402]:
+                    - img "How I Create Logos in Five Minutes Using Canva 🎨" [ref=e405]
+                    - generic [ref=e406]:
+                      - heading "How I Create Logos in Five Minutes Using Canva 🎨" [level=4] [ref=e407]
+                      - generic [ref=e408]:
+                        - link "Casandra Campbell" [ref=e410]:
+                          - /url: https://substack.com/profile/33945162-casandra-campbell
+                        - generic [ref=e411]: ·
+                        - generic [ref=e412]: 31 July 2024
+                      - link "Read full story" [ref=e414]:
+                        - /url: https://www.reallygoodbusinessideas.com/p/how-to-make-a-logo
+                        - generic [ref=e415]:
+                          - generic [ref=e416]: Read full story
+                          - img [ref=e417]
+            - heading "Publication Wordmark (Optional) Link" [level=3] [ref=e419]:
+              - text: Publication Wordmark (Optional)
+              - button "Link" [ref=e422] [cursor=pointer]:
+                - img [ref=e423]
+            - paragraph [ref=e426]:
+              - strong [ref=e427]: "What It Is:"
+              - text: A stylized version of your publication’s name using a specific font, layout, or design treatment.
+            - paragraph [ref=e428]:
+              - strong [ref=e429]: "Why It Matters:"
+              - text: This is often the missing piece that makes a Substack feel like a professional publication. Without a wordmark, your newsletter can look like every other default template. With one, it feels branded, intentional, and visually distinct.
+            - paragraph [ref=e430]:
+              - strong [ref=e431]: Specs
+              - text: ":"
+            - list [ref=e432]:
+              - listitem [ref=e433]:
+                - paragraph [ref=e434]:
+                  - strong [ref=e435]: File Size
+                  - text: ": Use a high-resolution image with an aspect ratio of 21:4, at least 1344 x 256 px or larger"
+              - listitem [ref=e436]:
+                - paragraph [ref=e437]:
+                  - strong [ref=e438]: File Type
+                  - text: ": Use a transparent PNG."
+            - paragraph [ref=e439]:
+              - strong [ref=e440]: "Tips:"
+            - list [ref=e441]:
+              - listitem [ref=e442]:
+                - paragraph [ref=e443]: Choose a stylized font that is legible and represents your brand.
+              - listitem [ref=e444]:
+                - paragraph [ref=e445]: When combined with your icon logo, the two become a complete logo that can be used on other brand assets.
+              - listitem [ref=e446]:
+                - paragraph [ref=e447]:
+                  - text: If you don’t have one yet, you can easily
+                  - link "design a logo in Canva" [ref=e448] [cursor=pointer]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/how-to-make-a-logo
+                  - text: for free!
+              - listitem [ref=e449]:
+                - paragraph [ref=e450]:
+                  - link "Directions for updating your wordmark on Substack." [ref=e451] [cursor=pointer]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/substack-publication-wordmark
+            - figure "Although I provide expert-level advice and content, I want Really Good Business Ideas to feel accessible to everyone, so I chose a more casual font for my wordmark and kept it lowercase." [ref=e453]:
+              - link [ref=e454] [cursor=pointer]:
+                - /url: https://substackcdn.com/image/fetch/$s_!s_CN!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F4f181e4c-ba9e-4db7-aa9d-075d42e3fcb9_610x124.png
+              - generic [ref=e457]: Although I provide expert-level advice and content, I want Really Good Business Ideas to feel accessible to everyone, so I chose a more casual font for my wordmark and kept it lowercase.
+            - heading "Brand Colors & Fonts Link" [level=3] [ref=e458]:
+              - text: Brand Colors & Fonts
+              - button "Link" [ref=e461] [cursor=pointer]:
+                - img [ref=e462]
+            - paragraph [ref=e465]:
+              - strong [ref=e466]: "What It Is:"
+              - text: The theme colors and font pairings you choose in your Substack design settings, including background color, brand accent color, heading and body copy fonts, and link style.
+            - paragraph [ref=e467]:
+              - strong [ref=e468]: "Why It Matters:"
+              - text: These subtle choices shape the overall feel of your entire publication, from your homepage to your posts and every email you send. They’re part of what makes your newsletter feel
+              - emphasis [ref=e469]: cohesive
+              - text: instead of simply copy-pasted..
+            - paragraph [ref=e470]:
+              - strong [ref=e471]: "Tips:"
+            - list [ref=e472]:
+              - listitem [ref=e473]:
+                - paragraph [ref=e474]: Make sure your accent color matches one of the brand colors you’ve chosen for your logo.
+              - listitem [ref=e475]:
+                - paragraph [ref=e476]: Use high-contrast color combinations to ensure readability in both light and dark modes.
+              - listitem [ref=e477]:
+                - paragraph [ref=e478]: Select fonts that match your tone. For example, serif for a classic look, sans-serif for a modern feel, or mono for a techy feel are common.
+              - listitem [ref=e479]:
+                - paragraph [ref=e480]: Your logo will also be used as your favicon (the icon that appears in the browser tab when your site is loaded).
+              - listitem [ref=e481]:
+                - paragraph [ref=e482]:
+                  - link "Directions for updating your brand fonts and colors in Substack" [ref=e483] [cursor=pointer]:
+                    - /url: https://faq.substack.com/p/creating-a-visual-identity-for-your
+                  - text: .
+            - heading "Publication Cover Image (Optional) Link" [level=3] [ref=e484]:
+              - text: Publication Cover Image (Optional)
+              - button "Link" [ref=e487] [cursor=pointer]:
+                - img [ref=e488]
+            - paragraph [ref=e491]:
+              - strong [ref=e492]: "What It Is:"
+              - text: The cover image appears at the top of your publication’s
+              - link "welcome page" [ref=e493] [cursor=pointer]:
+                - /url: https://support.substack.com/hc/en-us/articles/7999279240212-What-is-a-Welcome-page-on-Substack
+              - text: ", sitting just above your publication name and description. If you leave it empty, your logo will be placed here instead."
+            - paragraph [ref=e494]:
+              - strong [ref=e495]: "Why It Matters:"
+              - text: This is your newsletter’s
+              - emphasis [ref=e496]: first visual impression
+              - text: . For many readers, it’s the difference between “this looks legit” and “is this even a real website?” A strong cover image instantly communicates tone, quality, and brand identity, before they even read a word.
+            - paragraph [ref=e497]:
+              - strong [ref=e498]: Specs
+              - text: ":"
+            - list [ref=e499]:
+              - listitem [ref=e500]:
+                - paragraph [ref=e501]:
+                  - strong [ref=e502]: File Size
+                  - text: ": Use a high-resolution image of at least 600 x 600 px."
+              - listitem [ref=e503]:
+                - paragraph [ref=e504]:
+                  - strong [ref=e505]: File Type
+                  - text: ": JPG, PNG, WebP, or AVIF."
+            - paragraph [ref=e506]:
+              - strong [ref=e507]: "Tips:"
+            - list [ref=e508]:
+              - listitem [ref=e509]:
+                - paragraph [ref=e510]: Use your wordmark (or a combination of logo and wordmark) as the focal point.
+              - listitem [ref=e511]:
+                - paragraph [ref=e512]: If you decide to use it, this is a way to communicate the vibe you want your brand to convey.
+              - listitem [ref=e513]:
+                - paragraph [ref=e514]:
+                  - link "Directions for updating your cover image on Substack." [ref=e515] [cursor=pointer]:
+                    - /url: https://faq.substack.com/p/creating-a-visual-identity-for-your
+            - figure "J.Massey uses a photo of himself as the cover image for his publication, Cashflow Diary Direct, adding personality to his welcome page." [ref=e517]:
+              - link [ref=e518]:
+                - /url: https://substackcdn.com/image/fetch/$s_!DcEL!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F3bbea5e1-3840-4154-b0ef-4a8ab5e829aa_1326x926.png
+                - generic [ref=e522]:
+                  - button [ref=e523] [cursor=pointer]:
+                    - img [ref=e524]
+                  - button [ref=e526] [cursor=pointer]:
+                    - img [ref=e527]
+              - generic [ref=e528]:
+                - link "J.Massey" [ref=e529] [cursor=pointer]:
+                  - /url: https://substack.com/@cashflowdiary
+                - text: uses a photo of himself as the cover image for his publication,
+                - link "Cashflow Diary Direct" [ref=e530] [cursor=pointer]:
+                  - /url: https://newsletter.cashflowdiary.com/?utm_campaign=profile_chips
+                - text: ", adding personality to his welcome page."
+            - heading "Email Banner (Optional) Link" [level=3] [ref=e531]:
+              - text: Email Banner (Optional)
+              - button "Link" [ref=e534] [cursor=pointer]:
+                - img [ref=e535]
+            - paragraph [ref=e538]:
+              - strong [ref=e539]: "What It Is:"
+              - text: An optional banner image that appears at the top of every email your Substack sends above your post title, like a masthead.
+            - paragraph [ref=e540]:
+              - strong [ref=e541]: "Why It Matters:"
+              - text: It’s the
+              - emphasis [ref=e542]: first thing
+              - text: readers see when they open your email. A well-designed banner gives your newsletter a polished, publication-like feel. If you’re going for a more personal letter from a friend vibe, feel free to skip it.
+            - paragraph [ref=e543]:
+              - strong [ref=e544]: Specs
+            - list [ref=e545]:
+              - listitem [ref=e546]:
+                - paragraph [ref=e547]:
+                  - strong [ref=e548]: File Size
+                  - text: ": Substack recommends 1100 x 220 px with a transparent background, but it could also be taller."
+              - listitem [ref=e549]:
+                - paragraph [ref=e550]:
+                  - strong [ref=e551]: File Type
+                  - text: ": PNG"
+            - paragraph [ref=e552]:
+              - strong [ref=e553]: Tips
+              - text: ":"
+            - list [ref=e554]:
+              - listitem [ref=e555]:
+                - paragraph [ref=e556]: Incorporate your wordmark, icon logo, or brand colors to reinforce your visual identity.
+              - listitem [ref=e557]:
+                - paragraph [ref=e558]: Keep it clean and readable, and avoid small text or edge-to-edge clutter.
+              - listitem [ref=e559]:
+                - paragraph [ref=e560]:
+                  - link "Directions for adding a banner to your Substack emails." [ref=e561] [cursor=pointer]:
+                    - /url: https://support.substack.com/hc/en-us/articles/360056142311-How-do-I-edit-email-headers-and-footers-on-Substack
+                - paragraph
+            - figure "Yana G.Y uses a branded banner in her emails for her publication, Unplugged. It incporates her publication’s name, icon logo, and brand colors." [ref=e563]:
+              - link [ref=e564] [cursor=pointer]:
+                - /url: https://substackcdn.com/image/fetch/$s_!JUzr!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F29ec1076-1602-468f-9c0c-f34b2d0c13b6_2316x466.png
+              - generic [ref=e567]:
+                - link "Yana G.Y" [ref=e568] [cursor=pointer]:
+                  - /url: https://substack.com/profile/136431837-yana-gy?utm_source=global-search
+                - text: uses a branded banner in her emails for her publication,
+                - link "Unplugged" [ref=e569] [cursor=pointer]:
+                  - /url: https://www.yana-g-y.com/?utm_campaign=profile_chips
+                - text: . It incporates her publication’s name, icon logo, and brand colors.
+            - heading "Substack Post-Level Assets Link" [level=2] [ref=e570]:
+              - text: Substack Post-Level Assets
+              - button "Link" [ref=e573] [cursor=pointer]:
+                - img [ref=e574]
+            - paragraph [ref=e577]: These are the visuals that show up inside your actual posts. What readers see in their inbox, on the Substack site, and when scrolling through your archive.
+            - paragraph [ref=e578]:
+              - text: Well-chosen post visuals can make your newsletter feel more polished, more readable, and more engaging. They help break up text, reinforce your ideas, and give your posts a professional finish by using screenshots, illustrations,
+              - link "AI-generated images" [ref=e579] [cursor=pointer]:
+                - /url: https://www.reallygoodbusinessideas.com/p/ai-image-generation-tools
+              - text: ", or even just"
+              - link "free stock photography" [ref=e580] [cursor=pointer]:
+                - /url: https://www.reallygoodbusinessideas.com/p/free-stock-photography
+              - text: .
+            - heading "Post Social Image Link" [level=3] [ref=e581]:
+              - text: Post Social Image
+              - button "Link" [ref=e584] [cursor=pointer]:
+                - img [ref=e585]
+            - paragraph [ref=e588]:
+              - strong [ref=e589]: "What It Is:"
+              - text: An optional image uploaded in the post editor for each post you publish. The image shows up as the thumbnail when your post is shared on social media, featured on your homepage, or previewed in the inbox.
+            - paragraph [ref=e590]:
+              - strong [ref=e591]: "Why It Matters:"
+              - text: This is the
+              - emphasis [ref=e592]: first visual impression
+              - text: of your post. It’s what shows up in social media feeds like Twitter, LinkedIn, and
+              - link "Substack Notes" [ref=e593] [cursor=pointer]:
+                - /url: https://www.reallygoodbusinessideas.com/p/substack-notes
+              - text: . A strong preview image can stop the scroll and increase clicks, shares, and open rates.
+            - paragraph [ref=e594]:
+              - strong [ref=e595]: Specs
+              - text: ":"
+            - list [ref=e596]:
+              - listitem [ref=e597]:
+                - paragraph [ref=e598]:
+                  - strong [ref=e599]: File Size
+                  - text: ": Use a high-resolution image with an aspect ratio of 14:10 (at least 1456 x 1048 px is ideal)."
+              - listitem [ref=e600]:
+                - paragraph [ref=e601]:
+                  - strong [ref=e602]: File Type
+                  - text: ": JPG, PNG, WebP, AVIF, or GIF."
+            - paragraph [ref=e603]:
+              - strong [ref=e604]: "Tips:"
+            - list [ref=e605]:
+              - listitem [ref=e606]:
+                - paragraph [ref=e607]: If you don’t upload a social image, the first image in your post will get used instead, but I recommend making a conscious choice about whether that image will work well or if you should create something different.
+              - listitem [ref=e608]:
+                - paragraph [ref=e609]: Many publishers prefer to use a consistent color or style to reinforce their brand; others like to experiment with different ways of capturing attention and standing out in social feeds.
+              - listitem [ref=e610]:
+                - paragraph [ref=e611]: Be aware that the image may be cropped differently on different social networks and devices. Try to keep text centered so it doesn’t get cropped, or avoid text entirely.
+              - listitem [ref=e612]:
+                - paragraph [ref=e613]:
+                  - link "Directions for uploading a social preview image in your Substack posts" [ref=e614] [cursor=pointer]:
+                    - /url: https://support.substack.com/hc/en-us/articles/360039016992-How-do-I-edit-what-my-post-looks-like-on-social-media
+                  - text: .
+                - paragraph
+            - figure "I experiment with a lot of different header image styles to stand out in the feed, but I also use color to create a bit of cohesion, including incorporating a bit of orange whenever a post is about Substack." [ref=e616]:
+              - link [ref=e617]:
+                - /url: https://substackcdn.com/image/fetch/$s_!PWPx!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F27399377-77fd-4f82-8fac-8ec6dbde8f1b_2010x1174.png
+                - generic [ref=e621]:
+                  - button [ref=e622] [cursor=pointer]:
+                    - img [ref=e623]
+                  - button [ref=e625] [cursor=pointer]:
+                    - img [ref=e626]
+              - generic [ref=e627]: I experiment with a lot of different header image styles to stand out in the feed, but I also use color to create a bit of cohesion, including incorporating a bit of orange whenever a post is about Substack.
+            - heading "In-Post Visuals Link" [level=3] [ref=e628]:
+              - text: In-Post Visuals
+              - button "Link" [ref=e631] [cursor=pointer]:
+                - img [ref=e632]
+            - paragraph [ref=e635]:
+              - strong [ref=e636]: "What It Is:"
+              - text: "Any images you embed directly into the body of your posts: screenshots, charts, illustrations, memes, product shots, etc."
+            - paragraph [ref=e637]:
+              - strong [ref=e638]: "Why It Matters:"
+              - text: These visuals break up walls of text, add context, and make your post more engaging and memorable. Used well, they can also help explain complex ideas or reinforce your tone and personality.
+            - paragraph [ref=e639]:
+              - strong [ref=e640]: Specs
+              - text: ":"
+            - list [ref=e641]:
+              - listitem [ref=e642]:
+                - paragraph [ref=e643]:
+                  - strong [ref=e644]: File Size
+                  - text: ": Use the highest-quality version of the image you have, in any size."
+              - listitem [ref=e645]:
+                - paragraph [ref=e646]:
+                  - strong [ref=e647]: File Type
+                  - text: ": JPG, PNG, WebP, AVIF, or GIF."
+            - paragraph [ref=e648]:
+              - strong [ref=e649]: "Tips:"
+            - list [ref=e650]:
+              - listitem [ref=e651]:
+                - paragraph [ref=e652]: Make sure you properly source images when appropriate, and consider adding alt text for people who use screen readers.
+              - listitem [ref=e653]:
+                - paragraph [ref=e654]: If you use screenshots, consider light annotation (circles, arrows) for added clarity.
+              - listitem [ref=e655]:
+                - paragraph [ref=e656]: Have fun and be creative! This is a great way to enhance the reading experience.
+              - listitem [ref=e657]:
+                - paragraph [ref=e658]:
+                  - link "Directions for adding images to your posts on Substack" [ref=e659] [cursor=pointer]:
+                    - /url: https://support.substack.com/hc/en-us/articles/360037832971-How-do-I-embed-media-in-my-post-e-g-images-video-GIFs
+                  - text: .
+            - link "30 Places to Find Free Stock Photography 📸 30 Places to Find Free Stock Photography 📸 Casandra Campbell · 2 October 2024 Read full story" [ref=e661] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/free-stock-photography
+              - generic [ref=e662]:
+                - img "30 Places to Find Free Stock Photography 📸" [ref=e665]
+                - generic [ref=e666]:
+                  - heading "30 Places to Find Free Stock Photography 📸" [level=4] [ref=e667]
+                  - generic [ref=e668]:
+                    - link "Casandra Campbell" [ref=e670]:
+                      - /url: https://substack.com/profile/33945162-casandra-campbell
+                    - generic [ref=e671]: ·
+                    - generic [ref=e672]: 2 October 2024
+                  - link "Read full story" [ref=e674]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/free-stock-photography
+                    - generic [ref=e675]:
+                      - generic [ref=e676]: Read full story
+                      - img [ref=e677]
+            - link "Which AI Image Tool Generates the Most Realistic Images? Which AI Image Tool Generates the Most Realistic Images? Casandra Campbell · 25 September 2025 Read full story" [ref=e680] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/ai-image-generation-tools
+              - generic [ref=e681]:
+                - img "Which AI Image Tool Generates the Most Realistic Images?" [ref=e684]
+                - generic [ref=e685]:
+                  - heading "Which AI Image Tool Generates the Most Realistic Images?" [level=4] [ref=e686]
+                  - generic [ref=e687]:
+                    - link "Casandra Campbell" [ref=e689]:
+                      - /url: https://substack.com/profile/33945162-casandra-campbell
+                    - generic [ref=e690]: ·
+                    - generic [ref=e691]: 25 September 2025
+                  - link "Read full story" [ref=e693]:
+                    - /url: https://www.reallygoodbusinessideas.com/p/ai-image-generation-tools
+                    - generic [ref=e694]:
+                      - generic [ref=e695]: Read full story
+                      - img [ref=e696]
+            - heading "Substack Image Specs Link" [level=2] [ref=e698]:
+              - text: Substack Image Specs
+              - button "Link" [ref=e701] [cursor=pointer]:
+                - img [ref=e702]
+            - paragraph [ref=e705]: Here’s a quick reference summary of all the recommended image sizes and allowable file types across Substack visual assets. If you’re not sure which filetype to use, go with PNG since it works for everything on the list.
+            - iframe [ref=e707]:
+              - generic [ref=f31e4]:
+                - generic [ref=f31e6]:
+                  - heading "Substack Image Specs" [level=3] [ref=f31e8]:
+                    - generic [ref=f31e9]: Substack Image Specs
+                  - table "Table with 3 columns and 8 rows. (column headers with buttons are sortable)" [ref=f31e14]:
+                    - caption [ref=f31e15]: Table with 3 columns and 8 rows. (column headers with buttons are sortable)
+                    - rowgroup [ref=f31e16]:
+                      - row "Visual Asset Minimum Recommended Size Allowable File Types" [ref=f31e17]:
+                        - columnheader "Visual Asset" [ref=f31e18] [cursor=pointer]:
+                          - button "Visual Asset" [ref=f31e19]:
+                            - generic [ref=f31e20]: Visual Asset
+                        - columnheader "Minimum Recommended Size" [ref=f31e21] [cursor=pointer]:
+                          - button "Minimum Recommended Size" [ref=f31e22]:
+                            - generic [ref=f31e23]: Minimum Recommended Size
+                        - columnheader "Allowable File Types" [ref=f31e24] [cursor=pointer]:
+                          - button "Allowable File Types" [ref=f31e25]:
+                            - generic [ref=f31e26]: Allowable File Types
+                    - rowgroup [ref=f31e27]:
+                      - row "Profile Photo 400 × 400 px JPG, PNG, WebP, AVIF, or GIF" [ref=f31e28]:
+                        - rowheader "Profile Photo" [ref=f31e29]
+                        - cell "400 × 400 px" [ref=f31e30]
+                        - cell "JPG, PNG, WebP, AVIF, or GIF" [ref=f31e31]
+                      - row "Profile Cover Image 1200 x 400 px JPG, PNG, WebP, or GIF" [ref=f31e32]:
+                        - rowheader "Profile Cover Image" [ref=f31e33]
+                        - cell "1200 x 400 px" [ref=f31e34]
+                        - cell "JPG, PNG, WebP, or GIF" [ref=f31e35]
+                      - row "Publication Logo 256 × 256p px JPG,PNG, WebP, AVIF, or GIF" [ref=f31e36]:
+                        - rowheader "Publication Logo" [ref=f31e37]
+                        - cell "256 × 256p px" [ref=f31e38]
+                        - cell "JPG,PNG, WebP, AVIF, or GIF" [ref=f31e39]
+                      - row "Publication Wordmark 1344 x 256 px Transparent PNG" [ref=f31e40]:
+                        - rowheader "Publication Wordmark" [ref=f31e41]
+                        - cell "1344 x 256 px" [ref=f31e42]
+                        - cell "Transparent PNG" [ref=f31e43]
+                      - row "Publication Cover Image 600 x 600 px JPG, PNG, WebP, or AVIF" [ref=f31e44]:
+                        - rowheader "Publication Cover Image" [ref=f31e45]
+                        - cell "600 x 600 px" [ref=f31e46]
+                        - cell "JPG, PNG, WebP, or AVIF" [ref=f31e47]
+                      - row "Email Banner 1100 x 220 px PNG" [ref=f31e48]:
+                        - rowheader "Email Banner" [ref=f31e49]
+                        - cell "1100 x 220 px" [ref=f31e50]
+                        - cell "PNG" [ref=f31e51]
+                      - row "Post Social Images 1456 x 1048 px JPG, PNG, WebP, AVIF, or GIF." [ref=f31e52]:
+                        - rowheader "Post Social Images" [ref=f31e53]
+                        - cell "1456 x 1048 px" [ref=f31e54]
+                        - cell "JPG, PNG, WebP, AVIF, or GIF." [ref=f31e55]
+                      - row "In-Post Visuals Any JPG, PNG, WebP, AVIF, or GIF." [ref=f31e56]:
+                        - rowheader "In-Post Visuals" [ref=f31e57]
+                        - cell "Any" [ref=f31e58]
+                        - cell "JPG, PNG, WebP, AVIF, or GIF." [ref=f31e59]
+                - generic [ref=f31e61]:
+                  - generic [ref=f31e62]:
+                    - text: "Table:"
+                    - generic [ref=f31e63]: reallygoodbusinessideas.com
+                  - generic [ref=f31e64]: •
+                  - generic [ref=f31e65]:
+                    - text: Created with
+                    - link "Datawrapper" [ref=f31e66] [cursor=pointer]:
+                      - /url: https://www.datawrapper.de/_/koIEy
+            - paragraph [ref=e708]: You don’t need a design degree to make your Substack look great. You just need a few well-chosen visual assets. Ones that align with your tone, reflect your brand, and stay consistent from post to post.
+            - paragraph [ref=e709]: "Start with the basics: a clean headshot, a strong logo or wordmark, and social post images that look good on both desktop and mobile. From there, layer in headers, banners, and brand colors to your newsletter to life."
+            - paragraph [ref=e710]: The goal isn’t perfection. It’s clarity, trust, and a visual identity that makes your readers feel like they’re in the right place. Remember, you can keep improving as you go!
+            - heading "A Strong Visual Brand Starts With Strong Positioning. Link" [level=2] [ref=e711]:
+              - text: A Strong Visual Brand Starts With Strong Positioning.
+              - button "Link" [ref=e714] [cursor=pointer]:
+                - img [ref=e715]
+            - paragraph [ref=e718]: If you want help refining your own positioning so you can build out your visual brand, I created a step-by-step worksheet to walk you through it.
+            - paragraph [ref=e719]: "Inside, you’ll get:"
+            - list [ref=e720]:
+              - listitem [ref=e721]:
+                - paragraph [ref=e722]: A simple 4-question framework to uncover your niche.
+              - listitem [ref=e723]:
+                - paragraph [ref=e724]: Tips to avoid common positioning mistakes.
+              - listitem [ref=e725]:
+                - paragraph [ref=e726]: A plug-and-play sentence formula to describe your newsletter clearly.
+              - listitem [ref=e727]:
+                - paragraph [ref=e728]: Real examples to guide your own.
+            - figure [ref=e730]:
+              - link [ref=e731]:
+                - /url: https://substackcdn.com/image/fetch/$s_!TLRn!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fe6c394d8-00cf-4cc7-82b8-ceb2ccdd37d4_1024x1217.png
+                - generic [ref=e735]:
+                  - button [ref=e736] [cursor=pointer]:
+                    - img [ref=e737]
+                  - button [ref=e739] [cursor=pointer]:
+                    - img [ref=e740]
+            - paragraph [ref=e741]:
+              - strong [ref=e742]: By the end, you’ll have a strong niche where you can thrive and a one-sentence positioning statement you can use to build out your brand.
+            - paragraph [ref=e743]:
+              - text: This resource is available to
+              - strong [ref=e744]: Really Good Business Ideas Premium subscribers
+              - text: in the
+              - strong [ref=e745]:
+                - link "Really Good Resource Library" [ref=e746] [cursor=pointer]:
+                  - /url: https://www.reallygoodbusinessideas.com/p/resource-library
+                - text: .
+            - paragraph [ref=e747]:
+              - text: Premium members also get access to
+              - strong [ref=e748]:
+                - link "office hours" [ref=e749] [cursor=pointer]:
+                  - /url: https://www.reallygoodbusinessideas.com/p/office-hours-appointments
+              - text: ", where you can get one-on-one feedback and guidance from me directly."
+            - paragraph [ref=e750]:
+              - strong [ref=e751]: Upgrade to access the worksheet and start sharpening your positioning today.
+            - generic [ref=e756]:
+              - textbox "Type your email..." [ref=e759]
+              - button "Subscribe" [disabled] [ref=e760]
+            - paragraph [ref=e761]: To endless possibilities,
+            - paragraph [ref=e762]: Casandra
+            - paragraph [ref=e763]:
+              - emphasis [ref=e764]: 💬 What’s the best visual brand you’ve seen on Substack? Share your favorite in the comments!
+            - paragraph
+          - generic [ref=e766]:
+            - generic [ref=e768]:
+              - link "View Craig Ettinger's profile" [ref=e770] [cursor=pointer]:
+                - /url: https://substack.com/profile/1606462-craig-ettinger
+                - generic "Craig Ettinger" [ref=e772]:
+                  - img "Craig Ettinger's avatar" [ref=e774]
+              - link "View KleinS's profile" [ref=e776] [cursor=pointer]:
+                - /url: https://substack.com/profile/69592801-kleins
+                - generic "KleinS" [ref=e778]:
+                  - img "KleinS's avatar" [ref=e780]
+              - link "View art mccarty's profile" [ref=e782] [cursor=pointer]:
+                - /url: https://substack.com/profile/254730380-art-mccarty
+                - generic "art mccarty" [ref=e784]:
+                  - img "art mccarty's avatar" [ref=e786]
+              - link "View Gold.'s profile" [ref=e788] [cursor=pointer]:
+                - /url: https://substack.com/profile/289098724-gold
+                - generic "Gold." [ref=e790]:
+                  - img "Gold.'s avatar" [ref=e792]
+              - link "View The Pricing Committee's profile" [ref=e794] [cursor=pointer]:
+                - /url: https://substack.com/profile/19050967-the-pricing-committee
+                - generic "The Pricing Committee" [ref=e796]:
+                  - img "The Pricing Committee's avatar" [ref=e798]
+            - generic [ref=e800]:
+              - generic [ref=e801] [cursor=pointer]: 149 Likes
+              - text: ∙
+              - link "13 Restacks" [ref=e803] [cursor=pointer]:
+                - /url: https://substack.com/note/p-173281832/restacks?utm_source=substack&utm_content=facepile-restacks
+          - generic [ref=e805]:
+            - generic [ref=e806]:
+              - button "Like (149)" [ref=e808] [cursor=pointer]:
+                - img [ref=e809]:
+                  - img [ref=e811]
+                - generic [ref=e813]: "149"
+              - button "View comments (30)" [ref=e814] [cursor=pointer]:
+                - img [ref=e815]:
+                  - img [ref=e817]
+                - generic [ref=e819]: "30"
+              - button "13" [ref=e820] [cursor=pointer]:
+                - img [ref=e821]
+                - generic [ref=e824]: "13"
+            - button "Share" [ref=e826] [cursor=pointer]:
+              - generic [ref=e827]: Share
+      - generic [ref=e828]:
+        - generic [ref=e829]:
+          - generic [ref=e830]:
+            - heading "Discussion about this post" [level=4] [ref=e831]
+            - tablist "Select discussion type" [ref=e835]:
+              - tab "Comments" [selected] [ref=e836] [cursor=pointer]
+              - tab "Restacks" [ref=e837] [cursor=pointer]
+          - generic [ref=e840]:
+            - generic [ref=e842]:
+              - generic "User" [ref=e844]:
+                - img "User's avatar" [ref=e846]
+              - textbox "Write a comment..." [ref=e849]
+            - generic [ref=e851]:
+              - article "Comment by Sia Bartrum" [ref=e855]:
+                - link "View Sia Bartrum's profile" [ref=e858] [cursor=pointer]:
+                  - /url: https://substack.com/profile/13832127-sia-bartrum?utm_source=comment
+                  - generic "Sia Bartrum" [ref=e860]:
+                    - img "Sia Bartrum's avatar" [ref=e862]
+                - generic [ref=e863]:
+                  - generic [ref=e864]:
+                    - generic [ref=e865]:
+                      - generic [ref=e867]:
+                        - generic [ref=e869]:
+                          - link "Sia Bartrum" [ref=e872] [cursor=pointer]:
+                            - /url: https://substack.com/profile/13832127-sia-bartrum?utm_source=substack-feed-item
+                          - img [ref=e875] [cursor=pointer]
+                        - link "16 Sept 2025" [ref=e878] [cursor=pointer]:
+                          - /url: https://www.reallygoodbusinessideas.com/p/substack-visuals/comment/156383564
+                      - button "Liked by Casandra Campbell" [ref=e880]:
+                        - img [ref=e882]
+                        - text: Liked by Casandra Campbell
+                    - button "Ellipsis" [ref=e887] [cursor=pointer]:
+                      - img [ref=e888]
+                  - paragraph [ref=e893]: Thank you! I didn’t even realised we had a profile banner!
+                  - generic [ref=e894]:
+                    - link "Like (2)" [ref=e896] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e897]:
+                        - img [ref=e899]:
+                          - img [ref=e901]
+                        - generic [ref=e903]: Like (2)
+                    - generic [ref=e906] [cursor=pointer]:
+                      - img [ref=e907]
+                      - generic [ref=e909]: Reply
+                    - generic [ref=e912] [cursor=pointer]:
+                      - img [ref=e913]
+                      - generic [ref=e916]: Share
+              - article "Comment by Kay Walten" [ref=e920]:
+                - link "View Kay Walten's profile" [ref=e923] [cursor=pointer]:
+                  - /url: https://substack.com/profile/123347433-kay-walten?utm_source=comment
+                  - generic "Kay Walten" [ref=e925]:
+                    - img "Kay Walten's avatar" [ref=e927]
+                - generic [ref=e928]:
+                  - generic [ref=e929]:
+                    - generic [ref=e930]:
+                      - generic [ref=e932]:
+                        - generic [ref=e934]:
+                          - link "Kay Walten" [ref=e937] [cursor=pointer]:
+                            - /url: https://substack.com/profile/123347433-kay-walten?utm_source=substack-feed-item
+                          - img [ref=e940] [cursor=pointer]
+                        - link "15 Sept 2025" [ref=e943] [cursor=pointer]:
+                          - /url: https://www.reallygoodbusinessideas.com/p/substack-visuals/comment/156180675
+                      - button "Liked by Casandra Campbell" [ref=e945]:
+                        - img [ref=e947]
+                        - text: Liked by Casandra Campbell
+                    - button "Ellipsis" [ref=e952] [cursor=pointer]:
+                      - img [ref=e953]
+                  - paragraph [ref=e958]: This is spot on. Readers make a judgment in seconds, and design is often the first signal of quality and trust. Even the strongest writing can be overlooked if the presentation feels cluttered or unfinished. I appreciate how you break it down into simple, doable steps. It makes design feel less intimidating and more like part of the craft of publishing.
+                  - generic [ref=e959]:
+                    - link "Like (2)" [ref=e961] [cursor=pointer]:
+                      - /url: javascript:void(0)
+                      - generic [ref=e962]:
+                        - img [ref=e964]:
+                          - img [ref=e966]
+                        - generic [ref=e968]: Like (2)
+                    - generic [ref=e971] [cursor=pointer]:
+                      - img [ref=e972]
+                      - generic [ref=e974]: Reply
+                    - generic [ref=e977] [cursor=pointer]:
+                      - img [ref=e978]
+                      - generic [ref=e981]: Share
+            - link "28 more comments..." [ref=e982] [cursor=pointer]:
+              - /url: https://www.reallygoodbusinessideas.com/p/substack-visuals/comments
+        - region "Top Posts Footer" [ref=e985]:
+          - generic [ref=e986]:
+            - navigation "Archive sort tabs" [ref=e987]:
+              - tablist "Tabs" [ref=e990]:
+                - tab "Top" [selected] [ref=e991] [cursor=pointer]
+                - tab "Latest" [ref=e992] [cursor=pointer]
+                - tab "Discussions" [ref=e993] [cursor=pointer]
+              - button "Search" [ref=e995] [cursor=pointer]:
+                - img [ref=e996]
+            - generic [ref=e999]:
+              - generic [ref=e1001]:
+                - article "Post preview for 15 Substack Features That Will Instantly Make Your Posts Look Professional" [ref=e1002] [cursor=pointer]:
+                  - generic [ref=e1004]:
+                    - link "15 Substack Features That Will Instantly Make Your Posts Look Professional" [ref=e1006]:
+                      - /url: https://www.reallygoodbusinessideas.com/p/substack-rich-content
+                    - link "These rich content features will make your Substack look as polished as the New York Times." [ref=e1008]:
+                      - /url: https://www.reallygoodbusinessideas.com/p/substack-rich-content
+                    - generic [ref=e1009]:
+                      - time [ref=e1010]: Apr 9
+                      - text: •
+                      - link "Casandra Campbell" [ref=e1013]:
+                        - /url: https://substack.com/@casandracampbell
+                    - generic [ref=e1015]:
+                      - button "Like (1,361)" [ref=e1017]:
+                        - img [ref=e1018]:
+                          - img [ref=e1020]
+                        - generic [ref=e1022]: 1,361
+                      - button "View comments (161)" [ref=e1023]:
+                        - img [ref=e1024]:
+                          - img [ref=e1026]
+                        - generic [ref=e1028]: "161"
+                      - button "114" [ref=e1029]:
+                        - img [ref=e1030]
+                        - generic [ref=e1033]: "114"
+                      - button [ref=e1034]:
+                        - img [ref=e1035]
+                - 'article "Post preview for 23 Substack Bestsellers Share Their #1 Tip for New Publications" [ref=e1041] [cursor=pointer]':
+                  - generic [ref=e1043]:
+                    - 'link "23 Substack Bestsellers Share Their #1 Tip for New Publications" [ref=e1045]':
+                      - /url: https://www.reallygoodbusinessideas.com/p/substack-tips
+                    - link "If you’re new to Substack, this article is for you" [ref=e1047]:
+                      - /url: https://www.reallygoodbusinessideas.com/p/substack-tips
+                    - generic [ref=e1048]:
+                      - time [ref=e1049]: Apr 28
+                      - text: •
+                      - generic [ref=e1050]:
+                        - link "Casandra Campbell" [ref=e1052]:
+                          - /url: https://substack.com/@casandracampbell
+                        - text: ","
+                        - link "Yana G.Y." [ref=e1054]:
+                          - /url: https://substack.com/@yanagy
+                        - text: ","
+                        - link "CJ Gustafson" [ref=e1056]:
+                          - /url: https://substack.com/@cjgustafson
+                        - text: ","
+                        - link "Fleur Hull" [ref=e1058]:
+                          - /url: https://substack.com/@fleurhull
+                        - text: ","
+                        - link "Ana Calin" [ref=e1060]:
+                          - /url: https://substack.com/@theanacalin
+                        - text: ","
+                        - link "Derek Hughes" [ref=e1062]:
+                          - /url: https://substack.com/@derekhughes
+                        - text: ","
+                        - link "Adam Ming" [ref=e1064]:
+                          - /url: https://substack.com/@adamming
+                        - text: ","
+                        - link "Kevin Indig" [ref=e1066]:
+                          - /url: https://substack.com/@kevinindig
+                        - text: ","
+                        - link "Tim Stoddart" [ref=e1068]:
+                          - /url: https://substack.com/@timstodz
+                        - text: ","
+                        - link "Xinran Ma" [ref=e1070]:
+                          - /url: https://substack.com/@xinran
+                        - text: ","
+                        - link "Russell Nohelty" [ref=e1072]:
+                          - /url: https://substack.com/@russellnohelty
+                        - text: ","
+                        - link "Rich Miller" [ref=e1074]:
+                          - /url: https://substack.com/@richmiller
+                        - text: ","
+                        - link "Jari Roomer" [ref=e1076]:
+                          - /url: https://substack.com/@jariroomer1
+                        - text: ","
+                        - link "Claudia Faith" [ref=e1078]:
+                          - /url: https://substack.com/@claudiafaith
+                        - text: ","
+                        - link "David McIlroy" [ref=e1080]:
+                          - /url: https://substack.com/@thedavidmcilroy
+                        - text: ","
+                        - link "Tom Orbach" [ref=e1082]:
+                          - /url: https://substack.com/@marketingideas
+                        - text: ","
+                        - link "Claire Venus ✨" [ref=e1084]:
+                          - /url: https://substack.com/@clairevenus
+                        - text: ","
+                        - link "Sinem Günel" [ref=e1086]:
+                          - /url: https://substack.com/@sinemgunel
+                        - text: ","
+                        - link "Veronica Llorca-Smith 🍋" [ref=e1088]:
+                          - /url: https://substack.com/@veronicallorcasmith
+                        - text: ","
+                        - link "Kristina God, MBA" [ref=e1090]:
+                          - /url: https://substack.com/@kristinagod
+                        - text: ","
+                        - link "Ruben Dominguez" [ref=e1092]:
+                          - /url: https://substack.com/@rubendominguez
+                        - text: ","
+                        - link "Philip Hofmacher" [ref=e1094]:
+                          - /url: https://substack.com/@philiphofmacher
+                        - text: ","
+                        - link "Daria Cupareanu" [ref=e1096]:
+                          - /url: https://substack.com/@dariacupareanu
+                        - text: ", and"
+                        - link "Jeff Morhous" [ref=e1098]:
+                          - /url: https://substack.com/@jeffmorhous
+                    - generic [ref=e1100]:
+                      - button "Like (802)" [ref=e1102]:
+                        - img [ref=e1103]:
+                          - img [ref=e1105]
+                        - generic [ref=e1107]: "802"
+                      - button "View comments (125)" [ref=e1108]:
+                        - img [ref=e1109]:
+                          - img [ref=e1111]
+                        - generic [ref=e1113]: "125"
+                      - button "97" [ref=e1114]:
+                        - img [ref=e1115]
+                        - generic [ref=e1118]: "97"
+                      - button [ref=e1119]:
+                        - img [ref=e1120]
+                - article "Post preview for How to Email Your Substack Subscribers (Without Publishing a Post)" [ref=e1126] [cursor=pointer]:
+                  - generic [ref=e1128]:
+                    - link "How to Email Your Substack Subscribers (Without Publishing a Post)" [ref=e1130]:
+                      - /url: https://www.reallygoodbusinessideas.com/p/how-to-email-your-substack-subscribers
+                    - link "And why it's important." [ref=e1132]:
+                      - /url: https://www.reallygoodbusinessideas.com/p/how-to-email-your-substack-subscribers
+                    - generic [ref=e1133]:
+                      - time [ref=e1134]: Jan 20
+                      - text: •
+                      - link "Casandra Campbell" [ref=e1137]:
+                        - /url: https://substack.com/@casandracampbell
+                    - generic [ref=e1139]:
+                      - button "Like (691)" [ref=e1141]:
+                        - img [ref=e1142]:
+                          - img [ref=e1144]
+                        - generic [ref=e1146]: "691"
+                      - button "View comments (108)" [ref=e1147]:
+                        - img [ref=e1148]:
+                          - img [ref=e1150]
+                        - generic [ref=e1152]: "108"
+                      - button "72" [ref=e1153]:
+                        - img [ref=e1154]
+                        - generic [ref=e1157]: "72"
+                      - button [ref=e1158]:
+                        - img [ref=e1159]
+              - button "See all" [ref=e1165] [cursor=pointer]:
+                - text: See all
+                - img [ref=e1166]
+        - generic [ref=e1170]:
+          - heading "Ready for more?" [level=3] [ref=e1171]
+          - generic [ref=e1174]:
+            - textbox "Type your email..." [ref=e1177]
+            - button "Subscribe" [disabled] [ref=e1178]
+    - generic [ref=e1182]:
+      - generic [ref=e1184]:
+        - generic [ref=e1185]: © 2026 Casandra Campbell
+        - text: ·
+        - link "Privacy" [ref=e1186] [cursor=pointer]:
+          - /url: https://substack.com/privacy
+        - text: ∙
+        - link "Terms" [ref=e1187] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: ∙
+        - link "Collection notice" [ref=e1188] [cursor=pointer]:
+          - /url: https://substack.com/ccpa#personal-data-collected
+      - generic [ref=e1190]:
+        - link "Start your Substack" [ref=e1191] [cursor=pointer]:
+          - /url: https://substack.com/signup?utm_source=substack&utm_medium=web&utm_content=footer
+          - img [ref=e1192]
+          - text: Start your Substack
+        - link "Get the app" [ref=e1197] [cursor=pointer]:
+          - /url: https://substack.com/app/app-store-redirect?utm_campaign=app-marketing&utm_content=web-footer-button
+      - generic [ref=e1199]:
+        - link "Substack" [ref=e1200] [cursor=pointer]:
+          - /url: https://substack.com
+        - text: is the home for great culture
+    - generic [ref=e1202]:
+      - heading "Cookie Policy" [level=4] [ref=e1203]
+      - generic [ref=e1204]:
+        - text: We use cookies to improve your experience, for analytics, and for marketing. You can accept, reject, or manage your preferences. See our
+        - link "privacy policy" [ref=e1205] [cursor=pointer]:
+          - /url: https://substack.com/tos
+        - text: .
+      - generic [ref=e1206]:
+        - button "Manage" [ref=e1207] [cursor=pointer]
+        - button "Reject" [ref=e1208] [cursor=pointer]
+        - button "Accept" [ref=e1209] [cursor=pointer]
+  - region "Notifications (F8)":
+    - list

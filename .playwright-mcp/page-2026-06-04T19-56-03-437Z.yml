@@ -1,0 +1,322 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "CoverImage We've got you covered." [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]
+        - generic [ref=e10]:
+          - generic [ref=e11]: CoverImage
+          - generic [ref=e12]: We've got you covered.
+      - generic [ref=e13]:
+        - link "Favorites" [ref=e14] [cursor=pointer]:
+          - /url: /favorites
+        - link "Guides" [ref=e15] [cursor=pointer]:
+          - /url: /guides
+        - link "Pricing" [ref=e16] [cursor=pointer]:
+          - /url: /pricing
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+        - link "Sign in" [ref=e19] [cursor=pointer]:
+          - /url: /auth/signin
+  - article [ref=e20]:
+    - generic [ref=e21]:
+      - navigation [ref=e22]:
+        - link "Home" [ref=e23] [cursor=pointer]:
+          - /url: /
+        - img [ref=e24]
+        - link "Guides" [ref=e26] [cursor=pointer]:
+          - /url: /guides
+        - img [ref=e27]
+        - generic [ref=e29]: "Substack Header Images: Sizes, Best Practices & Examples"
+      - generic [ref=e30]: PLATFORMS
+      - 'heading "Substack Header Images: Sizes, Best Practices & Examples" [level=1] [ref=e31]'
+      - paragraph [ref=e32]: Everything you need to know about Substack images. Optimal sizes for headers, posts, and social sharing.
+      - generic [ref=e33]:
+        - generic [ref=e34]: By CoverImage.app
+        - generic [ref=e35]: "|"
+        - generic [ref=e36]: Published January 17, 2026
+        - generic [ref=e37]: "|"
+        - generic [ref=e38]: 6 min read
+      - figure "Photo by Aaron Burden on Unsplash" [ref=e39]:
+        - img "Hand writing with pen on paper" [ref=e41]
+        - generic [ref=e42]:
+          - text: Photo by
+          - link "Aaron Burden" [ref=e43] [cursor=pointer]:
+            - /url: https://unsplash.com/@aaronburden
+          - text: on Unsplash
+      - generic [ref=e44]:
+        - paragraph [ref=e45]: Substack has become the platform for independent writers and newsletter creators. Your header image is the first thing subscribers see—in their inbox, on your publication page, and when your posts get shared. Here's how to get it right.
+        - heading "Substack Image Sizes" [level=2] [ref=e46]
+        - heading "Publication Logo" [level=3] [ref=e47]
+        - paragraph [ref=e48]:
+          - strong [ref=e49]: "Recommended: 256 x 256 pixels (1:1 square)"
+        - paragraph [ref=e50]: "This appears in:"
+        - list [ref=e51]:
+          - listitem [ref=e52]: Your publication header
+          - listitem [ref=e53]: Subscriber's inbox (as sender avatar)
+          - listitem [ref=e54]: Substack app
+          - listitem [ref=e55]: Social sharing cards
+        - paragraph [ref=e56]: Keep it simple—it displays small. Text-heavy logos become unreadable.
+        - heading "Publication Header/Banner" [level=3] [ref=e57]
+        - paragraph [ref=e58]:
+          - strong [ref=e59]: "Recommended: 1100 x 220 pixels (5:1 ratio)"
+        - paragraph [ref=e60]: The wide banner that appears at the top of your publication homepage. Optional but adds personality.
+        - paragraph [ref=e61]: "Tips:"
+        - list [ref=e62]:
+          - listitem [ref=e63]: Works best with patterns, gradients, or abstract imagery
+          - listitem [ref=e64]: Avoid important elements at edges (mobile crops differently)
+          - listitem [ref=e65]: Test on mobile—it gets compressed significantly
+        - heading "Post Header Image" [level=3] [ref=e66]
+        - paragraph [ref=e67]:
+          - strong [ref=e68]: "Recommended: 1456 x 816 pixels (16:9 ratio)"
+        - paragraph [ref=e69]: The main cover image for individual posts. This is what matters most for engagement.
+        - paragraph [ref=e70]: "Where it appears:"
+        - list [ref=e71]:
+          - listitem [ref=e72]: Top of your post
+          - listitem [ref=e73]: Email preview (if enabled)
+          - listitem [ref=e74]: Social sharing cards
+          - listitem [ref=e75]: Substack homepage/recommendations
+        - heading "Email Header" [level=3] [ref=e76]
+        - paragraph [ref=e77]: "When you include an image in your email, Substack recommends:"
+        - paragraph [ref=e78]:
+          - strong [ref=e79]: "Maximum width: 1456 pixels"
+        - paragraph [ref=e80]: Height is flexible, but keep emails scannable. Tall images push content below the fold.
+        - heading "Where Images Appear" [level=2] [ref=e81]
+        - paragraph [ref=e82]: "Understanding context helps you choose better images:"
+        - heading "In the Inbox" [level=3] [ref=e83]
+        - paragraph [ref=e84]: "Subscribers see:"
+        - list [ref=e85]:
+          - listitem [ref=e86]: Your logo (small, next to your name)
+          - listitem [ref=e87]: Subject line
+          - listitem [ref=e88]: Preview text
+          - listitem [ref=e89]: Sometimes a thumbnail of the header image
+        - paragraph [ref=e90]: The header image thumbnail is small—high contrast and simple compositions work best.
+        - heading "On Your Publication Page" [level=3] [ref=e91]
+        - paragraph [ref=e92]: "Visitors see:"
+        - list [ref=e93]:
+          - listitem [ref=e94]: Banner image (if set)
+          - listitem [ref=e95]: Logo
+          - listitem [ref=e96]: Recent posts with header images as cards
+        - paragraph [ref=e97]: Images compete with each other here. Consistent style helps brand recognition.
+        - heading "In the Substack App" [level=3] [ref=e98]
+        - paragraph [ref=e99]: "The app shows:"
+        - list [ref=e100]:
+          - listitem [ref=e101]: Logo prominently
+          - listitem [ref=e102]: Post images as cards in feeds
+          - listitem [ref=e103]: Full header images when reading
+        - paragraph [ref=e104]: Mobile-first design matters—test on phones.
+        - heading "When Shared Socially" [level=3] [ref=e105]
+        - paragraph [ref=e106]: "Substack generates Open Graph images:"
+        - list [ref=e107]:
+          - listitem [ref=e108]: Uses your post header image
+          - listitem [ref=e109]: Adds your publication name
+          - listitem [ref=e110]: Formatted for Twitter/Facebook/LinkedIn
+        - paragraph [ref=e111]: Your image becomes a preview card. It needs to work at multiple sizes.
+        - heading "Best Practices" [level=2] [ref=e112]
+        - heading "1. Keep Headers Clean" [level=3] [ref=e113]
+        - paragraph [ref=e114]: Substack's aesthetic is minimal. Busy images clash with the platform's design.
+        - paragraph [ref=e115]:
+          - strong [ref=e116]: "Works well:"
+        - list [ref=e117]:
+          - listitem [ref=e118]: Simple photography
+          - listitem [ref=e119]: Solid colors with subtle elements
+          - listitem [ref=e120]: Clean illustrations
+          - listitem [ref=e121]: Abstract or conceptual images
+        - paragraph [ref=e122]:
+          - strong [ref=e123]: "Avoid:"
+        - list [ref=e124]:
+          - listitem [ref=e125]: Text-heavy images (title is already displayed)
+          - listitem [ref=e126]: Cluttered compositions
+          - listitem [ref=e127]: Low contrast images
+          - listitem [ref=e128]: Generic stock photos
+        - heading "2. Consider the Title Overlay" [level=3] [ref=e129]
+        - paragraph [ref=e130]: "Substack displays your post title over or near the image. Ensure:"
+        - list [ref=e131]:
+          - listitem [ref=e132]: The image has space for text
+          - listitem [ref=e133]: Colors don't clash with white/black text
+          - listitem [ref=e134]: Important elements aren't covered
+        - heading "3. Be Consistent" [level=3] [ref=e135]
+        - paragraph [ref=e136]: "Successful Substack publications develop visual identity:"
+        - list [ref=e137]:
+          - listitem [ref=e138]: Same color palette across posts
+          - listitem [ref=e139]: Similar photography style
+          - listitem [ref=e140]: Recognizable illustration approach
+          - listitem [ref=e141]: Consistent use of logos/watermarks (if any)
+        - paragraph [ref=e142]: Subscribers should recognize your posts in their feed.
+        - heading "4. Optimize for Email" [level=3] [ref=e143]
+        - paragraph [ref=e144]: "Many subscribers read in email clients. Consider:"
+        - list [ref=e145]:
+          - listitem [ref=e146]: Some clients block images by default
+          - listitem [ref=e147]: Alt text matters for accessibility
+          - listitem [ref=e148]: Large files slow loading
+          - listitem [ref=e149]: Keep file size under 500KB
+        - heading "5. Skip the Image Sometimes" [level=3] [ref=e150]
+        - paragraph [ref=e151]: Not every post needs a header image. Substack works fine without one, and some of the most successful newsletters are text-only.
+        - paragraph [ref=e152]: "When to skip:"
+        - list [ref=e153]:
+          - listitem [ref=e154]: Quick updates or notes
+          - listitem [ref=e155]: Personal/intimate posts
+          - listitem [ref=e156]: When you can't find something relevant
+          - listitem [ref=e157]: When minimal aesthetic fits your brand
+        - heading "Image Ideas by Newsletter Type" [level=2] [ref=e158]
+        - heading "News/Commentary" [level=3] [ref=e159]
+        - list [ref=e160]:
+          - listitem [ref=e161]: Abstract imagery
+          - listitem [ref=e162]: Conceptual photography
+          - listitem [ref=e163]: Clean graphics
+          - listitem [ref=e164]: Color-coded by topic
+        - heading "Personal Essays" [level=3] [ref=e165]
+        - list [ref=e166]:
+          - listitem [ref=e167]: Lifestyle photography
+          - listitem [ref=e168]: Atmospheric images
+          - listitem [ref=e169]: Personal photos (if appropriate)
+          - listitem [ref=e170]: Illustrations
+        - heading "Professional/Business" [level=3] [ref=e171]
+        - list [ref=e172]:
+          - listitem [ref=e173]: Clean, professional photography
+          - listitem [ref=e174]: Brand-consistent colors
+          - listitem [ref=e175]: Minimal illustrations
+          - listitem [ref=e176]: Data visualizations
+        - heading "Creative Writing" [level=3] [ref=e177]
+        - list [ref=e178]:
+          - listitem [ref=e179]: Moody, atmospheric images
+          - listitem [ref=e180]: Artistic photography
+          - listitem [ref=e181]: Illustrations matching tone
+          - listitem [ref=e182]: Abstract or conceptual
+        - heading "Educational/How-To" [level=3] [ref=e183]
+        - list [ref=e184]:
+          - listitem [ref=e185]: Clean, bright images
+          - listitem [ref=e186]: Step-by-step graphics
+          - listitem [ref=e187]: Tool/workspace photos
+          - listitem [ref=e188]: Diagrams or illustrations
+        - heading "Creating a Publication Logo" [level=2] [ref=e189]
+        - paragraph [ref=e190]: "Your logo appears everywhere—get it right:"
+        - 'heading "Option 1: Simple Text" [level=3] [ref=e191]'
+        - paragraph [ref=e192]: "Many successful publications use just their name in a nice font:"
+        - list [ref=e193]:
+          - listitem [ref=e194]: Clean sans-serif or distinctive serif
+          - listitem [ref=e195]: High contrast (dark on light or vice versa)
+          - listitem [ref=e196]: Square format, centered
+        - 'heading "Option 2: Monogram" [level=3] [ref=e197]'
+        - paragraph [ref=e198]: "First letters of your publication name:"
+        - list [ref=e199]:
+          - listitem [ref=e200]: Works great at small sizes
+          - listitem [ref=e201]: Easy to recognize
+          - listitem [ref=e202]: Simple to create
+        - 'heading "Option 3: Simple Icon" [level=3] [ref=e203]'
+        - paragraph [ref=e204]: "A relevant symbol plus name:"
+        - list [ref=e205]:
+          - listitem [ref=e206]: Keep it very simple
+          - listitem [ref=e207]: Test at 32px size
+          - listitem [ref=e208]: Avoid fine details
+        - heading "Tools" [level=3] [ref=e209]
+        - list [ref=e210]:
+          - listitem [ref=e211]:
+            - strong [ref=e212]: Canva
+            - text: ": Templates for Substack logos"
+          - listitem [ref=e213]:
+            - strong [ref=e214]: Figma
+            - text: ": More control, still free"
+          - listitem [ref=e215]:
+            - strong [ref=e216]: Logomaster.ai
+            - text: ": AI-generated options"
+        - heading "Technical Specifications" [level=2] [ref=e217]
+        - table [ref=e219]:
+          - rowgroup [ref=e220]:
+            - row "Image Type Size Ratio Format" [ref=e221]:
+              - columnheader "Image Type" [ref=e222]
+              - columnheader "Size" [ref=e223]
+              - columnheader "Ratio" [ref=e224]
+              - columnheader "Format" [ref=e225]
+          - rowgroup [ref=e226]:
+            - row "Logo 256 x 256 1:1 PNG (transparent)" [ref=e227]:
+              - cell "Logo" [ref=e228]
+              - cell "256 x 256" [ref=e229]
+              - cell "1:1" [ref=e230]
+              - cell "PNG (transparent)" [ref=e231]
+            - row "Banner 1100 x 220 5:1 JPG or PNG" [ref=e232]:
+              - cell "Banner" [ref=e233]
+              - cell "1100 x 220" [ref=e234]
+              - cell "5:1" [ref=e235]
+              - cell "JPG or PNG" [ref=e236]
+            - row "Post header 1456 x 816 16:9 JPG" [ref=e237]:
+              - cell "Post header" [ref=e238]
+              - cell "1456 x 816" [ref=e239]
+              - cell "16:9" [ref=e240]
+              - cell "JPG" [ref=e241]
+            - row "In-post images 1456px wide Any JPG or PNG" [ref=e242]:
+              - cell "In-post images" [ref=e243]
+              - cell "1456px wide" [ref=e244]
+              - cell "Any" [ref=e245]
+              - cell "JPG or PNG" [ref=e246]
+        - heading "File Size" [level=3] [ref=e247]
+        - list [ref=e248]:
+          - listitem [ref=e249]: Keep under 1MB for headers
+          - listitem [ref=e250]: Under 500KB is better for email
+          - listitem [ref=e251]: Use compression tools (TinyPNG, Squoosh)
+        - heading "Format" [level=3] [ref=e252]
+        - list [ref=e253]:
+          - listitem [ref=e254]: JPG for photographs
+          - listitem [ref=e255]: PNG for graphics, logos, screenshots
+          - listitem [ref=e256]: Avoid GIFs for headers (email client issues)
+        - heading "Common Mistakes" [level=2] [ref=e257]
+        - heading "1. Using Horizontal Text" [level=3] [ref=e258]
+        - paragraph [ref=e259]: Text in images often gets cut off on mobile or becomes unreadable at small sizes. Let Substack handle your title.
+        - heading "2. Inconsistent Sizing" [level=3] [ref=e260]
+        - paragraph [ref=e261]: Using different aspect ratios creates a messy publication page. Stick to 16:9 for all post headers.
+        - heading "3. Over-Designed Images" [level=3] [ref=e262]
+        - paragraph [ref=e263]: Substack's strength is content, not visuals. Overly designed images feel out of place and distract from your writing.
+        - heading "4. Forgetting Mobile" [level=3] [ref=e264]
+        - paragraph [ref=e265]: Over 50% of email opens are on mobile. Always preview on your phone.
+        - heading "5. Stock Photo Clichés" [level=3] [ref=e266]
+        - paragraph [ref=e267]: Handshakes, light bulbs, and "person typing" images are invisible. Find something that actually relates to your content.
+        - heading "FAQ" [level=2] [ref=e268]
+        - paragraph [ref=e269]:
+          - strong [ref=e270]: "Q: Do I need a header image for every post?"
+        - paragraph [ref=e271]: No. Some successful newsletters never use images. If you can't find something relevant, skip it rather than adding a generic placeholder.
+        - paragraph [ref=e272]:
+          - strong [ref=e273]: "Q: Can I change images after publishing?"
+        - paragraph [ref=e274]: Yes, but the email is already sent. You can update the web version, but subscribers who already received it will see the original.
+        - paragraph [ref=e275]:
+          - strong [ref=e276]: "Q: Should I add my logo to post headers?"
+        - paragraph [ref=e277]: Generally no. Substack already shows your publication name. Adding a logo is redundant and clutters the image.
+        - paragraph [ref=e278]:
+          - strong [ref=e279]: "Q: What about images within the post?"
+        - paragraph [ref=e280]: Same 1456px width maximum. Use them sparingly—email clients can struggle with image-heavy messages.
+        - paragraph [ref=e281]:
+          - strong [ref=e282]: "Q: Do images affect deliverability?"
+        - paragraph [ref=e283]: Image-heavy emails can trigger spam filters. If deliverability is a concern, use fewer and smaller images.
+        - separator [ref=e284]
+        - heading "Find the Right Header Fast" [level=2] [ref=e285]
+        - paragraph [ref=e286]: Stop scrolling through stock sites. CoverImage.app matches images to your content using AI—paste your newsletter draft and get relevant suggestions in seconds.
+      - generic [ref=e287]:
+        - heading "Ready to find your perfect cover image?" [level=2] [ref=e288]
+        - paragraph [ref=e289]: Try CoverImage.app - paste your content, get AI-matched images instantly.
+        - link "Try it Free" [ref=e290] [cursor=pointer]:
+          - /url: /
+  - contentinfo [ref=e291]:
+    - generic [ref=e293]:
+      - generic [ref=e294]:
+        - link "CoverImage.app" [ref=e295] [cursor=pointer]:
+          - /url: /
+        - paragraph [ref=e296]: AI-powered cover image search
+      - generic [ref=e297]:
+        - link "Home" [ref=e298] [cursor=pointer]:
+          - /url: /
+        - link "Pricing" [ref=e299] [cursor=pointer]:
+          - /url: /pricing
+        - link "Guides" [ref=e300] [cursor=pointer]:
+          - /url: /guides
+        - link "API" [ref=e301] [cursor=pointer]:
+          - /url: /docs/api
+        - link "Integrations" [ref=e302] [cursor=pointer]:
+          - /url: /integrations
+        - link "Privacy" [ref=e303] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms" [ref=e304] [cursor=pointer]:
+          - /url: /terms
+        - link "Contact" [ref=e305] [cursor=pointer]:
+          - /url: /contact
+  - region "Notifications alt+T"
+  - alert [ref=e306]
