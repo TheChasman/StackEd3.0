@@ -8,7 +8,6 @@ interface TabState {
   fileHandle: FileSystemFileHandle | null;
   filePath: string | null;
   dirty: boolean;
-  loadVersion: number;
 }
 
 export interface TabMeta {
@@ -25,7 +24,6 @@ function emptyTab(): TabState {
     fileHandle: null,
     filePath: null,
     dirty: false,
-    loadVersion: 0,
   };
 }
 
@@ -38,6 +36,7 @@ function tabTitle(tab: TabState): string {
 class DocumentStore {
   private _tabs = $state<TabState[]>([emptyTab()]);
   private _activeIndex = $state(0);
+  private _loadVersion = $state(0);
 
   get activeIndex(): number {
     return this._activeIndex;
@@ -81,7 +80,7 @@ class DocumentStore {
   }
 
   get loadVersion(): number {
-    return this._tabs[this._activeIndex].loadVersion;
+    return this._loadVersion;
   }
 
   get wordCount(): number {
@@ -108,7 +107,7 @@ class DocumentStore {
     tab.fileHandle = fileHandle;
     tab.filePath = filePath;
     tab.dirty = dirty;
-    tab.loadVersion += 1;
+    this._loadVersion += 1;
   }
 
   /** Open a blank tab (Cmd+T). Always creates a new one. */
@@ -145,14 +144,15 @@ class DocumentStore {
       fileHandle: parsed.fileHandle ?? null,
       filePath: parsed.filePath ?? null,
       dirty: parsed.dirty ?? false,
-      loadVersion: 1,
     });
     this._activeIndex = this._tabs.length - 1;
+    this._loadVersion += 1;
   }
 
   switchTab(index: number): void {
     if (index >= 0 && index < this._tabs.length) {
       this._activeIndex = index;
+      this._loadVersion += 1;
     }
   }
 
