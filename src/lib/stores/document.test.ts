@@ -62,6 +62,13 @@ describe('document store', () => {
     expect(documentStore.dirty).toBe(false);
   });
 
+  it('replaceFrontmatter marks the document dirty', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE);
+    expect(documentStore.dirty).toBe(false);
+    documentStore.replaceFrontmatter({ ...BASE, TITLE: 'Replaced' });
+    expect(documentStore.dirty).toBe(true);
+  });
+
   it('wordCount counts words in body', () => {
     documentStore.load(BASE, 'one two three', [], FAKE_HANDLE);
     expect(documentStore.wordCount).toBe(3);
