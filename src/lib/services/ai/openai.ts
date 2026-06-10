@@ -35,6 +35,7 @@ export class OpenAIAdapter implements AIAdapter {
   }
 
   async generateSeoDraft(context: ArticleContext) {
+    // Responses API is not yet typed in the openai SDK
     const response = await (this.client as any).responses.create({
       model: 'gpt-4o-mini',
       input: buildSeoPrompt(context),

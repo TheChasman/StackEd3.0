@@ -152,7 +152,6 @@
       });
       const merged = mergeSeoDraft(frontmatter, draft);
       documentStore.replaceFrontmatter(merged);
-      documentStore.patchField('SEO_TAGS', merged.SEO_TAGS);
       alert('SEO draft generated. Review the SEO fields in the YAML panel, then save before export/posting.');
     } catch (e) {
       alert('SEO generation failed: ' + (e instanceof Error ? e.message : e));

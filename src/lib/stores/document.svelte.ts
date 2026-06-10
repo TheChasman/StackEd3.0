@@ -48,6 +48,7 @@ class DocumentStore {
 
   replaceFrontmatter(frontmatter: ArticleFrontmatter): void {
     this.frontmatter = frontmatter;
+    this.dirty = true;
   }
 
   markClean(): void {
