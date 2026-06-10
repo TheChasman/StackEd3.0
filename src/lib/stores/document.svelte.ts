@@ -111,6 +111,12 @@ class DocumentStore {
     tab.loadVersion += 1;
   }
 
+  /** Open a blank tab (Cmd+T). Always creates a new one. */
+  newTab(): void {
+    this._tabs.push(emptyTab());
+    this._activeIndex = this._tabs.length - 1;
+  }
+
   /** Open a parsed file in a new tab.  Reuses the active tab if it is blank and untouched. */
   openInNewTab(parsed: ParsedFile): void {
     const current = this._tabs[this._activeIndex];

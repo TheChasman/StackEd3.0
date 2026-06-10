@@ -42,6 +42,7 @@
   onMount(() => {
     let unlistenOpenFile: (() => void) | undefined;
     let unlistenMenuNew: (() => void) | undefined;
+    let unlistenMenuNewTab: (() => void) | undefined;
     let unlistenMenuOpen: (() => void) | undefined;
     let unlistenMenuSave: (() => void) | undefined;
     let unlistenMenuSaveAs: (() => void) | undefined;
@@ -52,6 +53,9 @@
     });
     void listen('stacked:menu-new', () => { void handleNew(); }).then((unlisten) => {
       unlistenMenuNew = unlisten;
+    });
+    void listen('stacked:menu-new-tab', () => { documentStore.newTab(); }).then((unlisten) => {
+      unlistenMenuNewTab = unlisten;
     });
     void listen('stacked:menu-open', () => { void handleOpen(); }).then((unlisten) => {
       unlistenMenuOpen = unlisten;
@@ -80,6 +84,7 @@
     return () => {
       unlistenOpenFile?.();
       unlistenMenuNew?.();
+      unlistenMenuNewTab?.();
       unlistenMenuOpen?.();
       unlistenMenuSave?.();
       unlistenMenuSaveAs?.();
@@ -226,7 +231,7 @@
     if (e.metaKey || e.ctrlKey) {
       if (e.key === 't') {
         e.preventDefault();
-        void handleNew();
+        documentStore.newTab();
         return;
       }
       if (e.shiftKey) {

@@ -79,7 +79,7 @@ pub fn run() {
         .on_menu_event(|app, event| {
             let event_name = match event.id().as_ref() {
                 "file-new" => Some("stacked:menu-new"),
-                "file-new-tab" => Some("stacked:menu-new"),
+                "file-new-tab" => Some("stacked:menu-new-tab"),
                 "file-open" => Some("stacked:menu-open"),
                 "file-save" => Some("stacked:menu-save"),
                 "file-save-as" => Some("stacked:menu-save-as"),
