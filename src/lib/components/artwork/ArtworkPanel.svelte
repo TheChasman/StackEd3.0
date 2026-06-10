@@ -11,10 +11,8 @@
   let images = $state<ArtworkImage[]>([]);
   let loading = $state(true);
   let error = $state('');
-  let currentFilePath = $derived(documentStore.filePath);
-
   $effect(() => {
-    void loadArtwork(currentFilePath);
+    void loadArtwork(documentStore.filePath);
   });
 
   async function loadArtwork(articlePath: string | null) {
@@ -47,7 +45,7 @@
       <p class="text-xs text-dark-500">./artwork</p>
     </div>
     <button
-      onclick={() => loadArtwork(currentFilePath)}
+      onclick={() => loadArtwork(documentStore.filePath)}
       class="px-2 py-1 text-xs border border-dark-600 rounded hover:bg-dark-700 text-dark-300"
       disabled={loading}
     >
