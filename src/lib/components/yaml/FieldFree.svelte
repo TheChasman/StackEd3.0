@@ -17,6 +17,7 @@
   } = $props();
 
   let value = $derived(documentStore.frontmatter?.[field] ?? '');
+  let inputId = $derived(`field-${String(field).toLowerCase().replaceAll('_', '-')}`);
 
   function update(newValue: unknown) {
     documentStore.patchField(field, newValue);
@@ -24,11 +25,13 @@
 </script>
 
 <div class="flex flex-col gap-0.5">
-  <label class="text-xs font-medium text-dark-300 uppercase tracking-wide">{label}</label>
+  <label for={inputId} class="text-xs font-medium text-dark-300 uppercase tracking-wide">{label}</label>
 
   {#if type === 'toggle'}
     <button
+      id={inputId}
       role="switch"
+      aria-label={label}
       aria-checked={Boolean(value)}
       onclick={() => update(!value)}
       class="w-10 h-5 rounded-full relative transition-colors {value ? 'bg-primary-600' : 'bg-dark-600'}"
@@ -38,6 +41,7 @@
 
   {:else if type === 'select'}
     <select
+      id={inputId}
       value={String(value)}
       onchange={(e) => update((e.target as HTMLSelectElement).value)}
       class="text-sm border border-dark-600 rounded px-2 py-1 bg-dark-800"
@@ -49,6 +53,7 @@
 
   {:else if type === 'textarea'}
     <textarea
+      id={inputId}
       value={String(value)}
       oninput={(e) => update((e.target as HTMLTextAreaElement).value)}
       rows={rows}
@@ -57,6 +62,7 @@
 
   {:else if type === 'datetime'}
     <input
+      id={inputId}
       type="datetime-local"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}
@@ -65,6 +71,7 @@
 
   {:else}
     <input
+      id={inputId}
       type="text"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}

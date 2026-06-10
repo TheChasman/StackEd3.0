@@ -11,13 +11,24 @@
   } = $props();
 
   let inputId = $derived(`field-tags-${field.toLowerCase().replaceAll('_', '-')}`);
+  let rawValue = $state('');
+  let isEditing = $state(false);
 
-  let rawValue = $derived.by(() => {
+  function valueFromStore() {
     const value = documentStore.frontmatter?.[field];
     return Array.isArray(value) ? value.join(', ') : String(value ?? '');
+  }
+
+  $effect(() => {
+    const nextValue = valueFromStore();
+    if (!isEditing && rawValue !== nextValue) {
+      rawValue = nextValue;
+    }
   });
 
   function update(value: string) {
+    isEditing = true;
+    rawValue = value;
     documentStore.patchField(
       field,
       value
@@ -25,6 +36,11 @@
         .map(item => item.trim())
         .filter(Boolean),
     );
+  }
+
+  function finishEditing() {
+    isEditing = false;
+    rawValue = valueFromStore();
   }
 </script>
 
@@ -35,7 +51,9 @@
     type="text"
     value={rawValue}
     placeholder="tag one, tag two, tag three"
+    onfocus={() => (isEditing = true)}
     oninput={(e) => update((e.target as HTMLInputElement).value)}
+    onblur={finishEditing}
     class="text-sm border border-dark-600 rounded px-2 py-1"
   />
 </div>
