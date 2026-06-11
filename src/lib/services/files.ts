@@ -78,11 +78,14 @@ function getArticlePathForNewFile(selectedPath: string): { articlePath: string; 
   const title = titleFromFileName(fileName);
   const parent = getFolderPath(selectedPath);
   const parentName = getFileName(parent);
-  const articleFolder = parentName === title ? parent : parent ? `${parent}/${title}` : title;
+  // Already in correct folder if parent matches bare title (pre-migration) or A_{title} (post-migration)
+  const articleFolder = (parentName === title || parentName === `A_${title}`)
+    ? parent
+    : parent ? `${parent}/A_${title}` : `A_${title}`;
 
   return {
     articlePath: `${articleFolder}/${title}.md`,
-    artworkPath: `${articleFolder}/artwork`,
+    artworkPath: `${articleFolder}/_artwork`,
     title,
   };
 }
