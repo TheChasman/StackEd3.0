@@ -189,14 +189,15 @@ fn article_folder_paths(path: &Path) -> Result<(PathBuf, PathBuf, String), Strin
         .file_name()
         .and_then(|name| name.to_str())
         .unwrap_or("");
-    let article_folder = if parent_name == title {
+    // Already in correct folder if parent matches bare title (pre-migration) or A_{title} (post-migration)
+    let article_folder = if parent_name == title || parent_name == format!("A_{}", title) {
         parent.to_path_buf()
     } else {
-        parent.join(&title)
+        parent.join(format!("A_{}", title))
     };
     Ok((
         article_folder.join(format!("{}.md", title)),
-        article_folder.join("artwork"),
+        article_folder.join("_artwork"),
         title,
     ))
 }
@@ -493,7 +494,7 @@ mod tests {
             root.to_string_lossy().to_string(),
         )
         .unwrap();
-        let expected_path = root.join("Checkmate").join("Checkmate.md");
+        let expected_path = root.join("A_Checkmate").join("Checkmate.md");
 
         assert_eq!(
             final_path,
@@ -504,7 +505,7 @@ mod tests {
         );
         assert!(!article_path.exists());
         assert_eq!(std::fs::read_to_string(&expected_path).unwrap(), "article");
-        assert!(root.join("Checkmate").join("artwork").is_dir());
+        assert!(root.join("A_Checkmate").join("_artwork").is_dir());
 
         std::fs::remove_dir_all(root).unwrap();
     }
@@ -518,7 +519,8 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
-        let article_dir = root.join("Checkmate");
+        // Article already in A_* folder — should stay put, get _artwork created
+        let article_dir = root.join("A_Checkmate");
         std::fs::create_dir_all(&article_dir).unwrap();
         let article_path = article_dir.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
@@ -537,7 +539,7 @@ mod tests {
                 .to_string()
         );
         assert_eq!(std::fs::read_to_string(&article_path).unwrap(), "article");
-        assert!(article_dir.join("artwork").is_dir());
+        assert!(article_dir.join("_artwork").is_dir());
 
         std::fs::remove_dir_all(root).unwrap();
     }
