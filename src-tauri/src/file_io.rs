@@ -131,7 +131,7 @@ fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, Strin
             article_path.parent().unwrap_or_else(|| Path::new("")).to_path_buf()
         };
 
-        let candidate = article_dir.join("artwork");
+        let candidate = article_dir.join("_artwork");
         if candidate.is_dir() {
             return Ok(Some(candidate));
         }
@@ -393,9 +393,9 @@ mod tests {
         ));
         // Article folder contains its own artwork subfolder
         let article_dir = root.join("I Can Burn a Rainbow");
-        let artwork_dir = article_dir.join("artwork");
+        let artwork_dir = article_dir.join("_artwork");
         // Section-level artwork folder should NOT be picked up
-        let section_artwork_dir = root.join("artwork");
+        let section_artwork_dir = root.join("_artwork");
         std::fs::create_dir_all(&artwork_dir).unwrap();
         std::fs::create_dir_all(&section_artwork_dir).unwrap();
 
