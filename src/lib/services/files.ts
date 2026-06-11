@@ -73,7 +73,7 @@ function createTemplateFrontmatter(title: string): ArticleFrontmatter {
   };
 }
 
-function getArticlePathForNewFile(selectedPath: string): { articlePath: string; artworkPath: string; title: string } {
+function getArticlePathForNewFile(selectedPath: string): { articlePath: string; artworkPath: string; researchPath: string; title: string } {
   const fileName = getFileName(selectedPath);
   const title = titleFromFileName(fileName);
   const parent = getFolderPath(selectedPath);
@@ -86,6 +86,7 @@ function getArticlePathForNewFile(selectedPath: string): { articlePath: string; 
   return {
     articlePath: `${articleFolder}/${title}.md`,
     artworkPath: `${articleFolder}/_artwork`,
+    researchPath: `${articleFolder}/_research`,
     title,
   };
 }
@@ -152,13 +153,14 @@ export async function createNewFile(): Promise<ParsedFile | null> {
 
   if (!selectedPath) return null;
 
-  const { articlePath, artworkPath, title } = getArticlePathForNewFile(selectedPath);
+  const { articlePath, artworkPath, researchPath, title } = getArticlePathForNewFile(selectedPath);
   const frontmatter = createTemplateFrontmatter(title);
   const fieldOrder = FRONTMATTER_FIELD_ORDER.map(String);
   const body = '';
   const content = serializeArticleFile(frontmatter, fieldOrder, body);
 
   await invoke('create_dir_recursive', { path: artworkPath });
+  await invoke('create_dir_recursive', { path: researchPath });
   await invoke('write_markdown_file', { filePath: articlePath, content });
   rememberLastSavedFolder(articlePath);
   await addRecentFile(articlePath, frontmatter.TITLE || title).catch(() => {});
