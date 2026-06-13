@@ -19,7 +19,8 @@
   import { createAdapter } from '$lib/services/ai/adapter';
   import { isSeoComplete, mergeSeoDraft } from '$lib/services/seo';
   import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
-  import { backfillArticleFrontmatter } from '$lib/utils/frontmatter';
+  import { backfillArticleFrontmatter, runBodyParser } from '$lib/utils/frontmatter';
+  import PreviewPanel from '$lib/components/editor/PreviewPanel.svelte';
   import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import '$lib/themes/catppuccin.css';
@@ -33,6 +34,7 @@
   let sidebarWidth = $state(288);
   let isResizing = $state(false);
   let seoLoading = $state(false);
+  let activeEditorTab = $state<'editor' | 'preview'>('editor');
 
   async function loadFilePath(filePath: string) {
     const parsed = await openFilePath(filePath);
@@ -132,10 +134,11 @@
   }
 
   function getFrontmatterForSave() {
-    return backfillArticleFrontmatter(
+    const fm = backfillArticleFrontmatter(
       documentStore.frontmatter || FRONTMATTER_DEFAULTS,
       documentStore.body,
     );
+    return runBodyParser(fm, documentStore.body);
   }
 
   async function handlePrepareSeo() {
@@ -269,6 +272,13 @@
     document.title = fileName ? `StackEd ${buildLabel} - ${fileName}` : `StackEd ${buildLabel}`;
   });
 
+  // Reset editor tab when switching documents
+  $effect(() => {
+    // Reading activeIndex creates a reactive dependency; tab switches trigger reset
+    documentStore.activeIndex;
+    activeEditorTab = 'editor';
+  });
+
   // Add mouse event listeners when resizing
   $effect(() => {
     if (isResizing) {
@@ -369,9 +379,41 @@
 
 <!-- Main area -->
 <div class="flex flex-1 min-h-0">
-  <!-- Editor (always visible) -->
+  <!-- Editor area with tab bar -->
   <div class="flex-1 min-w-0 flex flex-col">
-    <Editor />
+    <!-- Tab bar: Draft phase shows Editor/Preview tabs; Final Draft shows label -->
+    {#if documentStore.phase === 'draft'}
+      <div class="flex items-center border-b border-dark-700 bg-dark-800 px-2 shrink-0">
+        <button
+          onclick={() => { activeEditorTab = 'editor'; }}
+          class="px-4 py-2 text-sm border-b-2 transition-colors {activeEditorTab === 'editor'
+            ? 'border-primary-400 text-dark-100'
+            : 'border-transparent text-dark-400 hover:text-dark-200'}"
+        >
+          Editor
+        </button>
+        <button
+          onclick={() => { activeEditorTab = 'preview'; }}
+          class="px-4 py-2 text-sm border-b-2 transition-colors {activeEditorTab === 'preview'
+            ? 'border-primary-400 text-dark-100'
+            : 'border-transparent text-dark-400 hover:text-dark-200'}"
+        >
+          Preview
+        </button>
+      </div>
+    {:else}
+      <!-- Final Draft mode label -->
+      <div class="flex items-center border-b border-dark-700 bg-dark-800 px-4 py-2 shrink-0">
+        <span class="text-xs text-amber-400 font-semibold uppercase tracking-wide">Final Draft</span>
+      </div>
+    {/if}
+
+    <!-- Content -->
+    {#if activeEditorTab === 'editor' || documentStore.phase === 'final'}
+      <Editor />
+    {:else}
+      <PreviewPanel />
+    {/if}
   </div>
 
   <!-- Right sidebar -->
