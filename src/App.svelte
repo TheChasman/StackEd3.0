@@ -259,8 +259,10 @@
     const manuscriptPath = finalPath.replace(/_final\.md$/, '.md');
 
     try {
-      await deleteFile(finalPath);
+      // Read the manuscript FIRST — if it fails, _final.md is untouched
       const parsed = await openFilePath(manuscriptPath);
+      // Manuscript verified. Now safe to delete the Final Draft.
+      await deleteFile(finalPath);
       documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, null, manuscriptPath, false);
       activeEditorTab = 'editor';
     } catch (e) {
