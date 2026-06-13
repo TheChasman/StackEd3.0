@@ -21,6 +21,7 @@
   import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
   import { backfillArticleFrontmatter, runBodyParser } from '$lib/utils/frontmatter';
   import PreviewPanel from '$lib/components/editor/PreviewPanel.svelte';
+  import WorkflowTimeline from '$lib/components/WorkflowTimeline.svelte';
   import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import '$lib/themes/catppuccin.css';
@@ -375,6 +376,24 @@
     {/each}
   </div>
 {/if}
+
+<!-- Workflow timeline strip -->
+<WorkflowTimeline
+  phase={documentStore.phase}
+  yamlVisible={settingsStore.sidebarVisible && !yamlCollapsed}
+  onToggleYaml={() => {
+    if (!settingsStore.sidebarVisible) {
+      settingsStore.toggleSidebar();
+      yamlCollapsed = false;
+    } else if (yamlCollapsed) {
+      yamlCollapsed = false;
+    } else {
+      yamlCollapsed = true;
+    }
+  }}
+  onOpenPreview={() => { activeEditorTab = 'preview'; }}
+  onOpenSettings={() => { showSettings = true; }}
+/>
 
 <!-- Main area -->
 <div class="flex flex-1 min-h-0">
