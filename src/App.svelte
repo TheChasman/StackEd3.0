@@ -201,7 +201,22 @@
       return;
     }
 
-    if (!window.confirm('Promote to Final Draft? The manuscript will be frozen. You can restart later if needed.')) return;
+    // If there are unsaved changes, save them first
+    if (documentStore.dirty) {
+      await handleSave();
+      // If still dirty after save (save failed), abort
+      if (documentStore.dirty) {
+        alert('Please save the manuscript before promoting to Final Draft.');
+        return;
+      }
+    }
+
+    if (!window.confirm(
+      'Promote to Final Draft?\n\n' +
+      'The manuscript file will remain untouched. A clean prose file will be written to:\n' +
+      finalPath + '\n\n' +
+      'If this file already exists, it will be overwritten. Proceed?'
+    )) return;
 
     promotionLoading = true;
     try {
