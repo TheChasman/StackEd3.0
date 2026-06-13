@@ -444,7 +444,7 @@
     {#if documentStore.phase === 'final'}
       <button
         onclick={handlePublish}
-        disabled={seoLoading}
+        disabled={seoLoading || !documentStore.frontmatter || !settingsStore.hasValidKey}
         class="px-3 py-2 text-sm bg-amber-600 text-dark-900 rounded hover:bg-amber-500
           disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
       >
