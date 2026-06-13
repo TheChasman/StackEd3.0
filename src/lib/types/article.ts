@@ -1,17 +1,22 @@
 // Simplified YAML frontmatter for Markdown articles (Substack structure + pre-posting SEO)
 export interface ArticleFrontmatter {
-  IMAGE: string;            // Hero image src (URL or data-URI)
-  SPARK: string;            // Raw idea seed
-  TITLE: string;            // Article title
-  SUBTITLE: string;         // Hook promise
-  HOOK: string;             // Refined opening
-  LANDING: string;          // Closing thought
-  SEO_TITLE: string;        // Search/social title
-  SEO_DESCRIPTION: string;  // Search/social description
-  SEO_SLUG: string;         // URL-safe slug
-  SEO_TAGS: string[];       // Short topical tags
-  created: string;          // ISO timestamp
-  updated: string;          // ISO timestamp
+  IMAGE: string;
+  SPARK: string;
+  TITLE: string;
+  SUBTITLE: string;
+  HOOK: string;
+  LANDING: string;
+  TITLE_SELECTED: string;      // [✓]-chosen Alt TITLE text, or ''
+  SUBTITLE_SELECTED: string;   // [✓]-chosen Alt SUBTITLE text, or ''
+  HOOK_SELECTED: string;       // [✓]-chosen Alt HOOK text, or ''
+  LANDING_SELECTED: string;    // [✓]-chosen Alt LANDING text, or ''
+  AI_GEN: boolean;             // true = generative mode, false = rescan mode
+  SEO_TITLE: string;
+  SEO_DESCRIPTION: string;
+  SEO_SLUG: string;
+  SEO_TAGS: string[];
+  created: string;
+  updated: string;
 }
 
 // Defaults for a freshly loaded article with missing fields
@@ -22,6 +27,11 @@ export const FRONTMATTER_DEFAULTS: ArticleFrontmatter = {
   SUBTITLE: '',
   HOOK: '',
   LANDING: '',
+  TITLE_SELECTED: '',
+  SUBTITLE_SELECTED: '',
+  HOOK_SELECTED: '',
+  LANDING_SELECTED: '',
+  AI_GEN: false,
   SEO_TITLE: '',
   SEO_DESCRIPTION: '',
   SEO_SLUG: '',
@@ -37,6 +47,11 @@ export const FRONTMATTER_FIELD_ORDER: (keyof ArticleFrontmatter)[] = [
   'SUBTITLE',
   'HOOK',
   'LANDING',
+  'TITLE_SELECTED',
+  'SUBTITLE_SELECTED',
+  'HOOK_SELECTED',
+  'LANDING_SELECTED',
+  'AI_GEN',
   'SEO_TITLE',
   'SEO_DESCRIPTION',
   'SEO_SLUG',
