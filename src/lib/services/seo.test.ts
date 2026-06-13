@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ArticleFrontmatter } from '$lib/types/article';
+import { FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
 import {
   buildSeoPrompt,
   isSeoComplete,
@@ -106,5 +107,35 @@ describe('buildSeoPrompt', () => {
     expect(prompt).toContain('Return only valid JSON');
     expect(prompt).toContain('Partial Solution');
     expect(prompt).toContain('Body copy.');
+  });
+});
+
+describe('buildSeoPrompt with Alt history', () => {
+  it('includes Alt block evolution in the prompt', () => {
+    const fm: ArticleFrontmatter = {
+      ...BASE,
+      TITLE: 'Partial Solution',
+      TITLE_SELECTED: 'Lady Justice has Lost Her Blindfold',
+    };
+    const body = [
+      '## TITLE',
+      'Partial Solution',
+      '',
+      '## Alt TITLE',
+      '1. Lady Justice has Lost Her Blindfold [✓]',
+      '2. Remove the Blindfold',
+      '',
+      '## HOOK',
+      'The oath changed in 2002.',
+    ].join('\n');
+    const prompt = buildSeoPrompt({
+      frontmatter: fm,
+      fieldOrder: FRONTMATTER_FIELD_ORDER.map(String),
+      body,
+      filePath: '/tmp/test.md',
+    });
+    expect(prompt).toContain('Lady Justice has Lost Her Blindfold');
+    expect(prompt).toContain('Remove the Blindfold');
+    expect(prompt).toContain('Alt TITLE');
   });
 });

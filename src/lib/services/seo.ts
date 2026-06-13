@@ -79,6 +79,22 @@ export function mergeSeoDraft(frontmatter: ArticleFrontmatter, draft: SeoDraft):
   };
 }
 
+function extractAltHistory(body: string): string {
+  // Split at every ## heading boundary (lookahead keeps the ## on the next chunk)
+  const sections = body.split(/^(?=##\s)/m);
+  const blocks: string[] = [];
+  for (const section of sections) {
+    const match = section.match(/^##\s+Alt\s+(TITLE|SUBTITLE|HOOK|LANDING)\s*(?:\n|$)([\s\S]*)/i);
+    if (match) {
+      const content = match[2].trim();
+      if (content) {
+        blocks.push(`Alt ${match[1]}:\n${content}`);
+      }
+    }
+  }
+  return blocks.join('\n\n');
+}
+
 export function buildSeoPrompt(context: ArticleContext): string {
   const frontmatter = context.frontmatter
     ? serializeMarkdownFile(context.frontmatter as unknown as Record<string, unknown>, context.fieldOrder, '').trim()
@@ -87,6 +103,8 @@ export function buildSeoPrompt(context: ArticleContext): string {
   const body = context.body.trim()
     ? truncate(context.body, MAX_BODY_CONTEXT_CHARS)
     : 'No Markdown body loaded.';
+
+  const altHistory = extractAltHistory(context.body);
 
   return `Create pre-posting SEO metadata for this StackEd/Substack article.
 
@@ -110,7 +128,7 @@ Current file: ${context.filePath ?? 'unsaved StackEd article'}
 
 YAML frontmatter:
 ${frontmatter}
-
+${altHistory ? `\nTitle/Hook evolution (Alt blocks — strongest SEO signal):\n${altHistory}\n` : ''}
 Markdown body:
 ${body}`;
 }

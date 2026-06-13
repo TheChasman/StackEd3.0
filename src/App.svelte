@@ -143,7 +143,8 @@
     );
   }
 
-  async function handlePrepareSeo() {
+  async function handlePublish() {
+    if (documentStore.phase !== 'final') return;
     if (!documentStore.frontmatter) return;
     if (isSeoComplete(documentStore.frontmatter)) {
       alert('SEO fields are already complete.');
@@ -440,14 +441,16 @@
         {promotionLoading ? 'Promoting…' : '→ Final Draft'}
       </button>
     {/if}
-    <button
-      onclick={handlePrepareSeo}
-      disabled={!documentStore.frontmatter || seoLoading}
-      class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700 disabled:opacity-50 disabled:cursor-default"
-      title="Generate SEO metadata before export/posting"
-    >
-      {seoLoading ? 'SEO…' : 'Prepare SEO'}
-    </button>
+    {#if documentStore.phase === 'final'}
+      <button
+        onclick={handlePublish}
+        disabled={seoLoading}
+        class="px-3 py-2 text-sm bg-amber-600 text-dark-900 rounded hover:bg-amber-500
+          disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+      >
+        {seoLoading ? 'Generating SEO…' : '→ Publish'}
+      </button>
+    {/if}
     <button
       onclick={() => showRecents = true}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
