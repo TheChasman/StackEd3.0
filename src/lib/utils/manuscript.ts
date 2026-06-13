@@ -97,14 +97,12 @@ export function renderForPreview(body: string, frontmatter: ArticleFrontmatter):
     if (upper === 'SPARK') continue;
 
     // Alt blocks: extract as data, not prose
-    if (isAltBlock(heading)) {
-      const sectionMatch = heading.match(/^Alt\s+(TITLE|SUBTITLE|HOOK|LANDING)$/i);
-      if (sectionMatch) {
-        altBlocks.push({
-          section: sectionMatch[1].toUpperCase() as AltBlock['section'],
-          items: parseAltItems(chunk.content),
-        });
-      }
+    const altMatch = heading.match(/^Alt\s+(TITLE|SUBTITLE|HOOK|LANDING)$/i);
+    if (altMatch) {
+      altBlocks.push({
+        section: altMatch[1].toUpperCase() as AltBlock['section'],
+        items: parseAltItems(chunk.content),
+      });
       continue;
     }
 
@@ -149,8 +147,8 @@ function countBodyWords(body: string): number {
     const heading = chunk.heading?.trim() ?? '';
     const upper = heading.toUpperCase();
 
-    // HOOK opens body range — count its chunk content too (may contain inline body prose)
-    if (upper === 'HOOK') { inBody = true; }
+    // HOOK opens body range — its own content is not counted (same as render behaviour)
+    if (upper === 'HOOK') { inBody = true; continue; }
     // LANDING closes body range — do not count LANDING content
     else if (upper === 'LANDING') { inBody = false; continue; }
     // Skip anything outside the body range, Alt blocks, and other spine sections

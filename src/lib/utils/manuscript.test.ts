@@ -115,7 +115,15 @@ describe('renderForPromotion', () => {
 describe('checkPromotionGate', () => {
   it('passes when SPINE is complete and body has 100+ words', () => {
     const fm = { ...BASE_FM };
-    const body = `## HOOK\nHook text.\n\n${Array(110).fill('word').join(' ')}\n\n## LANDING\nLanding.\n`;
+    const body = [
+      '## HOOK\nHook text.',
+      '',
+      '## CONTEXT',
+      Array(110).fill('word').join(' '),
+      '',
+      '## LANDING\nLanding.',
+      '',
+    ].join('\n');
     const result = checkPromotionGate(fm, body);
     expect(result.canPromote).toBe(true);
     expect(result.missing).toHaveLength(0);
@@ -129,7 +137,15 @@ describe('checkPromotionGate', () => {
   });
 
   it('fails when body word count is below 100', () => {
-    const body = `## HOOK\nHook.\n\n${Array(10).fill('word').join(' ')}\n\n## LANDING\nLanding.\n`;
+    const body = [
+      '## HOOK\nHook.',
+      '',
+      '## CONTEXT',
+      Array(10).fill('word').join(' '),
+      '',
+      '## LANDING\nLanding.',
+      '',
+    ].join('\n');
     const result = checkPromotionGate(BASE_FM, body);
     expect(result.canPromote).toBe(false);
     expect(result.missing.some((m: string) => m.includes('100 words'))).toBe(true);
