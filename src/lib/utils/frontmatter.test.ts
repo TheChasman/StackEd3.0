@@ -450,4 +450,17 @@ describe('runBodyParser', () => {
     expect(result.TITLE).toBe('My Title');
     expect(result.TITLE_SELECTED).toBe('Better Title');
   });
+
+  it('clears _SELECTED when the [✓] marker is removed from the body', () => {
+    const fm: ArticleFrontmatter = {
+      IMAGE: '', SPARK: '', TITLE: '', SUBTITLE: '', HOOK: '',
+      LANDING: '', TITLE_SELECTED: 'Previously Selected', SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
+      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
+      created: '2026-06-13', updated: '2026-06-13',
+    };
+    const body = `## Alt TITLE\n1. Option A\n2. Option B`; // no [✓] marker
+    const result = runBodyParser(fm, body);
+    expect(result.TITLE_SELECTED).toBe('');
+  });
 });

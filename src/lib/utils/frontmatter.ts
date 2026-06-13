@@ -236,7 +236,7 @@ export function runBodyParser(
   for (const section of ARTICLE_SECTIONS) {
     const extracted = extractSection(body, section);
     if (extracted) {
-      updated[section as keyof ArticleFrontmatter] = extracted as never;
+      (updated as Record<string, unknown>)[section] = extracted;
     }
   }
 
