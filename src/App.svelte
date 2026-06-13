@@ -15,11 +15,12 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile } from '$lib/services/files';
+  import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile, writeFilePath } from '$lib/services/files';
   import { createAdapter } from '$lib/services/ai/adapter';
   import { isSeoComplete, mergeSeoDraft } from '$lib/services/seo';
-  import { FRONTMATTER_DEFAULTS } from '$lib/types/article';
-  import { backfillArticleFrontmatter, runBodyParser } from '$lib/utils/frontmatter';
+  import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
+  import { backfillArticleFrontmatter, runBodyParser, serializeArticleFile } from '$lib/utils/frontmatter';
+  import { checkPromotionGate, renderForPromotion } from '$lib/utils/manuscript';
   import PreviewPanel from '$lib/components/editor/PreviewPanel.svelte';
   import WorkflowTimeline from '$lib/components/WorkflowTimeline.svelte';
   import { buildLabel } from '$lib/utils/buildInfo';
@@ -35,6 +36,7 @@
   let sidebarWidth = $state(288);
   let isResizing = $state(false);
   let seoLoading = $state(false);
+  let promotionLoading = $state(false);
   let activeEditorTab = $state<'editor' | 'preview'>('editor');
 
   async function loadFilePath(filePath: string) {
@@ -169,6 +171,63 @@
       alert('SEO generation failed: ' + (e instanceof Error ? e.message : e));
     } finally {
       seoLoading = false;
+    }
+  }
+
+  function getManuscriptFinalPath(): string | null {
+    const path = documentStore.filePath;
+    if (!path || !path.endsWith('.md')) return null;
+    return path.replace(/\.md$/, '_final.md');
+  }
+
+  async function handlePromote() {
+    if (promotionLoading) return;
+    const fm = documentStore.frontmatter;
+    const body = documentStore.body;
+    if (!fm || !documentStore.filePath) {
+      alert('Save the manuscript before promoting to Final Draft.');
+      return;
+    }
+
+    // Don't promote if already in Final Draft
+    if (documentStore.phase === 'final') return;
+
+    const finalPath = getManuscriptFinalPath();
+    if (!finalPath) return;
+
+    const gate = checkPromotionGate(fm, body);
+    if (!gate.canPromote) {
+      alert('Cannot promote to Final Draft:\n\n' + gate.missing.join('\n'));
+      return;
+    }
+
+    if (!window.confirm('Promote to Final Draft? The manuscript will be frozen. You can restart later if needed.')) return;
+
+    promotionLoading = true;
+    try {
+      const parsedFm = runBodyParser(fm, body);
+      const prose = renderForPromotion(body, parsedFm);
+
+      // Build clean frontmatter for _final.md (no SEO yet — generated at Publish)
+      const finalFm = {
+        ...parsedFm,
+        SEO_TITLE: '',
+        SEO_DESCRIPTION: '',
+        SEO_SLUG: '',
+        SEO_TAGS: [] as string[],
+      };
+
+      const fieldOrder = FRONTMATTER_FIELD_ORDER.map(String);
+      const content = serializeArticleFile(finalFm, fieldOrder, prose);
+      await writeFilePath(finalPath, content);
+
+      // Switch editor to _final.md
+      documentStore.load(finalFm, prose, fieldOrder, null, finalPath, false);
+      activeEditorTab = 'editor';
+    } catch (e) {
+      alert('Promotion failed: ' + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      promotionLoading = false;
     }
   }
 
@@ -328,6 +387,20 @@
     <button onclick={handleSaveAs} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
       Save as...
     </button>
+    {#if documentStore.phase === 'draft' && documentStore.filePath && documentStore.frontmatter}
+      {@const gate = checkPromotionGate(documentStore.frontmatter, documentStore.body)}
+      <button
+        onclick={handlePromote}
+        disabled={!gate.canPromote || promotionLoading}
+        title={gate.canPromote
+          ? 'Promote to Final Draft'
+          : 'Missing: ' + gate.missing.join(' · ')}
+        class="px-3 py-2 text-sm border border-dark-600 rounded hover:bg-dark-700
+          disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        {promotionLoading ? 'Promoting…' : '→ Final Draft'}
+      </button>
+    {/if}
     <button
       onclick={handlePrepareSeo}
       disabled={!documentStore.frontmatter || seoLoading}

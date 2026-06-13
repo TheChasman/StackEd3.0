@@ -275,3 +275,7 @@ export async function saveFilePath(
   await addRecentFile(articlePath, frontmatter.TITLE || getFileName(articlePath)).catch(() => {});
   return articlePath;
 }
+
+export async function writeFilePath(filePath: string, content: string): Promise<void> {
+  await invoke('write_markdown_file', { filePath, content });
+}
