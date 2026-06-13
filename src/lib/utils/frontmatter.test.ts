@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { backfillArticleFrontmatter, parseMarkdownFile, serializeMarkdownFile } from './frontmatter';
+import type { ArticleFrontmatter } from '$lib/types/article';
+import { backfillArticleFrontmatter, parseMarkdownFile, runBodyParser, serializeMarkdownFile } from './frontmatter';
 
 const SAMPLE_WITH_FRONTMATTER = `---
 TITLE: "Test Article"
@@ -412,5 +413,41 @@ describe('backfillArticleFrontmatter', () => {
 
     expect(backfilled.TITLE).toBe('Manual title');
     expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
+  });
+});
+
+const LONG_HOOK_BODY = `## HOOK
+${Array(155).fill('word').join(' ')}
+`;
+
+const SHORT_HOOK_BODY = `## HOOK
+Short hook paragraph.
+`;
+
+describe('HOOK length warning', () => {
+  it('sets HOOK_WARNING when HOOK exceeds 150 words', () => {
+    const { hookWarning } = parseMarkdownFile(LONG_HOOK_BODY);
+    expect(hookWarning).toBe(true);
+  });
+
+  it('does not set HOOK_WARNING for short HOOK', () => {
+    const { hookWarning } = parseMarkdownFile(SHORT_HOOK_BODY);
+    expect(hookWarning).toBe(false);
+  });
+});
+
+describe('runBodyParser', () => {
+  it('returns updated frontmatter with Alt selections applied', () => {
+    const fm: ArticleFrontmatter = {
+      IMAGE: '', SPARK: '', TITLE: '', SUBTITLE: '', HOOK: '',
+      LANDING: '', TITLE_SELECTED: '', SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
+      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
+      created: '2026-06-13', updated: '2026-06-13',
+    };
+    const body = `## TITLE\nMy Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
+    const result = runBodyParser(fm, body);
+    expect(result.TITLE).toBe('My Title');
+    expect(result.TITLE_SELECTED).toBe('Better Title');
   });
 });

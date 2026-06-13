@@ -7,6 +7,7 @@ export interface ParsedMarkdown {
   fieldOrder: string[];
   hasFrontmatter: boolean;
   removedArtifacts: boolean;
+  hookWarning: boolean;
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
@@ -41,6 +42,10 @@ function extractAltSelections(body: string): Partial<Record<SelectedKey, string>
   }
 
   return result;
+}
+
+function wordCount(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
 function removeEtlArtifacts(body: string): { body: string; removed: boolean } {
@@ -148,12 +153,16 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
     }
   }
 
+  const hookText = typeof frontmatter.HOOK === 'string' ? frontmatter.HOOK as string : '';
+  const hookWarning = hookText.trim() ? wordCount(hookText) > 150 : false;
+
   return {
     frontmatter,
     body,
     fieldOrder,
     hasFrontmatter: Boolean(match),
     removedArtifacts: cleaned.removed,
+    hookWarning,
   };
 }
 
@@ -208,4 +217,42 @@ export function serializeArticleFile(
   body: string,
 ): string {
   return serializeMarkdownFile(frontmatter as unknown as Record<string, unknown>, fieldOrder, body);
+}
+
+/**
+ * Re-parses body sections and Alt block selections into frontmatter.
+ * Called on every Save and every Preview activation.
+ * Does not touch SEO_*, IMAGE, or AI_GEN fields.
+ * Updates `updated` timestamp.
+ */
+export function runBodyParser(
+  frontmatter: ArticleFrontmatter,
+  body: string,
+): ArticleFrontmatter {
+  const now = new Date().toISOString();
+  const updated = { ...frontmatter, updated: now };
+
+  // Extract primary sections (only overwrites if body has content)
+  for (const section of ARTICLE_SECTIONS) {
+    const extracted = extractSection(body, section);
+    if (extracted) {
+      updated[section as keyof ArticleFrontmatter] = extracted as never;
+    }
+  }
+
+  // Extract Alt selections (always overwrites — selection is canonical state)
+  const altSelections = extractAltSelections(body);
+  for (const [key, value] of Object.entries(altSelections)) {
+    (updated as Record<string, unknown>)[key] = value;
+  }
+
+  // Clear _SELECTED fields for Alt blocks that no longer have a [✓] marker
+  for (const section of ALT_SECTIONS) {
+    const key = `${section}_SELECTED` as keyof ArticleFrontmatter;
+    if (!(key in altSelections)) {
+      (updated as Record<string, unknown>)[key] = '';
+    }
+  }
+
+  return updated;
 }
