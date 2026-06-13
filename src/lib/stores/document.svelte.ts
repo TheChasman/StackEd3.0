@@ -97,6 +97,11 @@ class DocumentStore {
     return hook.trim().split(/\s+/).filter(Boolean).length > 150;
   }
 
+  get phase(): 'draft' | 'final' {
+    const path = this._tabs[this._activeIndex]?.filePath ?? '';
+    return path.endsWith('_final.md') ? 'final' : 'draft';
+  }
+
   /** Load a file into the active tab (used for saves / initial load). */
   load(
     frontmatter: ArticleFrontmatter,
@@ -183,6 +188,11 @@ class DocumentStore {
     if (!tab.frontmatter) return;
     tab.frontmatter = { ...tab.frontmatter, [field]: value };
     tab.dirty = true;
+  }
+
+  setAltSelection(section: 'TITLE' | 'SUBTITLE' | 'HOOK' | 'LANDING', text: string): void {
+    const key = `${section}_SELECTED` as keyof ArticleFrontmatter;
+    this.patchField(key, text);
   }
 
   replaceFrontmatter(frontmatter: ArticleFrontmatter): void {

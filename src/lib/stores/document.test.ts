@@ -122,3 +122,51 @@ describe('document store', () => {
     expect(documentStore.wordCount).toBeGreaterThan(0);
   });
 });
+
+describe('documentStore.phase', () => {
+  beforeEach(() => documentStore.reset());
+
+  it('returns "draft" when no file path is set', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE, null);
+    expect(documentStore.phase).toBe('draft');
+  });
+
+  it('returns "draft" for a normal manuscript path', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE, '/vault/A_foo/A_foo.md');
+    expect(documentStore.phase).toBe('draft');
+  });
+
+  it('returns "final" when the file path ends with _final.md', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE, '/vault/A_foo/A_foo_final.md');
+    expect(documentStore.phase).toBe('final');
+  });
+});
+
+describe('documentStore.setAltSelection', () => {
+  beforeEach(() => documentStore.reset());
+
+  it('updates the _SELECTED field and marks dirty', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE);
+    documentStore.setAltSelection('TITLE', 'Better Title');
+    expect(documentStore.frontmatter?.TITLE_SELECTED).toBe('Better Title');
+    expect(documentStore.dirty).toBe(true);
+  });
+
+  it('updates SUBTITLE_SELECTED correctly', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE);
+    documentStore.setAltSelection('SUBTITLE', 'New Subtitle');
+    expect(documentStore.frontmatter?.SUBTITLE_SELECTED).toBe('New Subtitle');
+  });
+
+  it('updates HOOK_SELECTED correctly', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE);
+    documentStore.setAltSelection('HOOK', 'A punchy hook');
+    expect(documentStore.frontmatter?.HOOK_SELECTED).toBe('A punchy hook');
+  });
+
+  it('updates LANDING_SELECTED correctly', () => {
+    documentStore.load(BASE, '', [], FAKE_HANDLE);
+    documentStore.setAltSelection('LANDING', 'Closing thought');
+    expect(documentStore.frontmatter?.LANDING_SELECTED).toBe('Closing thought');
+  });
+});
