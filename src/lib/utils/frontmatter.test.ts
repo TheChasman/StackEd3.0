@@ -219,6 +219,79 @@ Some body content without section headings.
   });
 });
 
+const SAMPLE_WITH_ALT_TITLE = `---
+TITLE: "Partial Solution"
+TITLE_SELECTED: ""
+created: "2026-06-13"
+---
+
+## TITLE
+Partial Solution
+
+## Alt TITLE
+1. Lady Justice has Lost Her Blindfold [✓]
+2. Remove the Blindfold from Lady Justice
+
+## HOOK
+The oath was changed in 2002.
+`;
+
+const SAMPLE_WITH_MULTIPLE_ALTS = `---
+TITLE: ""
+TITLE_SELECTED: ""
+HOOK_SELECTED: ""
+created: "2026-06-13"
+---
+
+## TITLE
+Original Title
+
+## Alt TITLE
+1. Option A
+2. Option B [✓]
+
+## HOOK
+Short hook.
+
+## Alt HOOK
+1. Hook variant one [✓]
+2. Hook variant two
+`;
+
+const SAMPLE_NO_ALT_SELECTED = `---
+TITLE: "Test"
+TITLE_SELECTED: ""
+created: "2026-06-13"
+---
+
+## Alt TITLE
+1. Option A
+2. Option B
+`;
+
+describe('Alt block extraction', () => {
+  it('extracts [✓]-marked Alt TITLE into TITLE_SELECTED', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_WITH_ALT_TITLE);
+    expect(frontmatter.TITLE_SELECTED).toBe('Lady Justice has Lost Her Blindfold');
+  });
+
+  it('extracts multiple Alt selections independently', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_WITH_MULTIPLE_ALTS);
+    expect(frontmatter.TITLE_SELECTED).toBe('Option B');
+    expect(frontmatter.HOOK_SELECTED).toBe('Hook variant one');
+  });
+
+  it('leaves _SELECTED empty when no [✓] marker present', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_NO_ALT_SELECTED);
+    expect(String(frontmatter.TITLE_SELECTED ?? '')).toBe('');
+  });
+
+  it('strips the [✓] marker from extracted text', () => {
+    const { frontmatter } = parseMarkdownFile(SAMPLE_WITH_ALT_TITLE);
+    expect(String(frontmatter.TITLE_SELECTED)).not.toContain('[✓]');
+  });
+});
+
 describe('backfillArticleFrontmatter', () => {
   it('fills blank StackEd fields from body sections on save', () => {
     const frontmatter = {

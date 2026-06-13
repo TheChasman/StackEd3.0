@@ -15,6 +15,34 @@ const EVERNOTE_TASKS_HTML_ARTIFACT_RE = /<div\b[^>]*--en-task-group:true;[\s\S]*
 const EVERNOTE_ENML_WRAPPER_RE = /^\s*<!DOCTYPE en-note SYSTEM "http:\/\/xml\.evernote\.com\/pub\/enml2\.dtd">\s*<en-note>([\s\S]*)<\/en-note>\s*$/;
 const ARTICLE_SECTIONS = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 
+const ALT_SECTIONS = ['TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
+type AltSection = typeof ALT_SECTIONS[number];
+type SelectedKey = `${AltSection}_SELECTED`;
+
+const SELECTED_ITEM_RE = /^\d+\.\s+(.*?)\s*\[✓\]\s*$/m;
+
+function extractAltSelections(body: string): Partial<Record<SelectedKey, string>> {
+  const result: Partial<Record<SelectedKey, string>> = {};
+
+  for (const section of ALT_SECTIONS) {
+    const headingRe = new RegExp(`^##\\s+Alt\\s+${section}\\s*$`, 'im');
+    const match = body.match(headingRe);
+    if (!match || match.index === undefined) continue;
+
+    const startIdx = match.index + match[0].length;
+    const rest = body.substring(startIdx);
+    const nextHeading = rest.match(/\n##\s/);
+    const chunk = nextHeading ? rest.substring(0, nextHeading.index) : rest;
+
+    const selected = chunk.match(SELECTED_ITEM_RE);
+    if (selected) {
+      result[`${section}_SELECTED`] = selected[1].trim();
+    }
+  }
+
+  return result;
+}
+
 function removeEtlArtifacts(body: string): { body: string; removed: boolean } {
   const unwrapped = body.replace(EVERNOTE_ENML_WRAPPER_RE, '$1');
   const cleaned = unwrapped
@@ -109,6 +137,14 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
       if (extracted) {
         frontmatter[section] = extracted;
       }
+    }
+  }
+
+  // Extract Alt block [✓] selections into _SELECTED fields
+  const altSelections = extractAltSelections(body);
+  for (const [key, value] of Object.entries(altSelections)) {
+    if (!(key in frontmatter) || (frontmatter as Record<string, unknown>)[key] === '') {
+      (frontmatter as Record<string, unknown>)[key] = value;
     }
   }
 
