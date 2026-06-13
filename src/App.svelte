@@ -134,11 +134,10 @@
   }
 
   function getFrontmatterForSave() {
-    const fm = backfillArticleFrontmatter(
+    return backfillArticleFrontmatter(
       documentStore.frontmatter || FRONTMATTER_DEFAULTS,
       documentStore.body,
     );
-    return runBodyParser(fm, documentStore.body);
   }
 
   async function handlePrepareSeo() {
@@ -178,7 +177,7 @@
     // If no file is open yet, prompt for a save location
     if (!documentStore.fileHandle && !documentStore.filePath) {
       try {
-        const frontmatter = getFrontmatterForSave();
+        const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
         const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
         if (filePath) {
           documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
@@ -190,7 +189,7 @@
     }
 
     try {
-      const frontmatter = getFrontmatterForSave();
+      const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
       if (documentStore.filePath) {
         const filePath = await saveFilePath(
           documentStore.filePath,
@@ -218,7 +217,7 @@
     if (!documentStore.body && !documentStore.frontmatter) return;
 
     try {
-      const frontmatter = getFrontmatterForSave();
+      const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
       const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
       if (filePath) {
         documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
@@ -383,8 +382,10 @@
   <div class="flex-1 min-w-0 flex flex-col">
     <!-- Tab bar: Draft phase shows Editor/Preview tabs; Final Draft shows label -->
     {#if documentStore.phase === 'draft'}
-      <div class="flex items-center border-b border-dark-700 bg-dark-800 px-2 shrink-0">
+      <div role="tablist" class="flex items-center border-b border-dark-700 bg-dark-800 px-2 shrink-0">
         <button
+          role="tab"
+          aria-selected={activeEditorTab === 'editor'}
           onclick={() => { activeEditorTab = 'editor'; }}
           class="px-4 py-2 text-sm border-b-2 transition-colors {activeEditorTab === 'editor'
             ? 'border-primary-400 text-dark-100'
@@ -393,6 +394,8 @@
           Editor
         </button>
         <button
+          role="tab"
+          aria-selected={activeEditorTab === 'preview'}
           onclick={() => { activeEditorTab = 'preview'; }}
           class="px-4 py-2 text-sm border-b-2 transition-colors {activeEditorTab === 'preview'
             ? 'border-primary-400 text-dark-100'
