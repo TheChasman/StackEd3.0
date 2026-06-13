@@ -58,6 +58,8 @@
     <!-- AI-GEN toggle -->
     <section>
       <button
+        role="checkbox"
+        aria-checked={fm.AI_GEN}
         onclick={() => documentStore.patchField('AI_GEN', !fm.AI_GEN)}
         class="flex items-center gap-2 text-xs text-dark-300 hover:text-dark-100"
       >
