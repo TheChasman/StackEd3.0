@@ -290,6 +290,12 @@ describe('Alt block extraction', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_WITH_ALT_TITLE);
     expect(String(frontmatter.TITLE_SELECTED)).not.toContain('[✓]');
   });
+
+  it('does not overwrite a non-empty TITLE_SELECTED already in frontmatter', () => {
+    const content = `---\nTITLE_SELECTED: "Kept"\n---\n## Alt TITLE\n1. Replaced [✓]\n`;
+    const { frontmatter } = parseMarkdownFile(content);
+    expect(frontmatter.TITLE_SELECTED).toBe('Kept');
+  });
 });
 
 describe('backfillArticleFrontmatter', () => {
