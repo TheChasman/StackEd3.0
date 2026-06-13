@@ -8,18 +8,21 @@
     type = 'text',
     options,
     rows = 3,
+    readonly = false,
   }: {
     label: string;
     field: keyof ArticleFrontmatter;
     type?: 'text' | 'textarea' | 'select' | 'toggle' | 'datetime';
     options?: string[];
     rows?: number;
+    readonly?: boolean;
   } = $props();
 
   let value = $derived(documentStore.frontmatter?.[field] ?? '');
   let inputId = $derived(`field-${String(field).toLowerCase().replaceAll('_', '-')}`);
 
   function update(newValue: unknown) {
+    if (readonly) return;
     documentStore.patchField(field, newValue);
   }
 </script>
@@ -34,7 +37,8 @@
       aria-label={label}
       aria-checked={Boolean(value)}
       onclick={() => update(!value)}
-      class="w-10 h-5 rounded-full relative transition-colors {value ? 'bg-primary-600' : 'bg-dark-600'}"
+      disabled={readonly}
+      class="w-10 h-5 rounded-full relative transition-colors {value ? 'bg-primary-600' : 'bg-dark-600'} {readonly ? 'opacity-60 cursor-default' : ''}"
     >
       <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-dark-800 shadow transition-transform {value ? 'translate-x-5' : ''}"></span>
     </button>
@@ -44,7 +48,8 @@
       id={inputId}
       value={String(value)}
       onchange={(e) => update((e.target as HTMLSelectElement).value)}
-      class="text-sm border border-dark-600 rounded px-2 py-1 bg-dark-800"
+      disabled={readonly}
+      class="text-sm border border-dark-600 rounded px-2 py-1 bg-dark-800 {readonly ? 'opacity-60 cursor-default' : ''}"
     >
       {#each options ?? [] as opt}
         <option value={opt}>{opt}</option>
@@ -57,7 +62,8 @@
       value={String(value)}
       oninput={(e) => update((e.target as HTMLTextAreaElement).value)}
       rows={rows}
-      class="text-sm border border-dark-600 rounded px-2 py-1 resize-none"
+      readonly={readonly}
+      class="text-sm border border-dark-600 rounded px-2 py-1 resize-none {readonly ? 'opacity-60 cursor-default bg-dark-800' : ''}"
     ></textarea>
 
   {:else if type === 'datetime'}
@@ -66,7 +72,8 @@
       type="datetime-local"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}
-      class="text-sm border border-dark-600 rounded px-2 py-1"
+      readonly={readonly}
+      class="text-sm border border-dark-600 rounded px-2 py-1 {readonly ? 'opacity-60 cursor-default bg-dark-800' : ''}"
     />
 
   {:else}
@@ -75,7 +82,8 @@
       type="text"
       value={String(value)}
       oninput={(e) => update((e.target as HTMLInputElement).value)}
-      class="text-sm border border-dark-600 rounded px-2 py-1"
+      readonly={readonly}
+      class="text-sm border border-dark-600 rounded px-2 py-1 {readonly ? 'opacity-60 cursor-default bg-dark-800' : ''}"
     />
   {/if}
 </div>

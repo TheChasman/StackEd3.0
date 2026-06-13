@@ -91,6 +91,12 @@ class DocumentStore {
       .filter(Boolean).length;
   }
 
+  get hookWarning(): boolean {
+    const hook = String(this._tabs[this._activeIndex]?.frontmatter?.HOOK ?? '');
+    if (!hook.trim()) return false;
+    return hook.trim().split(/\s+/).filter(Boolean).length > 150;
+  }
+
   /** Load a file into the active tab (used for saves / initial load). */
   load(
     frontmatter: ArticleFrontmatter,
