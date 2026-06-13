@@ -15,7 +15,7 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { createNewFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile, writeFilePath } from '$lib/services/files';
+  import { createNewFile, deleteFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile, writeFilePath } from '$lib/services/files';
   import { createAdapter } from '$lib/services/ai/adapter';
   import { isSeoComplete, mergeSeoDraft } from '$lib/services/seo';
   import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
@@ -243,6 +243,28 @@
       alert('Promotion failed: ' + (e instanceof Error ? e.message : String(e)));
     } finally {
       promotionLoading = false;
+    }
+  }
+
+  async function handleRestartFinalDraft() {
+    const finalPath = documentStore.filePath;
+    if (!finalPath?.endsWith('_final.md')) return;
+
+    if (!window.confirm(
+      'Restart Final Draft?\n\n' +
+      'All changes to the Final Draft will be discarded. ' +
+      'The original manuscript is unchanged and will be re-opened.'
+    )) return;
+
+    const manuscriptPath = finalPath.replace(/_final\.md$/, '.md');
+
+    try {
+      await deleteFile(finalPath);
+      const parsed = await openFilePath(manuscriptPath);
+      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, null, manuscriptPath, false);
+      activeEditorTab = 'editor';
+    } catch (e) {
+      alert('Restart failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   }
 
@@ -513,8 +535,15 @@
       </div>
     {:else}
       <!-- Final Draft mode label -->
-      <div class="flex items-center border-b border-dark-700 bg-dark-800 px-4 py-2 shrink-0">
+      <div class="flex items-center gap-3 border-b border-dark-700 bg-dark-800 px-4 py-2 shrink-0">
         <span class="text-xs text-amber-400 font-semibold uppercase tracking-wide">Final Draft</span>
+        <button
+          onclick={handleRestartFinalDraft}
+          class="px-3 py-2 text-sm border border-amber-800 text-amber-500 rounded hover:bg-amber-900/20 transition-colors"
+          title="Discard Final Draft and return to manuscript"
+        >
+          ↩ Restart
+        </button>
       </div>
     {/if}
 

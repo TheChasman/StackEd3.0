@@ -279,3 +279,7 @@ export async function saveFilePath(
 export async function writeFilePath(filePath: string, content: string): Promise<void> {
   await invoke('write_markdown_file', { filePath, content });
 }
+
+export async function deleteFile(filePath: string): Promise<void> {
+  await invoke('delete_file', { path: filePath });
+}
