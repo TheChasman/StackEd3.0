@@ -1,4 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
+import { invoke } from '@tauri-apps/api/core';
 
 interface StackEdDB extends DBSchema {
   settings: { key: string; value: unknown };
@@ -89,4 +90,50 @@ export async function getRecentFiles(): Promise<RecentFile[]> {
     .filter((recent): recent is RecentFile => typeof recent.filePath === 'string')
     .sort((a, b) => b.openedAt - a.openedAt)
     .slice(0, MAX_RECENTS);
+}
+
+export async function removeRecentFile(id: number): Promise<void> {
+  const db = await DB_PROMISE;
+  const tx = db.transaction('recents', 'readwrite');
+  await tx.store.delete(id);
+  await tx.done;
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    return await invoke<boolean>('file_exists', { path: filePath });
+  } catch {
+    return false;
+  }
+}
+
+export async function pruneRecentFiles(
+  pathExists: (filePath: string) => Promise<boolean> = fileExists,
+): Promise<RecentFile[]> {
+  const recents = await getRecentFiles();
+  if (!recents.length) return recents;
+
+  const checks = await Promise.all(
+    recents.map(async (recent) => ({
+      recent,
+      exists: await pathExists(recent.filePath),
+    })),
+  );
+
+  const missing = checks
+    .map(({ recent, exists }) => (!exists ? recent.id : undefined))
+    .filter((id): id is number => typeof id === 'number');
+
+  if (missing.length > 0) {
+    const db = await DB_PROMISE;
+    const tx = db.transaction('recents', 'readwrite');
+    for (const id of missing) {
+      await tx.store.delete(id);
+    }
+    await tx.done;
+  }
+
+  return checks
+    .filter(({ exists }) => exists)
+    .map(({ recent }) => recent);
 }

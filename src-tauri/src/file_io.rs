@@ -40,6 +40,11 @@ pub fn read_file(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+pub fn file_exists(path: String) -> bool {
+    PathBuf::from(path).exists()
+}
+
+#[tauri::command]
 pub fn write_file(path: String, contents: String) -> Result<(), String> {
     let path = PathBuf::from(path);
     std::fs::write(&path, contents)
@@ -369,6 +374,27 @@ mod tests {
         assert!(is_article_path("article.md"));
         assert!(is_article_path("ARTICLE.MD"));
         assert!(!is_article_path("article.txt"));
+    }
+
+    #[test]
+    fn test_file_exists_returns_presence_for_path() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-file-exists-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        let file_path = root.join("exists.md");
+        std::fs::write(&file_path, "ok").unwrap();
+
+        assert!(file_exists(file_path.to_string_lossy().to_string()));
+        assert!(!file_exists(
+            root.join("missing.md").to_string_lossy().to_string()
+        ));
+
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

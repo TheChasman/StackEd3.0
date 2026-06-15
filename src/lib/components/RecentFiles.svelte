@@ -1,13 +1,19 @@
 <script lang="ts">
-  import { getRecentFiles, type RecentFile } from '$lib/services/storage';
+  import { pruneRecentFiles, removeRecentFile, type RecentFile } from '$lib/services/storage';
   import { openFilePath } from '$lib/services/files';
+  import { syncRecentFilesMenu } from '$lib/services/recentMenu';
   import { documentStore } from '$lib/stores/document.svelte';
 
   let { onclose }: { onclose: () => void } = $props();
   let recents = $state<RecentFile[]>([]);
 
+  async function loadRecents() {
+    recents = await pruneRecentFiles().catch(() => []);
+    await syncRecentFilesMenu(recents).catch(() => {});
+  }
+
   $effect(() => {
-    getRecentFiles().then(r => { recents = r; }).catch(() => {});
+    void loadRecents();
   });
 
   async function open(file: RecentFile) {
@@ -16,7 +22,11 @@
       documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
       onclose();
     } catch {
-      alert('Could not reopen that file. Try opening it manually.');
+      if (typeof file.id === 'number') {
+        await removeRecentFile(file.id).catch(() => {});
+      }
+      await loadRecents();
+      alert('Could not reopen that file. If it was missing, it has been removed from recents.');
     }
   }
 </script>

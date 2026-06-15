@@ -52,6 +52,7 @@ class CatalogueSyncService {
       timestamp: Date.now(),
       colors,
       source: 'imported',
+      catalogueFlavor: flavor,
     };
 
     await themeStorage.saveTheme(theme);

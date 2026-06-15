@@ -3,6 +3,7 @@
   import type { SvelteHTMLElements } from 'svelte/elements';
   import { invoke } from '@tauri-apps/api/core';
   import { listen } from '@tauri-apps/api/event';
+  import { Clock3, FilePlus2, FolderOpen, PanelRight, Save, SaveAll, Settings } from 'lucide-svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import YamlPanel from '$lib/components/yaml/YamlPanel.svelte';
   import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
@@ -25,6 +26,7 @@
   import WorkflowTimeline from '$lib/components/WorkflowTimeline.svelte';
   import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
+  import { syncRecentFilesMenu } from '$lib/services/recentMenu';
   import '$lib/themes/catppuccin.css';
 
   let showSettings = $state(false);
@@ -49,6 +51,7 @@
     let unlistenMenuNew: (() => void) | undefined;
     let unlistenMenuNewTab: (() => void) | undefined;
     let unlistenMenuOpen: (() => void) | undefined;
+    let unlistenMenuOpenRecent: (() => void) | undefined;
     let unlistenMenuSave: (() => void) | undefined;
     let unlistenMenuSaveAs: (() => void) | undefined;
     void listen<string>('stacked:open-file', (event) => {
@@ -64,6 +67,11 @@
     });
     void listen('stacked:menu-open', () => { void handleOpen(); }).then((unlisten) => {
       unlistenMenuOpen = unlisten;
+    });
+    void listen<string>('stacked:menu-open-recent', (event) => {
+      void loadFilePath(event.payload);
+    }).then((unlisten) => {
+      unlistenMenuOpenRecent = unlisten;
     });
     void listen('stacked:menu-save', () => { void handleSave(); }).then((unlisten) => {
       unlistenMenuSave = unlisten;
@@ -84,6 +92,7 @@
       const savedWidth = localStorage.getItem('sidebarWidth');
       if (savedWidth) sidebarWidth = parseInt(savedWidth, 10);
       setupZoomShortcuts();
+      await syncRecentFilesMenu();
     })();
 
     return () => {
@@ -91,6 +100,7 @@
       unlistenMenuNew?.();
       unlistenMenuNewTab?.();
       unlistenMenuOpen?.();
+      unlistenMenuOpenRecent?.();
       unlistenMenuSave?.();
       unlistenMenuSaveAs?.();
     };
@@ -409,24 +419,34 @@
     onclick={() => showSettings = true}
     class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
     title="Settings"
-  >⚙</button>
+    aria-label="Settings"
+  ><Settings class="h-5 w-5" /></button>
   <div class="flex items-center gap-2">
-    <button onclick={handleNew} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
-      New...
-    </button>
-    <button onclick={handleOpen} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
-      Open
-    </button>
+    <button
+      onclick={handleNew}
+      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
+      title="New file"
+      aria-label="New file"
+    ><FilePlus2 class="h-5 w-5" /></button>
+    <button
+      onclick={handleOpen}
+      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
+      title="Open file"
+      aria-label="Open file"
+    ><FolderOpen class="h-5 w-5" /></button>
     <button
       onclick={handleSave}
       disabled={!documentStore.dirty}
-      class="px-4 py-2.5 text-base bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:bg-green-600 disabled:hover:bg-green-600 disabled:opacity-50 disabled:cursor-default"
-    >
-      Save
-    </button>
-    <button onclick={handleSaveAs} class="px-4 py-2.5 text-base border border-dark-600 rounded hover:bg-dark-700">
-      Save as...
-    </button>
+      class="px-3 py-2.5 text-lg bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:bg-green-600 disabled:hover:bg-green-600 disabled:opacity-50 disabled:cursor-default"
+      title="Save"
+      aria-label="Save"
+    ><Save class="h-5 w-5" /></button>
+    <button
+      onclick={handleSaveAs}
+      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
+      title="Save as"
+      aria-label="Save as"
+    ><SaveAll class="h-5 w-5" /></button>
     {#if documentStore.phase === 'draft' && documentStore.filePath && documentStore.frontmatter}
       {@const gate = checkPromotionGate(documentStore.frontmatter, documentStore.body)}
       <button
@@ -455,7 +475,8 @@
       onclick={() => showRecents = true}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
       title="Recent files"
-    >⏱</button>
+      aria-label="Recent files"
+    ><Clock3 class="h-5 w-5" /></button>
   </div>
   <div class="flex-1"></div>
 
@@ -464,7 +485,8 @@
     onclick={() => settingsStore.toggleSidebar()}
     class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
     title="Toggle sidebar"
-  >⊞</button>
+    aria-label="Toggle sidebar"
+  ><PanelRight class="h-5 w-5" /></button>
 </header>
 
 <!-- Tab bar (visible when 2+ tabs are open) -->

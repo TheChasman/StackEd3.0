@@ -3,7 +3,7 @@
   import { themeStore } from '$lib/stores/theme.svelte';
   import { customThemesStore } from '$lib/stores/customThemes.svelte';
   import { catalogueSync } from '$lib/services/catalogueSync';
-  import { catppuccinPalettes } from '$lib/themes/catppuccin';
+  import { catppuccinPalettes, type CatppuccinFlavor } from '$lib/themes/catppuccin';
   import ThemeEditor from './ThemeEditor.svelte';
   import ThemePreview from './ThemePreview.svelte';
 
@@ -15,6 +15,7 @@
   let selectedThemeId = $state<string | null>(null);
 
   const officialFlavors = catalogueSync.getOfficialFlavors();
+  const darkOfficialFlavors = officialFlavors.filter(({ dark }) => dark);
 
   function selectBuiltinTheme(flavor: string) {
     themeStore.setFlavor(flavor as any);
@@ -42,10 +43,21 @@
     }
   }
 
-  async function importFromCatalogue(flavor: any) {
+  async function importFromCatalogue(flavor: CatppuccinFlavor) {
     const theme = await customThemesStore.importFromCatalogue(flavor);
     activeTab = 'custom';
     selectedThemeId = theme.id;
+  }
+
+  async function importAllDarkFromCatalogue() {
+    for (const { flavor } of darkOfficialFlavors) {
+      await customThemesStore.importFromCatalogue(flavor);
+    }
+    activeTab = 'custom';
+  }
+
+  function isImportedFromCatalogue(flavor: CatppuccinFlavor): boolean {
+    return customThemesStore.customThemes.some((theme) => theme.catalogueFlavor === flavor);
   }
 
   function getPaletteAsRecord(flavor: string): Record<string, string> {
@@ -120,7 +132,7 @@
         />
       {:else if activeTab === 'builtin'}
         <div class="p-6 grid grid-cols-2 gap-5">
-          {#each officialFlavors as { flavor, name, emoji }}
+          {#each darkOfficialFlavors as { flavor, name, emoji }}
             <button
               onclick={() => selectBuiltinTheme(flavor)}
               class="group p-5 rounded-lg border border-dark-600 hover:border-primary-500 hover:bg-dark-700 transition-all text-left"
@@ -217,7 +229,16 @@
         </div>
       {:else if activeTab === 'catalogue'}
         <div class="p-6 space-y-6">
-          {#each officialFlavors as { flavor, name, emoji, dark }}
+          <div class="flex items-center justify-between gap-3 rounded-lg border border-dark-600 bg-dark-700/60 p-4">
+            <p class="text-sm text-dark-300">Dark Catppuccin themes only. Add all official dark flavors in one click.</p>
+            <button
+              onclick={importAllDarkFromCatalogue}
+              class="px-4 py-2 bg-green-900/30 hover:bg-green-900/50 text-green-400 rounded text-sm font-medium transition-colors"
+            >
+              + Add All Dark Themes
+            </button>
+          </div>
+          {#each darkOfficialFlavors as { flavor, name, emoji, dark }}
             {@const paletteColors = getPaletteAsRecord(flavor)}
             <div class="p-5 rounded-lg border border-dark-600 hover:border-green-500 transition-all">
               <div class="flex items-center justify-between mb-5">
@@ -230,9 +251,11 @@
                 </div>
                 <button
                   onclick={() => importFromCatalogue(flavor)}
-                  class="px-5 py-3 bg-green-900/30 hover:bg-green-900/50 text-green-400 rounded text-base font-medium transition-colors"
+                  class="px-5 py-3 rounded text-base font-medium transition-colors {isImportedFromCatalogue(flavor)
+                    ? 'bg-dark-600 text-dark-200 hover:bg-dark-500'
+                    : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'}"
                 >
-                  + Import
+                  {isImportedFromCatalogue(flavor) ? 'Open in My Themes' : '+ Add to My Themes'}
                 </button>
               </div>
 

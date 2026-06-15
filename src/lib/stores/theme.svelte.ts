@@ -5,7 +5,7 @@ type AllThemes = readonly CatppuccinFlavor[];
 class ThemeStore {
   currentFlavor = $state<CatppuccinFlavor>('mocha');
   isLoaded = $state(false);
-  private readonly allFlavors: AllThemes = ['latte', 'frappe', 'macchiato', 'mocha'] as const;
+  private readonly allFlavors: AllThemes = ['frappe', 'macchiato', 'mocha'] as const;
 
   constructor() {
     this.loadTheme();
@@ -13,8 +13,9 @@ class ThemeStore {
 
   loadTheme(): void {
     const saved = getCatppuccinFlavor();
-    this.currentFlavor = saved;
-    this.applyTheme(saved);
+    const normalized = saved === 'latte' ? 'mocha' : saved;
+    this.currentFlavor = normalized;
+    this.applyTheme(normalized);
     this.isLoaded = true;
   }
 

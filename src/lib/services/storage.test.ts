@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+const store: Record<string, unknown> = {};
+const recents: Array<{ id: number; filePath: string; title: string; openedAt: number }> = [];
+let nextId = 1;
+
 // Mock idb before importing the module under test
 vi.mock('idb', () => {
-  const store: Record<string, unknown> = {};
-  const recents: Array<{ id: number; filePath: string; title: string; openedAt: number }> = [];
-  let nextId = 1;
-
   const mockDB = {
     put: vi.fn(async (_store: string, val: unknown, key: string) => { store[key] = val; }),
     get: vi.fn(async (_store: string, key: string) => store[key] ?? undefined),
@@ -38,9 +38,17 @@ import {
   loadPipelineFolderPath,
   addRecentFile,
   getRecentFiles,
+  pruneRecentFiles,
+  removeRecentFile,
 } from './storage';
 
 describe('storage service', () => {
+  beforeEach(() => {
+    Object.keys(store).forEach((key) => delete store[key]);
+    recents.splice(0, recents.length);
+    nextId = 1;
+  });
+
   it('saves and loads API key', async () => {
     await saveApiKey('claude', 'sk-ant-test123');
     const loaded = await loadApiKey('claude');
@@ -90,5 +98,39 @@ describe('storage service', () => {
     const matches = recents.filter(r => r.filePath === '/tmp/duplicate.md');
     expect(matches).toHaveLength(1);
     expect(matches[0].title).toBe('New Title');
+  });
+
+  it('pruneRecentFiles removes missing entries and persists deletions', async () => {
+    await addRecentFile('/tmp/exists.md', 'Exists');
+    await addRecentFile('/tmp/missing.md', 'Missing');
+
+    const pruned = await pruneRecentFiles(async (filePath) => filePath !== '/tmp/missing.md');
+    expect(pruned.map((recent) => recent.filePath)).toEqual(['/tmp/exists.md']);
+
+    const recentsAfterPrune = await getRecentFiles();
+    expect(recentsAfterPrune.map((recent) => recent.filePath)).toEqual(['/tmp/exists.md']);
+  });
+
+  it('pruneRecentFiles keeps entries when all paths exist', async () => {
+    await addRecentFile('/tmp/one.md', 'One');
+    await addRecentFile('/tmp/two.md', 'Two');
+
+    const pruned = await pruneRecentFiles(async () => true);
+    expect(pruned).toHaveLength(2);
+    expect(pruned.map((recent) => recent.filePath).sort()).toEqual(['/tmp/one.md', '/tmp/two.md']);
+  });
+
+  it('removeRecentFile deletes one entry by id', async () => {
+    await addRecentFile('/tmp/first.md', 'First');
+    await addRecentFile('/tmp/second.md', 'Second');
+    const all = await getRecentFiles();
+
+    const first = all.find((recent) => recent.filePath === '/tmp/first.md');
+    expect(first?.id).toBeTypeOf('number');
+
+    await removeRecentFile(first!.id!);
+    const remaining = await getRecentFiles();
+
+    expect(remaining.map((recent) => recent.filePath)).toEqual(['/tmp/second.md']);
   });
 });

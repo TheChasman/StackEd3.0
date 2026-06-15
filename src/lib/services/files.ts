@@ -4,6 +4,7 @@ import { parseMarkdownFile, serializeArticleFile } from '$lib/utils/frontmatter'
 import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
 import type { ArticleFrontmatter, ParsedFile } from '$lib/types/article';
 import { addRecentFile, loadPipelineFolderPath } from '$lib/services/storage';
+import { syncRecentFilesMenu } from '$lib/services/recentMenu';
 
 const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
 const STACKED_ARTICLE_SAVE_EXTENSIONS = ['md'];
@@ -61,6 +62,11 @@ function getDefaultSavePath(frontmatter: ArticleFrontmatter): string {
 function getDefaultNewPath(): string {
   const folder = getLocalStorage()?.getItem(LAST_SAVED_FOLDER_KEY);
   return folder ? `${folder}/untitled.md` : 'untitled.md';
+}
+
+async function addAndSyncRecent(filePath: string, title: string): Promise<void> {
+  await addRecentFile(filePath, title).catch(() => {});
+  await syncRecentFilesMenu().catch(() => {});
 }
 
 function createTemplateFrontmatter(title: string): ArticleFrontmatter {
@@ -163,7 +169,7 @@ export async function createNewFile(): Promise<ParsedFile | null> {
   await invoke('create_dir_recursive', { path: researchPath });
   await invoke('write_markdown_file', { filePath: articlePath, content });
   rememberLastSavedFolder(articlePath);
-  await addRecentFile(articlePath, frontmatter.TITLE || title).catch(() => {});
+  await addAndSyncRecent(articlePath, frontmatter.TITLE || title);
 
   return {
     frontmatter,
@@ -242,7 +248,7 @@ export async function openFilePath(filePath: string): Promise<ParsedFile> {
   const content = await invoke<string>('read_markdown_file', { filePath: articlePath });
   const filename = getFileName(articlePath);
   const parsed = parseContent(content, filename);
-  await addRecentFile(articlePath, parsed.frontmatter.TITLE || filename).catch(() => {});
+  await addAndSyncRecent(articlePath, parsed.frontmatter.TITLE || filename);
   return {
     ...parsed,
     fileHandle: null,
@@ -272,7 +278,7 @@ export async function saveFilePath(
   await invoke('write_markdown_file', { filePath, content });
   const articlePath = await organizePipelineFile(filePath);
   rememberLastSavedFolder(articlePath);
-  await addRecentFile(articlePath, frontmatter.TITLE || getFileName(articlePath)).catch(() => {});
+  await addAndSyncRecent(articlePath, frontmatter.TITLE || getFileName(articlePath));
   return articlePath;
 }
 

@@ -92,9 +92,15 @@ class CustomThemesStore {
   }
 
   async importFromCatalogue(flavor: CatppuccinFlavor): Promise<CustomTheme> {
+    const existing = this.getThemeByCatalogueFlavor(flavor);
+    if (existing) return existing;
     const theme = await catalogueSync.importFromCatalogue(flavor);
     this.customThemes = [theme, ...this.customThemes];
     return theme;
+  }
+
+  getThemeByCatalogueFlavor(flavor: CatppuccinFlavor): CustomTheme | undefined {
+    return this.customThemes.find(theme => theme.catalogueFlavor === flavor);
   }
 
   cloneFromCatalogueFlavor(flavor: CatppuccinFlavor): Promise<CustomTheme> {
