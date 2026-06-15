@@ -84,13 +84,24 @@
     {/if}
 
     <!-- Clean prose -->
-    <div class="mx-6 my-6 prose prose-invert prose-sm max-w-none leading-relaxed">
+    <div class="mx-6 my-6 leading-relaxed preview-prose">
       {#each preview.prose.split('\n\n') as paragraph}
         {#if paragraph.trim()}
           <p>{paragraph.trim()}</p>
+        {:else}
+          <p>&nbsp;</p>
         {/if}
       {/each}
     </div>
 
   </div>
 {/if}
+
+<style>
+  .preview-prose :global(p) {
+    margin-bottom: 1em;
+    color: var(--cat-text);
+    font-size: 0.925rem;
+    line-height: 1.7;
+  }
+</style>
