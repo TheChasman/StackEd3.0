@@ -16,7 +16,7 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { createNewFile, deleteFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile, writeFilePath } from '$lib/services/files';
+  import { createNewFile, deleteFile, openFile, openFilePath, saveFile, saveFilePath, saveAsFile, titleFromFilePath, writeFilePath } from '$lib/services/files';
   import { createAdapter } from '$lib/services/ai/adapter';
   import { isSeoComplete, mergeSeoDraft } from '$lib/services/seo';
   import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
@@ -290,7 +290,9 @@
         const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
         const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
         if (filePath) {
-          documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
+          const title = titleFromFilePath(filePath);
+          const fm = frontmatter.TITLE === title ? frontmatter : { ...frontmatter, TITLE: title };
+          documentStore.load(fm, documentStore.body, documentStore.fieldOrder, null, filePath);
         }
       } catch (e) {
         alert('Save failed: ' + (e instanceof Error ? e.message : e));
@@ -330,7 +332,9 @@
       const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
       const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
       if (filePath) {
-        documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
+        const title = titleFromFilePath(filePath);
+        const fm = frontmatter.TITLE === title ? frontmatter : { ...frontmatter, TITLE: title };
+        documentStore.load(fm, documentStore.body, documentStore.fieldOrder, null, filePath);
       }
     } catch (e) {
       alert('Save As failed: ' + (e instanceof Error ? e.message : e));

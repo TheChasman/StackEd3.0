@@ -49,8 +49,13 @@ function getSuggestedFileName(frontmatter: ArticleFrontmatter): string {
   return `${baseName || 'article'}.md`;
 }
 
-function titleFromFileName(fileName: string): string {
+export function titleFromFileName(fileName: string): string {
   return fileName.replace(/\.md$/i, '');
+}
+
+export function titleFromFilePath(filePath: string): string {
+  const fileName = getFileName(filePath);
+  return titleFromFileName(fileName);
 }
 
 function getDefaultSavePath(frontmatter: ArticleFrontmatter): string {
