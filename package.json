@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build --target aarch64-apple-darwin",
+    "tauri:build": "tauri build --target aarch64-apple-darwin && npm run install:app",
+    "install:app": "node scripts/install-macos-app.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
