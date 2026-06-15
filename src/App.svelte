@@ -528,6 +528,7 @@
       yamlCollapsed = true;
     }
   }}
+  onOpenEditor={() => { activeEditorTab = 'editor'; }}
   onOpenPreview={() => { activeEditorTab = 'preview'; }}
   onOpenSettings={() => { showSettings = true; }}
 />

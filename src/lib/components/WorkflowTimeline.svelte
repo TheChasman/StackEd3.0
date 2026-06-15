@@ -3,12 +3,14 @@
     phase,
     yamlVisible,
     onToggleYaml,
+    onOpenEditor,
     onOpenPreview,
     onOpenSettings,
   }: {
     phase: 'draft' | 'final';
     yamlVisible: boolean;
     onToggleYaml: () => void;
+    onOpenEditor: () => void;
     onOpenPreview: () => void;
     onOpenSettings: () => void;
   } = $props();
@@ -25,7 +27,11 @@
     <!-- [DRAFT | PREVIEW ↗] bracket -->
     <span class="border border-dark-600 rounded px-2 py-0.5 flex items-center gap-1.5 shrink-0
       {phase === 'draft' ? 'border-green-700' : 'border-dark-700'}">
-      <span class="{phase === 'draft' ? 'text-green-400' : 'text-dark-600'}">DRAFT</span>
+      <button
+        onclick={onOpenEditor}
+        disabled={phase !== 'draft'}
+        class="text-left {phase === 'draft' ? 'text-green-400 hover:text-green-300' : 'text-dark-600 pointer-events-none'}"
+      >DRAFT</button>
       <span class="text-dark-700">|</span>
       <button
         onclick={onOpenPreview}
