@@ -106,6 +106,12 @@ export function renderForPreview(body: string, frontmatter: ArticleFrontmatter):
       continue;
     }
 
+    // Headingless content (preamble / unstructured body): render as prose
+    if (!heading && chunk.content) {
+      proseChunks.push(stripScaffold(chunk.content));
+      continue;
+    }
+
     // Track body range: HOOK opens it, LANDING closes it
     if (upper === 'HOOK') inBody = true;
     if (upper === 'LANDING') inBody = false;

@@ -23,15 +23,24 @@ export function bumpPatchVersionString(version) {
   return `${major}.${minor}.${patch}`;
 }
 
+export function bumpCargoTomlVersion(content, nextVersion) {
+  return content.replace(
+    /^(\[package\][^\n]*\n(?:[^\n]+\n)*?version\s*=\s*)"[^"]+"/m,
+    `$1"${nextVersion}"`,
+  );
+}
+
 export async function applyPatchVersionBump({
   packagePath = join(projectRoot, 'package.json'),
   packageLockPath = join(projectRoot, 'package-lock.json'),
   tauriConfigPath = join(projectRoot, 'src-tauri', 'tauri.conf.json'),
+  cargoTomlPath = join(projectRoot, 'src-tauri', 'Cargo.toml'),
 } = {}) {
-  const [packageJson, packageLockJson, tauriConfigJson] = await Promise.all([
+  const [packageJson, packageLockJson, tauriConfigJson, cargoToml] = await Promise.all([
     readJson(packagePath),
     readJson(packageLockPath),
     readJson(tauriConfigPath),
+    readFile(cargoTomlPath, 'utf8'),
   ]);
 
   const nextVersion = bumpPatchVersionString(packageJson.version);
@@ -41,11 +50,13 @@ export async function applyPatchVersionBump({
     packageLockJson.packages[''].version = nextVersion;
   }
   tauriConfigJson.version = nextVersion;
+  const nextCargoToml = bumpCargoTomlVersion(cargoToml, nextVersion);
 
   await Promise.all([
     writeFile(packagePath, toJson(packageJson)),
     writeFile(packageLockPath, toJson(packageLockJson)),
     writeFile(tauriConfigPath, toJson(tauriConfigJson)),
+    writeFile(cargoTomlPath, nextCargoToml),
   ]);
 
   return nextVersion;
@@ -54,7 +65,7 @@ export async function applyPatchVersionBump({
 function stageVersionFiles() {
   execFileSync(
     'git',
-    ['add', 'package.json', 'package-lock.json', 'src-tauri/tauri.conf.json'],
+    ['add', 'package.json', 'package-lock.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml'],
     { stdio: 'inherit' },
   );
 }
