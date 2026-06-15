@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+node scripts/version-bump-hook.mjs --stage

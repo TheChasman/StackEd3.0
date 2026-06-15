@@ -1,7 +1,7 @@
 {
   "name": "stacked",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,9 +12,11 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build --target aarch64-apple-darwin && npm run install:app",
     "install:app": "node scripts/install-macos-app.mjs",
+    "version:bump:hook": "node scripts/version-bump-hook.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
@@ -45,6 +47,7 @@
     "@types/katex": "^0.16.7",
     "@types/marked": "^6.0.0",
     "@types/turndown": "^5.0.5",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "svelte": "^5.39.6",
     "svelte-check": "^4.4.8",

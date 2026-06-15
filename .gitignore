@@ -8,6 +8,7 @@ dist
 dist-ssr
 .worktrees
 .superpowers
+.husky/_
 *.local
 
 # Environment variables with secrets
