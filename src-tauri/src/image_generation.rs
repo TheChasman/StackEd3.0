@@ -73,7 +73,7 @@ async fn resolve_openrouter_api_key() -> Result<String, String> {
 
 async fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Result<Value, String> {
     let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(120))
+        .timeout(Duration::from_secs(300))
         .build()
         .map_err(|e| format!("failed to create OpenRouter client: {}", e))?;
 
