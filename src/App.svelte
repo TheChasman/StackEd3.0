@@ -33,10 +33,8 @@
   let showSettings = $state(false);
   let showRecents = $state(false);
   let showThemeBrowser = $state(false);
-  let yamlCollapsed = $state(false);
-  let researchCollapsed = $state(false);
-  let activeToolTab = $state<'research' | 'artwork' | 'generate'>('research');
-  let sidebarWidth = $state(288);
+  let activeToolTab = $state<'yaml' | 'research' | 'artwork' | 'generate'>('yaml');
+  let sidebarWidth = $state(320);
   let isResizing = $state(false);
   let seoLoading = $state(false);
   let promotionLoading = $state(false);
@@ -87,10 +85,10 @@
       if (initialPath) {
         await loadFilePath(initialPath);
       }
-      yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
-      researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
       const savedToolTab = localStorage.getItem('activeToolTab');
-      activeToolTab = savedToolTab === 'artwork' || savedToolTab === 'generate' ? savedToolTab : 'research';
+      activeToolTab = (['yaml', 'research', 'artwork', 'generate'] as const).includes(savedToolTab as any)
+        ? savedToolTab as typeof activeToolTab
+        : 'yaml';
       const savedWidth = localStorage.getItem('sidebarWidth');
       if (savedWidth) sidebarWidth = parseInt(savedWidth, 10);
       setupZoomShortcuts();
@@ -347,7 +345,6 @@
 
   function openImageGenerator() {
     if (!settingsStore.sidebarVisible) settingsStore.toggleSidebar();
-    researchCollapsed = false;
     activeToolTab = 'generate';
   }
 
@@ -390,8 +387,6 @@
 
   // Sidebar visibility and width persist across sessions
   $effect(() => {
-    localStorage.setItem('yamlCollapsed', String(yamlCollapsed));
-    localStorage.setItem('researchCollapsed', String(researchCollapsed));
     localStorage.setItem('activeToolTab', activeToolTab);
     localStorage.setItem('sidebarWidth', String(sidebarWidth));
   });
@@ -537,15 +532,15 @@
 <!-- Workflow timeline strip -->
 <WorkflowTimeline
   phase={documentStore.phase}
-  yamlVisible={settingsStore.sidebarVisible && !yamlCollapsed}
+  yamlVisible={settingsStore.sidebarVisible && activeToolTab === 'yaml'}
   onToggleYaml={() => {
     if (!settingsStore.sidebarVisible) {
       settingsStore.toggleSidebar();
-      yamlCollapsed = false;
-    } else if (yamlCollapsed) {
-      yamlCollapsed = false;
+      activeToolTab = 'yaml';
+    } else if (activeToolTab === 'yaml') {
+      settingsStore.toggleSidebar();
     } else {
-      yamlCollapsed = true;
+      activeToolTab = 'yaml';
     }
   }}
   onOpenEditor={() => { activeEditorTab = 'editor'; }}
@@ -609,68 +604,53 @@
       class="border-l border-dark-600 flex flex-col min-h-0 shrink-0 relative"
       style="width: {sidebarWidth}px;"
     >
-      <!-- YAML panel -->
-      <div class="flex flex-col {yamlCollapsed ? 'h-auto' : 'flex-1'} min-h-0 border-b border-dark-600">
-        <button
-          onclick={() => yamlCollapsed = !yamlCollapsed}
-          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-dark-300 uppercase tracking-wide hover:bg-dark-700 shrink-0"
-        >
-          Article
-          <span>{yamlCollapsed ? '▾' : '▴'}</span>
-        </button>
-        {#if !yamlCollapsed}
-          <div class="flex-1 overflow-y-auto">
+      <!-- Unified tab panel -->
+      <div class="flex flex-col flex-1 min-h-0">
+        <div class="flex border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
+          <button
+            onclick={() => activeToolTab = 'yaml'}
+            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'yaml'
+              ? 'border-dark-600 bg-dark-900 text-dark-100'
+              : 'border-transparent text-dark-400 hover:text-dark-200'}"
+          >
+            Article
+          </button>
+          <button
+            onclick={() => activeToolTab = 'research'}
+            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
+              ? 'border-dark-600 bg-dark-900 text-dark-100'
+              : 'border-transparent text-dark-400 hover:text-dark-200'}"
+          >
+            Research
+          </button>
+          <button
+            onclick={() => activeToolTab = 'artwork'}
+            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
+              ? 'border-dark-600 bg-dark-900 text-dark-100'
+              : 'border-transparent text-dark-400 hover:text-dark-200'}"
+          >
+            Artwork
+          </button>
+          <button
+            onclick={() => activeToolTab = 'generate'}
+            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
+              ? 'border-dark-600 bg-dark-900 text-dark-100'
+              : 'border-transparent text-dark-400 hover:text-dark-200'}"
+          >
+            Generate
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto min-h-0">
+          {#if activeToolTab === 'yaml'}
             <YamlPanel />
-          </div>
-        {/if}
-      </div>
-
-      <!-- Tools panel -->
-      <div class="flex flex-col {researchCollapsed ? 'h-auto' : 'flex-1'} min-h-0">
-        <button
-          onclick={() => researchCollapsed = !researchCollapsed}
-          class="flex items-center justify-between px-3 py-2 text-xs font-semibold text-dark-300 uppercase tracking-wide hover:bg-dark-700 shrink-0"
-        >
-          Tools
-          <span>{researchCollapsed ? '▾' : '▴'}</span>
-        </button>
-        {#if !researchCollapsed}
-          <div class="flex border-b border-dark-600 bg-dark-800 px-2 pt-2">
-            <button
-              onclick={() => activeToolTab = 'research'}
-              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
-                ? 'border-dark-600 bg-dark-900 text-dark-100'
-                : 'border-transparent text-dark-400 hover:text-dark-200'}"
-            >
-              Research
-            </button>
-            <button
-              onclick={() => activeToolTab = 'artwork'}
-              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
-                ? 'border-dark-600 bg-dark-900 text-dark-100'
-                : 'border-transparent text-dark-400 hover:text-dark-200'}"
-            >
-              Artwork
-            </button>
-            <button
-              onclick={() => activeToolTab = 'generate'}
-              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
-                ? 'border-dark-600 bg-dark-900 text-dark-100'
-                : 'border-transparent text-dark-400 hover:text-dark-200'}"
-            >
-              Generate
-            </button>
-          </div>
-          <div class="flex-1 overflow-y-auto min-h-0">
-            {#if activeToolTab === 'research'}
-              <ResearchPanel />
-            {:else if activeToolTab === 'artwork'}
-              <ArtworkPanel />
-            {:else}
-              <ImageGenerationPanel />
-            {/if}
-          </div>
-        {/if}
+          {:else if activeToolTab === 'research'}
+            <ResearchPanel />
+          {:else if activeToolTab === 'artwork'}
+            <ArtworkPanel />
+          {:else}
+            <ImageGenerationPanel />
+          {/if}
+        </div>
       </div>
 
       <!-- Resize handle -->
