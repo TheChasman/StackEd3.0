@@ -28,7 +28,7 @@
       image = await generateImage({ prompt: trimmed, model });
       altText = defaultAltText(trimmed);
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Image generation failed.';
+      error = e instanceof Error ? e.message : String(e);
     } finally {
       loading = false;
     }

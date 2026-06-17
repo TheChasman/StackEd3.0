@@ -1,6 +1,5 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::process::Command;
 use std::time::Duration;
 
 const OPENAI_IMAGE_MODEL: &str = "openai/gpt-5.4-image-2";
@@ -36,46 +35,37 @@ fn extract_generated_image_url(response: &Value) -> Result<String, String> {
         .ok_or_else(|| "OpenRouter response did not include a generated image".to_string())
 }
 
-fn spocklock_command_candidates(configured_path: Option<&str>) -> Vec<String> {
-    let mut candidates = Vec::new();
-    if let Some(path) = configured_path.map(str::trim).filter(|path| !path.is_empty()) {
-        candidates.push(path.to_string());
-    }
-    candidates.push("/Users/chasnewport/.local/bin/spocklock".to_string());
-    candidates.push("spocklock".to_string());
-    candidates.dedup();
-    candidates
+const SPOCKLOCK_DAEMON_URL: &str = "http://localhost:9090/v1/resolve";
+
+#[derive(Deserialize)]
+struct SpocklockResolveResponse {
+    value: String,
 }
 
 fn resolve_openrouter_api_key() -> Result<String, String> {
-    let mut last_error = String::new();
-    let mut resolved = None;
-    for command in spocklock_command_candidates(std::env::var("SPOCKLOCK_BIN").ok().as_deref()) {
-        match Command::new(&command)
-            .args([
-                "resolve",
-                OPENROUTER_SECRET_ITEM,
-                OPENROUTER_SECRET_FIELD,
-            ])
-            .output()
-        {
-            Ok(output) if output.status.success() => {
-                resolved = Some(output.stdout);
-                break;
-            }
-            Ok(_) => {
-                last_error = "failed to resolve OpenRouter key from SpockLock".to_string();
-            }
-            Err(e) => {
-                last_error = format!("failed to run spocklock: {}", e);
-            }
-        }
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(5))
+        .build()
+        .map_err(|e| format!("failed to create SpockLock client: {}", e))?;
+
+    let response = client
+        .post(SPOCKLOCK_DAEMON_URL)
+        .json(&json!({ "item": OPENROUTER_SECRET_ITEM, "field": OPENROUTER_SECRET_FIELD }))
+        .send()
+        .map_err(|e| format!("SpockLock daemon unreachable: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!(
+            "SpockLock daemon returned {}",
+            response.status()
+        ));
     }
 
-    let key = String::from_utf8(resolved.ok_or(last_error)?)
-        .map_err(|_| "spocklock returned a non-UTF8 OpenRouter key".to_string())?
-        .trim()
-        .to_string();
+    let body: SpocklockResolveResponse = response
+        .json()
+        .map_err(|e| format!("failed to parse SpockLock response: {}", e))?;
+
+    let key = body.value.trim().to_string();
     if key.is_empty() {
         return Err("SpockLock returned an empty OpenRouter key".to_string());
     }
@@ -180,14 +170,7 @@ mod tests {
     }
 
     #[test]
-    fn test_spocklock_command_candidates_prefer_configured_path() {
-        assert_eq!(
-            spocklock_command_candidates(Some("/custom/spocklock")),
-            vec![
-                "/custom/spocklock".to_string(),
-                "/Users/chasnewport/.local/bin/spocklock".to_string(),
-                "spocklock".to_string(),
-            ]
-        );
+    fn test_spocklock_daemon_url_is_localhost() {
+        assert!(SPOCKLOCK_DAEMON_URL.starts_with("http://localhost:"));
     }
 }
