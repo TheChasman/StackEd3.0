@@ -127,6 +127,28 @@ fn base64_encode(bytes: &[u8]) -> String {
     encoded
 }
 
+fn image_data_url(path: &Path) -> Result<String, String> {
+    if !path.is_file() {
+        return Err(format!("image file does not exist: {}", path.display()));
+    }
+    if !is_supported_artwork(path) {
+        return Err(format!("unsupported image type: {}", path.display()));
+    }
+
+    let bytes =
+        std::fs::read(path).map_err(|e| format!("failed to read {}: {}", path.display(), e))?;
+    Ok(format!(
+        "data:{};base64,{}",
+        mime_type(path),
+        base64_encode(&bytes)
+    ))
+}
+
+#[tauri::command]
+pub fn read_image_data_url(path: String) -> Result<String, String> {
+    image_data_url(&PathBuf::from(path))
+}
+
 fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, String> {
     if let Some(article_path) = article_path {
         let article_path = PathBuf::from(article_path);
@@ -162,13 +184,11 @@ pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkIm
             continue;
         }
 
-        let bytes = std::fs::read(&path)
-            .map_err(|e| format!("failed to read {}: {}", path.display(), e))?;
         let name = entry.file_name().to_string_lossy().to_string();
         images.push(ArtworkImage {
             name,
             path: path.display().to_string(),
-            data_url: format!("data:{};base64,{}", mime_type(&path), base64_encode(&bytes)),
+            data_url: image_data_url(&path)?,
         });
     }
 
@@ -407,6 +427,25 @@ mod tests {
         assert!(is_supported_artwork(Path::new("hero.PNG")));
         assert!(is_supported_artwork(Path::new("hero.webp")));
         assert!(!is_supported_artwork(Path::new("notes.txt")));
+    }
+
+    #[test]
+    fn test_read_image_data_url_reads_supported_image() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-read-image-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        let image_path = root.join("hero.png");
+        std::fs::write(&image_path, b"hero").unwrap();
+
+        let data_url = read_image_data_url(image_path.to_string_lossy().to_string()).unwrap();
+
+        assert_eq!(data_url, "data:image/png;base64,aGVybw==");
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

@@ -8,6 +8,7 @@
   import YamlPanel from '$lib/components/yaml/YamlPanel.svelte';
   import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
   import ArtworkPanel from '$lib/components/artwork/ArtworkPanel.svelte';
+  import ImageGenerationPanel from '$lib/components/image-generation/ImageGenerationPanel.svelte';
   import StatusBar from '$lib/components/StatusBar.svelte';
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import RecentFiles from '$lib/components/RecentFiles.svelte';
@@ -34,7 +35,7 @@
   let showThemeBrowser = $state(false);
   let yamlCollapsed = $state(false);
   let researchCollapsed = $state(false);
-  let activeToolTab = $state<'research' | 'artwork'>('research');
+  let activeToolTab = $state<'research' | 'artwork' | 'generate'>('research');
   let sidebarWidth = $state(288);
   let isResizing = $state(false);
   let seoLoading = $state(false);
@@ -88,7 +89,8 @@
       }
       yamlCollapsed = localStorage.getItem('yamlCollapsed') === 'true';
       researchCollapsed = localStorage.getItem('researchCollapsed') === 'true';
-      activeToolTab = localStorage.getItem('activeToolTab') === 'artwork' ? 'artwork' : 'research';
+      const savedToolTab = localStorage.getItem('activeToolTab');
+      activeToolTab = savedToolTab === 'artwork' || savedToolTab === 'generate' ? savedToolTab : 'research';
       const savedWidth = localStorage.getItem('sidebarWidth');
       if (savedWidth) sidebarWidth = parseInt(savedWidth, 10);
       setupZoomShortcuts();
@@ -343,6 +345,16 @@
 
   function handleSaveEvent() { handleSave(); }
 
+  function openImageGenerator() {
+    if (!settingsStore.sidebarVisible) settingsStore.toggleSidebar();
+    researchCollapsed = false;
+    activeToolTab = 'generate';
+  }
+
+  function openEditor() {
+    activeEditorTab = 'editor';
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
     if (e.metaKey || e.ctrlKey) {
       if (e.key === 't') {
@@ -366,9 +378,13 @@
   $effect(() => {
     window.addEventListener('stacked:save', handleSaveEvent);
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('stacked:open-image-generator', openImageGenerator);
+    window.addEventListener('stacked:open-editor', openEditor);
     return () => {
       window.removeEventListener('stacked:save', handleSaveEvent);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('stacked:open-image-generator', openImageGenerator);
+      window.removeEventListener('stacked:open-editor', openEditor);
     };
   });
 
@@ -636,12 +652,22 @@
             >
               Artwork
             </button>
+            <button
+              onclick={() => activeToolTab = 'generate'}
+              class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
+                ? 'border-dark-600 bg-dark-900 text-dark-100'
+                : 'border-transparent text-dark-400 hover:text-dark-200'}"
+            >
+              Generate
+            </button>
           </div>
           <div class="flex-1 overflow-y-auto min-h-0">
             {#if activeToolTab === 'research'}
               <ResearchPanel />
-            {:else}
+            {:else if activeToolTab === 'artwork'}
               <ArtworkPanel />
+            {:else}
+              <ImageGenerationPanel />
             {/if}
           </div>
         {/if}

@@ -5,6 +5,8 @@
   import FontSizeDropdown from './toolbar/FontSizeDropdown.svelte';
   import ButtonDropdown from './toolbar/ButtonDropdown.svelte';
   import MoreDropdown from './toolbar/MoreDropdown.svelte';
+  import { documentStore } from '$lib/stores/document.svelte';
+  import { pickImageForArticle } from '$lib/services/imagePicker';
 
   let { editor }: { editor: Editor | null } = $props();
 
@@ -13,8 +15,6 @@
     fn();
     editor.view.focus();
   }
-
-  let fileInput: HTMLInputElement;
 
   function toggleBold() { run(() => editor!.chain().toggleBold().run()); }
   function toggleItalic() { run(() => editor!.chain().toggleItalic().run()); }
@@ -39,37 +39,19 @@
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }
 
-  function addImage() {
+  async function addImage() {
     if (!editor) return;
-    fileInput?.click();
+    const image = await pickImageForArticle(documentStore.filePath);
+    if (!image) return;
+    const caption = window.prompt('Caption (optional):', '');
+    const isHero = window.confirm('Set as hero image?');
+    editor.chain().focus().insertCaptionedImage({ src: image.src, alt: image.alt, topImage: isHero }, caption || undefined).run();
   }
 
-  function handleImageUpload(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file && editor) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result && editor) {
-          const src = e.target.result as string;
-          const caption = window.prompt('Caption (optional):', '');
-          const isHero = window.confirm('Set as hero image?');
-          editor.chain().focus().insertCaptionedImage({ src, topImage: isHero }, caption || undefined).run();
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-    target.value = '';
+  function openImageGenerator() {
+    window.dispatchEvent(new CustomEvent('stacked:open-image-generator'));
   }
 </script>
-
-<input
-  type="file"
-  accept="image/*"
-  class="hidden"
-  bind:this={fileInput}
-  onchange={handleImageUpload}
-/>
 
 {#if editor}
 <div class="flex items-center gap-1 p-2 border-b border-dark-700 bg-dark-800 relative z-20 flex-wrap">
@@ -138,6 +120,11 @@
   <button onclick={addImage} class="p-1.5 rounded hover:bg-dark-600 text-dark-200" title="Image">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </button>
+  <button onclick={openImageGenerator} class="p-1.5 rounded hover:bg-dark-600 text-dark-200" title="Generate Image">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 3.5l1.2 3.1 3.3 1.2-3.3 1.2-1.2 3.1-1.2-3.1L5 7.8l3.3-1.2 1.2-3.1zM17 10l.8 2.1L20 13l-2.2.9L17 16l-.8-2.1L14 13l2.2-.9L17 10zM12 15l.6 1.6 1.6.6-1.6.6L12 20l-.6-1.6-1.6-.6 1.6-.6L12 15z" />
     </svg>
   </button>
 

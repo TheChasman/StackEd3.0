@@ -1,4 +1,5 @@
 mod file_io;
+mod image_generation;
 
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -205,8 +206,10 @@ pub fn run() {
             file_io::delete_file,
             file_io::list_files,
             file_io::list_artwork_images,
+            file_io::read_image_data_url,
             file_io::create_dir_recursive,
             file_io::organize_pipeline_article,
+            image_generation::generate_openrouter_image,
             set_recent_files_menu,
         ])
         .build(tauri::generate_context!())
