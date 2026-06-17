@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ArticleFrontmatter } from '$lib/types/article';
-import { backfillArticleFrontmatter, parseMarkdownFile, runBodyParser, serializeMarkdownFile } from './frontmatter';
+import { backfillArticleFrontmatter, parseMarkdownFile, runBodyParser, runBodyParserUpsertOnly, serializeMarkdownFile } from './frontmatter';
 
 const SAMPLE_WITH_FRONTMATTER = `---
 TITLE: "Test Article"
@@ -462,5 +462,40 @@ describe('runBodyParser', () => {
     const body = `## Alt TITLE\n1. Option A\n2. Option B`; // no [✓] marker
     const result = runBodyParser(fm, body);
     expect(result.TITLE_SELECTED).toBe('');
+  });
+});
+
+describe('runBodyParserUpsertOnly', () => {
+  it('upserts primary sections and Alt selections from the body', () => {
+    const fm: ArticleFrontmatter = {
+      IMAGE: '', SPARK: '', TITLE: 'Old Title', SUBTITLE: '', HOOK: '',
+      LANDING: '', TITLE_SELECTED: '', SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
+      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
+      created: '2026-06-13', updated: '2026-06-13',
+    };
+    const body = `## TITLE\nNew Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
+
+    const result = runBodyParserUpsertOnly(fm, body);
+
+    expect(result.TITLE).toBe('New Title');
+    expect(result.TITLE_SELECTED).toBe('Better Title');
+  });
+
+  it('does not clear existing fields when body tags or checkmarks are absent', () => {
+    const fm: ArticleFrontmatter = {
+      IMAGE: '', SPARK: 'Kept Spark', TITLE: 'Kept Title', SUBTITLE: '',
+      HOOK: '', LANDING: '', TITLE_SELECTED: 'Previously Selected',
+      SUBTITLE_SELECTED: '', HOOK_SELECTED: '', LANDING_SELECTED: '',
+      AI_GEN: false, SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '',
+      SEO_TAGS: [], created: '2026-06-13', updated: '2026-06-13',
+    };
+    const body = `## Alt TITLE\n1. Option A\n2. Option B`;
+
+    const result = runBodyParserUpsertOnly(fm, body);
+
+    expect(result.SPARK).toBe('Kept Spark');
+    expect(result.TITLE).toBe('Kept Title');
+    expect(result.TITLE_SELECTED).toBe('Previously Selected');
   });
 });

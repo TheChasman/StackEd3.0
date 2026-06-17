@@ -256,3 +256,25 @@ export function runBodyParser(
 
   return updated;
 }
+
+export function runBodyParserUpsertOnly(
+  frontmatter: ArticleFrontmatter,
+  body: string,
+): ArticleFrontmatter {
+  const now = new Date().toISOString();
+  const updated = { ...frontmatter, updated: now };
+
+  for (const section of ARTICLE_SECTIONS) {
+    const extracted = extractSection(body, section);
+    if (extracted) {
+      (updated as Record<string, unknown>)[section] = extracted;
+    }
+  }
+
+  const altSelections = extractAltSelections(body);
+  for (const [key, value] of Object.entries(altSelections)) {
+    (updated as Record<string, unknown>)[key] = value;
+  }
+
+  return updated;
+}

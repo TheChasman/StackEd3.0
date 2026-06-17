@@ -7,6 +7,7 @@ import { addRecentFile, loadPipelineFolderPath } from '$lib/services/storage';
 import { syncRecentFilesMenu } from '$lib/services/recentMenu';
 
 const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
+const DEFAULT_OPEN_FOLDER = '/Users/chasnewport/Obsidian/O_Substack';
 const STACKED_ARTICLE_SAVE_EXTENSIONS = ['md'];
 
 function getLocalStorage(): Storage | null {
@@ -69,6 +70,10 @@ function getDefaultNewPath(): string {
   return folder ? `${folder}/untitled.md` : 'untitled.md';
 }
 
+function getDefaultOpenPath(): string {
+  return getLocalStorage()?.getItem(LAST_SAVED_FOLDER_KEY) || DEFAULT_OPEN_FOLDER;
+}
+
 async function addAndSyncRecent(filePath: string, title: string): Promise<void> {
   await addRecentFile(filePath, title).catch(() => {});
   await syncRecentFilesMenu().catch(() => {});
@@ -123,6 +128,7 @@ export async function openFile(handle?: FileSystemFileHandle): Promise<ParsedFil
     const selected = await openDialog({
       title: 'Open Markdown File',
       multiple: false,
+      defaultPath: getDefaultOpenPath(),
     });
     const filePath = Array.isArray(selected) ? selected[0] : selected;
     if (!filePath) throw new Error('No file selected');

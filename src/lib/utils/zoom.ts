@@ -1,6 +1,24 @@
 import { getCurrentWebview } from '@tauri-apps/api/webview';
 
+const ZOOM_STORAGE_KEY = 'stacked:zoom';
+
 let currentZoom = 1.0;
+let shortcutsInstalled = false;
+
+function getLocalStorage(): Storage | null {
+  try {
+    return globalThis.localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function readSavedZoom(): number | null {
+  const raw = getLocalStorage()?.getItem(ZOOM_STORAGE_KEY);
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
 
 export async function getZoom(): Promise<number> {
   return currentZoom;
@@ -9,6 +27,7 @@ export async function getZoom(): Promise<number> {
 export async function setZoom(factor: number): Promise<void> {
   const clamped = Math.max(0.5, Math.min(3.0, factor));
   currentZoom = clamped;
+  getLocalStorage()?.setItem(ZOOM_STORAGE_KEY, String(clamped));
   await getCurrentWebview().setZoom(clamped);
 }
 
@@ -29,8 +48,16 @@ export async function resetZoom(): Promise<void> {
 }
 
 export function setupZoomShortcuts(): void {
+  const savedZoom = readSavedZoom();
+  if (savedZoom !== null) {
+    void setZoom(savedZoom);
+  }
+
+  if (shortcutsInstalled) return;
+  shortcutsInstalled = true;
+
   document.addEventListener('keydown', async (e) => {
-    if (e.key === '+' && (e.metaKey || e.ctrlKey)) {
+    if ((e.key === '+' || e.key === '=') && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       await zoomIn();
     } else if (e.key === '-' && (e.metaKey || e.ctrlKey)) {

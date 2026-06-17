@@ -1,16 +1,32 @@
 <script lang="ts">
   import { documentStore } from '$lib/stores/document.svelte';
+  import { runBodyParserUpsertOnly } from '$lib/utils/frontmatter';
+  import { RefreshCw } from 'lucide-svelte';
   import FieldFree from './FieldFree.svelte';
   import FieldTags from './FieldTags.svelte';
 
   let fm = $derived(documentStore.frontmatter);
   let hookWarning = $derived(documentStore.hookWarning);
+
+  function refreshYamlFromEditor() {
+    if (!fm) return;
+    documentStore.replaceFrontmatter(runBodyParserUpsertOnly(fm, documentStore.body));
+  }
 </script>
 
 {#if !fm}
   <div class="p-4 text-sm text-dark-400">No file open.</div>
 {:else}
   <div class="flex flex-col gap-4 p-4 overflow-y-auto h-full text-sm">
+    <button
+      type="button"
+      onclick={refreshYamlFromEditor}
+      class="inline-flex items-center justify-center gap-2 rounded border border-dark-600 px-3 py-2 text-xs font-medium text-dark-300 hover:bg-dark-700 hover:text-dark-100"
+      title="Harvest tagged Live Editor changes into YAML without deleting existing fields"
+    >
+      <RefreshCw size={14} aria-hidden="true" />
+      YAML Refresh
+    </button>
 
     <!-- Article Structure group -->
     <section>
