@@ -1,17 +1,24 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::time::Duration;
+use tauri::Emitter;
 
 const OPENAI_IMAGE_MODEL: &str = "openai/gpt-5.4-image-2";
 const NANOBANANA_MODEL: &str = "google/gemini-3.1-flash-image-preview";
 const OPENROUTER_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_SECRET_ITEM: &str = "spock-openrouter";
 const OPENROUTER_SECRET_FIELD: &str = "credential";
+const SPOCKLOCK_DAEMON_URL: &str = "http://localhost:9090/v1/resolve";
 
 #[derive(Serialize)]
 pub struct GeneratedImage {
     data_url: String,
     model: String,
+}
+
+#[derive(Deserialize)]
+struct SpocklockResolveResponse {
+    value: String,
 }
 
 fn is_allowed_model(model: &str) -> bool {
@@ -35,15 +42,8 @@ fn extract_generated_image_url(response: &Value) -> Result<String, String> {
         .ok_or_else(|| "OpenRouter response did not include a generated image".to_string())
 }
 
-const SPOCKLOCK_DAEMON_URL: &str = "http://localhost:9090/v1/resolve";
-
-#[derive(Deserialize)]
-struct SpocklockResolveResponse {
-    value: String,
-}
-
-fn resolve_openrouter_api_key() -> Result<String, String> {
-    let client = reqwest::blocking::Client::builder()
+async fn resolve_openrouter_api_key() -> Result<String, String> {
+    let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(5))
         .build()
         .map_err(|e| format!("failed to create SpockLock client: {}", e))?;
@@ -52,17 +52,16 @@ fn resolve_openrouter_api_key() -> Result<String, String> {
         .post(SPOCKLOCK_DAEMON_URL)
         .json(&json!({ "item": OPENROUTER_SECRET_ITEM, "field": OPENROUTER_SECRET_FIELD }))
         .send()
+        .await
         .map_err(|e| format!("SpockLock daemon unreachable: {}", e))?;
 
     if !response.status().is_success() {
-        return Err(format!(
-            "SpockLock daemon returned {}",
-            response.status()
-        ));
+        return Err(format!("SpockLock daemon returned {}", response.status()));
     }
 
     let body: SpocklockResolveResponse = response
         .json()
+        .await
         .map_err(|e| format!("failed to parse SpockLock response: {}", e))?;
 
     let key = body.value.trim().to_string();
@@ -72,8 +71,8 @@ fn resolve_openrouter_api_key() -> Result<String, String> {
     Ok(key)
 }
 
-fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Result<Value, String> {
-    let client = reqwest::blocking::Client::builder()
+async fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Result<Value, String> {
+    let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(120))
         .build()
         .map_err(|e| format!("failed to create OpenRouter client: {}", e))?;
@@ -85,22 +84,24 @@ fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Result<Val
         .header("X-Title", "StackEd")
         .json(&build_openrouter_payload(prompt, model))
         .send()
+        .await
         .map_err(|e| format!("OpenRouter request failed: {}", e))?;
 
     let status = response.status();
     let body = response
         .text()
+        .await
         .map_err(|e| format!("failed to read OpenRouter response: {}", e))?;
     if !status.is_success() {
-        return Err(format!("OpenRouter request failed with status {}", status));
+        return Err(format!("OpenRouter {} — {}", status, body.trim()));
     }
 
     serde_json::from_str(&body).map_err(|e| format!("failed to parse OpenRouter response: {}", e))
 }
 
 #[tauri::command]
-pub fn generate_openrouter_image(prompt: String, model: String) -> Result<GeneratedImage, String> {
-    let prompt = prompt.trim();
+pub async fn generate_openrouter_image(app: tauri::AppHandle, prompt: String, model: String) -> Result<GeneratedImage, String> {
+    let prompt = prompt.trim().to_string();
     if prompt.is_empty() {
         return Err("Prompt required".to_string());
     }
@@ -108,8 +109,13 @@ pub fn generate_openrouter_image(prompt: String, model: String) -> Result<Genera
         return Err("Unsupported image model".to_string());
     }
 
-    let api_key = resolve_openrouter_api_key()?;
-    let response = post_openrouter_image(prompt, &model, &api_key)?;
+    let _ = app.emit("image-gen:status", "Resolving API key…");
+    let api_key = resolve_openrouter_api_key().await?;
+
+    let _ = app.emit("image-gen:status", "Sending to OpenRouter…");
+    let response = post_openrouter_image(&prompt, &model, &api_key).await?;
+
+    let _ = app.emit("image-gen:status", "Processing response…");
     let data_url = extract_generated_image_url(&response)?;
     Ok(GeneratedImage { data_url, model })
 }

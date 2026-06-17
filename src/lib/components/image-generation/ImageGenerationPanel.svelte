@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { listen } from '@tauri-apps/api/event';
   import {
     generateImage,
     IMAGE_GENERATION_MODELS,
@@ -11,6 +12,7 @@
   let model = $state<ImageGenerationModel>('openai/gpt-5.4-image-2');
   let image = $state<GeneratedImage | null>(null);
   let loading = $state(false);
+  let status = $state('');
   let error = $state('');
   let altText = $state('');
 
@@ -22,15 +24,19 @@
     const trimmed = prompt.trim();
     if (!trimmed || loading) return;
     loading = true;
+    status = '';
     error = '';
     image = null;
+    const unlisten = await listen<string>('image-gen:status', (e) => { status = e.payload; });
     try {
       image = await generateImage({ prompt: trimmed, model });
       altText = defaultAltText(trimmed);
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     } finally {
+      unlisten();
       loading = false;
+      status = '';
     }
   }
 
@@ -93,7 +99,7 @@
   <div class="flex-1 overflow-y-auto p-3">
     {#if loading}
       <div class="rounded-lg border border-dark-600 bg-dark-800 p-4 text-sm text-dark-400">
-        Asking OpenRouter for an image…
+        {status || 'Starting…'}
       </div>
     {:else if image}
       <div class="flex flex-col gap-3">
