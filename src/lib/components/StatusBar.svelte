@@ -11,16 +11,28 @@
   function reloadApp(): void {
     window.location.reload();
   }
+
+  let copied = $state(false);
+  async function copyVersion(): Promise<void> {
+    await navigator.clipboard.writeText(`StackEd ${buildLabel}`);
+    copied = true;
+    setTimeout(() => (copied = false), 1200);
+  }
 </script>
 
-<footer class="flex items-center gap-4 px-4 py-1.5 border-t border-dark-700 bg-dark-800 text-xs text-dark-300 shrink-0">
+<footer class="relative z-10 flex items-center gap-4 px-4 py-1.5 border-t border-dark-700 bg-dark-800 text-xs text-dark-300 shrink-0">
   <span class="truncate max-w-xs" title={filePath ?? fileHandle?.name}>
     {fileName}
     {#if dirty}<span class="text-amber-500 ml-1">●</span>{/if}
   </span>
-  <span class="rounded border border-dark-600 bg-dark-900 px-2 py-0.5 font-mono text-[11px] text-primary-300 shadow-sm" title="Current StackEd build">
-    StackEd {buildLabel}
-  </span>
+  <button
+    type="button"
+    onclick={copyVersion}
+    class="rounded border border-dark-600 bg-dark-900 px-2 py-0.5 font-mono text-[11px] text-primary-300 shadow-sm hover:bg-dark-700 hover:text-primary-200 active:bg-dark-800"
+    title="Click to copy build version"
+  >
+    {copied ? 'Copied!' : `StackEd ${buildLabel}`}
+  </button>
   {#if buildInfo.dev}
     <button
       type="button"
