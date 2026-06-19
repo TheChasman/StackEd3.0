@@ -17,11 +17,35 @@ export interface GeneratedImage {
   model: ImageGenerationModel;
 }
 
+export interface SavedGeneratedImage {
+  name: string;
+  path: string;
+  data_url: string;
+}
+
 export async function generateImage(request: ImageGenerationRequest): Promise<GeneratedImage> {
   const prompt = request.prompt.trim();
   if (!prompt) throw new Error('Prompt required');
   return invoke<GeneratedImage>('generate_openrouter_image', {
     prompt,
     model: request.model,
+  });
+}
+
+export async function saveGeneratedImageToArtwork(params: {
+  articlePath: string;
+  prompt: string;
+  dataUrl: string;
+}): Promise<SavedGeneratedImage> {
+  const articlePath = params.articlePath.trim();
+  if (!articlePath) throw new Error('Article path required');
+
+  const dataUrl = params.dataUrl.trim();
+  if (!dataUrl.startsWith('data:image/')) throw new Error('Generated image data URL required');
+
+  return invoke<SavedGeneratedImage>('save_generated_image_to_artwork', {
+    articlePath,
+    prompt: params.prompt.trim(),
+    dataUrl,
   });
 }

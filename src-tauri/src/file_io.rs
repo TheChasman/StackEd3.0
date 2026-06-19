@@ -144,6 +144,163 @@ fn image_data_url(path: &Path) -> Result<String, String> {
     ))
 }
 
+fn base64_value(byte: u8) -> Option<u8> {
+    match byte {
+        b'A'..=b'Z' => Some(byte - b'A'),
+        b'a'..=b'z' => Some(byte - b'a' + 26),
+        b'0'..=b'9' => Some(byte - b'0' + 52),
+        b'+' => Some(62),
+        b'/' => Some(63),
+        _ => None,
+    }
+}
+
+fn base64_decode(input: &str) -> Result<Vec<u8>, String> {
+    let input = input.trim();
+    if input.is_empty() {
+        return Ok(Vec::new());
+    }
+    if input.len() % 4 != 0 {
+        return Err("invalid base64 length".to_string());
+    }
+
+    let bytes = input.as_bytes();
+    let mut output = Vec::with_capacity((bytes.len() / 4) * 3);
+
+    for chunk in bytes.chunks(4) {
+        let c0 = chunk[0];
+        let c1 = chunk[1];
+        let c2 = chunk[2];
+        let c3 = chunk[3];
+
+        let v0 = base64_value(c0).ok_or_else(|| "invalid base64 character".to_string())?;
+        let v1 = base64_value(c1).ok_or_else(|| "invalid base64 character".to_string())?;
+
+        let v2 = if c2 == b'=' {
+            0
+        } else {
+            base64_value(c2).ok_or_else(|| "invalid base64 character".to_string())?
+        };
+        let v3 = if c3 == b'=' {
+            0
+        } else {
+            base64_value(c3).ok_or_else(|| "invalid base64 character".to_string())?
+        };
+
+        output.push((v0 << 2) | (v1 >> 4));
+        if c2 != b'=' {
+            output.push(((v1 & 0b0000_1111) << 4) | (v2 >> 2));
+        }
+        if c3 != b'=' {
+            output.push(((v2 & 0b0000_0011) << 6) | v3);
+        }
+    }
+
+    Ok(output)
+}
+
+fn extension_for_image_mime(mime: &str) -> Option<&'static str> {
+    match mime {
+        "image/gif" => Some("gif"),
+        "image/jpeg" | "image/jpg" => Some("jpg"),
+        "image/png" => Some("png"),
+        "image/svg+xml" => Some("svg"),
+        "image/webp" => Some("webp"),
+        _ => None,
+    }
+}
+
+fn parse_data_url(data_url: &str) -> Result<(&str, &str), String> {
+    let Some(raw) = data_url.strip_prefix("data:") else {
+        return Err("generated image must be a data URL".to_string());
+    };
+    let Some((meta, payload)) = raw.split_once(',') else {
+        return Err("invalid data URL".to_string());
+    };
+    let Some(mime) = meta.strip_suffix(";base64") else {
+        return Err("generated image data URL must be base64 encoded".to_string());
+    };
+    if !mime.starts_with("image/") {
+        return Err("generated data URL must be an image".to_string());
+    }
+    Ok((mime, payload))
+}
+
+fn slugify_image_name(prompt: &str) -> String {
+    let mut slug = String::new();
+    let mut previous_dash = false;
+
+    for ch in prompt.trim().chars().flat_map(|c| c.to_lowercase()) {
+        if ch.is_ascii_alphanumeric() {
+            slug.push(ch);
+            previous_dash = false;
+        } else if !previous_dash && !slug.is_empty() {
+            slug.push('-');
+            previous_dash = true;
+        }
+        if slug.len() >= 48 {
+            break;
+        }
+    }
+
+    let slug = slug.trim_matches('-').to_string();
+    if slug.is_empty() {
+        "generated-image".to_string()
+    } else {
+        slug
+    }
+}
+
+fn unique_image_path(artwork_dir: &Path, stem: &str, extension: &str) -> PathBuf {
+    let base = artwork_dir.join(format!("{stem}.{extension}"));
+    if !base.exists() {
+        return base;
+    }
+
+    let mut index = 2usize;
+    loop {
+        let candidate = artwork_dir.join(format!("{stem}-{index}.{extension}"));
+        if !candidate.exists() {
+            return candidate;
+        }
+        index += 1;
+    }
+}
+
+#[tauri::command]
+pub fn save_generated_image_to_artwork(
+    article_path: String,
+    prompt: String,
+    data_url: String,
+) -> Result<ArtworkImage, String> {
+    let article_path = PathBuf::from(article_path.trim());
+    let article_dir = article_path
+        .parent()
+        .ok_or_else(|| "article path must include a parent directory".to_string())?;
+    let artwork_dir = article_dir.join("_artwork");
+    std::fs::create_dir_all(&artwork_dir)
+        .map_err(|e| format!("failed to create directory {}: {}", artwork_dir.display(), e))?;
+
+    let (mime, payload) = parse_data_url(data_url.trim())?;
+    let extension = extension_for_image_mime(mime)
+        .ok_or_else(|| format!("unsupported generated image mime type: {}", mime))?;
+    let bytes = base64_decode(payload)?;
+
+    let stem = slugify_image_name(&prompt);
+    let path = unique_image_path(&artwork_dir, &stem, extension);
+    std::fs::write(&path, bytes).map_err(|e| format!("failed to write {}: {}", path.display(), e))?;
+
+    Ok(ArtworkImage {
+        name: path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("generated-image")
+            .to_string(),
+        path: path.display().to_string(),
+        data_url: image_data_url(&path)?,
+    })
+}
+
 #[tauri::command]
 pub fn read_image_data_url(path: String) -> Result<String, String> {
     image_data_url(&PathBuf::from(path))
@@ -634,6 +791,71 @@ mod tests {
         assert_eq!(final_path, article_path.to_string_lossy().to_string());
         assert!(article_path.exists());
         assert!(!outside.join("Checkmate").exists());
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_save_generated_image_to_artwork_writes_image_in_article_folder() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-save-generated-image-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let article_dir = root.join("A_Checkmate");
+        std::fs::create_dir_all(&article_dir).unwrap();
+        let article_path = article_dir.join("Checkmate.md");
+        std::fs::write(&article_path, "article").unwrap();
+
+        let saved = save_generated_image_to_artwork(
+            article_path.to_string_lossy().to_string(),
+            "Hero concept".to_string(),
+            "data:image/png;base64,aGVybw==".to_string(),
+        )
+        .unwrap();
+
+        assert_eq!(saved.name, "hero-concept.png");
+        assert_eq!(
+            saved.path,
+            article_dir
+                .join("_artwork")
+                .join("hero-concept.png")
+                .to_string_lossy()
+                .to_string()
+        );
+        assert_eq!(std::fs::read(article_dir.join("_artwork").join("hero-concept.png")).unwrap(), b"hero");
+        assert_eq!(saved.data_url, "data:image/png;base64,aGVybw==");
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_save_generated_image_to_artwork_creates_unique_file_names() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-save-generated-image-collision-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let article_dir = root.join("A_Checkmate");
+        let artwork_dir = article_dir.join("_artwork");
+        std::fs::create_dir_all(&artwork_dir).unwrap();
+        let article_path = article_dir.join("Checkmate.md");
+        std::fs::write(&article_path, "article").unwrap();
+        std::fs::write(artwork_dir.join("hero-concept.png"), b"old").unwrap();
+
+        let saved = save_generated_image_to_artwork(
+            article_path.to_string_lossy().to_string(),
+            "Hero concept".to_string(),
+            "data:image/png;base64,bmV3".to_string(),
+        )
+        .unwrap();
+
+        assert_eq!(saved.name, "hero-concept-2.png");
+        assert_eq!(std::fs::read(artwork_dir.join("hero-concept-2.png")).unwrap(), b"new");
 
         std::fs::remove_dir_all(root).unwrap();
     }

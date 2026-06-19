@@ -83,7 +83,10 @@ export async function installMacosApp({
   if (isAppRunning()) {
     log('Quitting running StackEd…');
     try { execFileSync('pkill', ['-f', PROCESS_MATCH]); } catch { /* already gone */ }
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 300));
+    if (isAppRunning()) {
+      throw new Error('Quit StackEd before installing');
+    }
   }
 
   const destinationParent = dirname(destinationApp);

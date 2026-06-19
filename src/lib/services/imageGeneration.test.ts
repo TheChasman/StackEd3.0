@@ -6,7 +6,7 @@ vi.mock('@tauri-apps/api/core', () => ({
   invoke: invokeMock,
 }));
 
-import { generateImage, IMAGE_GENERATION_MODELS } from './imageGeneration';
+import { generateImage, IMAGE_GENERATION_MODELS, saveGeneratedImageToArtwork } from './imageGeneration';
 
 describe('imageGeneration service', () => {
   beforeEach(() => {
@@ -44,6 +44,36 @@ describe('imageGeneration service', () => {
     await expect(generateImage({ prompt: '   ', model: 'openai/gpt-5.4-image-2' })).rejects.toThrow(
       'Prompt required',
     );
+    expect(invokeMock).not.toHaveBeenCalled();
+  });
+
+  it('saves generated images into the current article artwork folder', async () => {
+    invokeMock.mockResolvedValueOnce({
+      path: '/vault/O_Substack/A_Checkmate/_artwork/hero-concept.png',
+      name: 'hero-concept.png',
+      data_url: 'data:image/png;base64,aGVybw==',
+    });
+
+    const saved = await saveGeneratedImageToArtwork({
+      articlePath: '/vault/O_Substack/A_Checkmate/Checkmate.md',
+      prompt: '  Hero concept  ',
+      dataUrl: 'data:image/png;base64,aGVybw==',
+    });
+
+    expect(invokeMock).toHaveBeenCalledWith('save_generated_image_to_artwork', {
+      articlePath: '/vault/O_Substack/A_Checkmate/Checkmate.md',
+      prompt: 'Hero concept',
+      dataUrl: 'data:image/png;base64,aGVybw==',
+    });
+    expect(saved.path).toBe('/vault/O_Substack/A_Checkmate/_artwork/hero-concept.png');
+  });
+
+  it('rejects saving a generated image without an article path', async () => {
+    await expect(saveGeneratedImageToArtwork({
+      articlePath: '  ',
+      prompt: 'Hero concept',
+      dataUrl: 'data:image/png;base64,aGVybw==',
+    })).rejects.toThrow('Article path required');
     expect(invokeMock).not.toHaveBeenCalled();
   });
 });

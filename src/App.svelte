@@ -153,6 +153,12 @@
     );
   }
 
+  function getFieldOrderForSave(): string[] {
+    return documentStore.fieldOrder.length
+      ? documentStore.fieldOrder
+      : FRONTMATTER_FIELD_ORDER.map(String);
+  }
+
   async function handlePublish() {
     if (documentStore.phase !== 'final') return;
     if (!documentStore.frontmatter) return;
@@ -281,23 +287,23 @@
     }
   }
 
-  async function handleSave() {
-    if (!documentStore.body && !documentStore.frontmatter) return;
-
+  async function handleSave(): Promise<string | null> {
+    const fieldOrder = getFieldOrderForSave();
     // If no file is open yet, prompt for a save location
     if (!documentStore.fileHandle && !documentStore.filePath) {
       try {
         const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
-        const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
+        const filePath = await saveAsFile(frontmatter, fieldOrder, documentStore.body);
         if (filePath) {
           const title = titleFromFilePath(filePath);
           const fm = frontmatter.TITLE === title ? frontmatter : { ...frontmatter, TITLE: title };
-          documentStore.load(fm, documentStore.body, documentStore.fieldOrder, null, filePath);
+          documentStore.load(fm, documentStore.body, fieldOrder, null, filePath);
+          return filePath;
         }
       } catch (e) {
         alert('Save failed: ' + (e instanceof Error ? e.message : e));
       }
-      return;
+      return null;
     }
 
     try {
@@ -306,42 +312,54 @@
         const filePath = await saveFilePath(
           documentStore.filePath,
           frontmatter,
-          documentStore.fieldOrder,
+          fieldOrder,
           documentStore.body,
         );
-        documentStore.load(frontmatter, documentStore.body, documentStore.fieldOrder, null, filePath);
+        documentStore.load(frontmatter, documentStore.body, fieldOrder, null, filePath);
       } else if (documentStore.fileHandle) {
         await saveFile(
           documentStore.fileHandle,
           frontmatter,
-          documentStore.fieldOrder,
+          fieldOrder,
           documentStore.body,
         );
       }
       documentStore.replaceFrontmatter(frontmatter);
       documentStore.markClean();
+      return documentStore.filePath;
     } catch (e) {
       alert('Save failed: ' + (e instanceof Error ? e.message : e));
+      return null;
     }
   }
 
   async function handleSaveAs() {
-    if (!documentStore.body && !documentStore.frontmatter) return;
-
     try {
       const frontmatter = runBodyParser(getFrontmatterForSave(), documentStore.body);
-      const filePath = await saveAsFile(frontmatter, documentStore.fieldOrder, documentStore.body);
+      const filePath = await saveAsFile(frontmatter, getFieldOrderForSave(), documentStore.body);
       if (filePath) {
         const title = titleFromFilePath(filePath);
         const fm = frontmatter.TITLE === title ? frontmatter : { ...frontmatter, TITLE: title };
-        documentStore.load(fm, documentStore.body, documentStore.fieldOrder, null, filePath);
+        documentStore.load(fm, documentStore.body, getFieldOrderForSave(), null, filePath);
       }
     } catch (e) {
       alert('Save As failed: ' + (e instanceof Error ? e.message : e));
     }
   }
 
-  function handleSaveEvent() { handleSave(); }
+  function handleSaveEvent() { void handleSave(); }
+
+  async function ensureArticlePath(): Promise<string | null> {
+    if (documentStore.filePath) return documentStore.filePath;
+    return handleSave();
+  }
+
+  function handleEnsureArticlePathEvent(event: Event) {
+    const { resolve } = (event as CustomEvent<{ resolve: (path: string | null) => void }>).detail || {};
+    void ensureArticlePath()
+      .then((path) => resolve?.(path))
+      .catch(() => resolve?.(null));
+  }
 
   function openImageGenerator() {
     if (!settingsStore.sidebarVisible) settingsStore.toggleSidebar();
@@ -377,11 +395,13 @@
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('stacked:open-image-generator', openImageGenerator);
     window.addEventListener('stacked:open-editor', openEditor);
+    window.addEventListener('stacked:ensure-article-path', handleEnsureArticlePathEvent);
     return () => {
       window.removeEventListener('stacked:save', handleSaveEvent);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('stacked:open-image-generator', openImageGenerator);
       window.removeEventListener('stacked:open-editor', openEditor);
+      window.removeEventListener('stacked:ensure-article-path', handleEnsureArticlePathEvent);
     };
   });
 
@@ -549,7 +569,7 @@
 />
 
 <!-- Main area -->
-<div class="flex flex-1 min-h-0">
+<div class="flex flex-1 min-h-0 overflow-hidden">
   <!-- Editor area with tab bar -->
   <div class="flex-1 min-w-0 flex flex-col">
     <!-- Tab bar: Draft phase shows Editor/Preview tabs; Final Draft shows label -->

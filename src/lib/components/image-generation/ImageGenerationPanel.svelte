@@ -6,7 +6,9 @@
     IMAGE_GENERATION_MODELS,
     type GeneratedImage,
     type ImageGenerationModel,
+    saveGeneratedImageToArtwork,
   } from '$lib/services/imageGeneration';
+  import { documentStore } from '$lib/stores/document.svelte';
 
   let prompt = $state('');
   let model = $state<ImageGenerationModel>('openai/gpt-5.4-image-2');
@@ -15,21 +17,42 @@
   let status = $state('');
   let error = $state('');
   let altText = $state('');
+  let savedPath = $state('');
 
   function defaultAltText(text: string): string {
     return text.trim().replace(/\s+/g, ' ').slice(0, 80) || 'Generated image';
   }
 
+  async function ensureArticlePath(): Promise<string | null> {
+    if (documentStore.filePath) return documentStore.filePath;
+    return new Promise((resolve) => {
+      window.dispatchEvent(new CustomEvent('stacked:ensure-article-path', {
+        detail: { resolve },
+      }));
+    });
+  }
+
   async function generate() {
     const trimmed = prompt.trim();
     if (!trimmed || loading) return;
+    const articlePath = await ensureArticlePath();
+    if (!articlePath) return;
+
     loading = true;
     status = '';
     error = '';
     image = null;
+    savedPath = '';
     const unlisten = await listen<string>('image-gen:status', (e) => { status = e.payload; });
     try {
-      image = await generateImage({ prompt: trimmed, model });
+      const generated = await generateImage({ prompt: trimmed, model });
+      const saved = await saveGeneratedImageToArtwork({
+        articlePath,
+        prompt: trimmed,
+        dataUrl: generated.data_url,
+      });
+      image = { ...generated, data_url: saved.data_url };
+      savedPath = saved.path;
       altText = defaultAltText(trimmed);
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -93,6 +116,9 @@
 
     {#if error}
       <p class="text-xs text-red-500">{error}</p>
+    {/if}
+    {#if savedPath}
+      <p class="text-xs text-emerald-500">Saved to {savedPath}</p>
     {/if}
   </div>
 

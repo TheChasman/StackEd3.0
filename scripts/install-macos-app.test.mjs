@@ -64,4 +64,26 @@ describe('installMacosApp', () => {
       log: () => {},
     })).rejects.toThrow('Quit StackEd before installing');
   });
+
+  test('continues install once StackEd has exited', async () => {
+    const root = await createTempDir();
+    const sourceApp = join(root, 'target', 'StackEd.app');
+    const destinationApp = join(root, 'Applications', 'StackEd.app');
+    await createAppBundle(sourceApp, 'fresh build');
+    await createAppBundle(destinationApp, 'stale build');
+
+    const states = [true, false];
+    const isAppRunning = () => (states.shift() ?? false);
+
+    await installMacosApp({
+      sourceApp,
+      destinationApp,
+      isAppRunning,
+      log: () => {},
+    });
+
+    expect(states.length).toBe(0);
+    await expect(readFile(join(destinationApp, 'Contents', 'Resources', 'marker.txt'), 'utf8'))
+      .resolves.toBe('fresh build');
+  });
 });

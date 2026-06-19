@@ -206,6 +206,7 @@ pub fn run() {
             file_io::delete_file,
             file_io::list_files,
             file_io::list_artwork_images,
+            file_io::save_generated_image_to_artwork,
             file_io::read_image_data_url,
             file_io::create_dir_recursive,
             file_io::organize_pipeline_article,
