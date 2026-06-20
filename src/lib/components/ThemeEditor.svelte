@@ -7,23 +7,20 @@
   if (!foundTheme) throw new Error(`Theme ${themeId} not found`);
 
   const theme = foundTheme;
+  const themeColors = theme.colors as Record<string, string>;
 
   let name = $state(theme.name);
   let description = $state(theme.description || '');
-  let colors = $state({ ...theme.colors });
+  let colors = $state<Record<string, string>>({ ...themeColors });
 
   const colorGroups = [
     {
-      name: 'Accents',
-      colors: ['rosewater', 'flamingo', 'pink', 'mauve', 'red', 'maroon', 'peach', 'yellow', 'green', 'teal', 'sky', 'sapphire', 'blue', 'lavender'],
+      name: 'Base Ramp',
+      colors: ['base00', 'base01', 'base02', 'base03', 'base04', 'base05', 'base06', 'base07'],
     },
     {
-      name: 'Base & Text',
-      colors: ['text', 'subtext1', 'subtext0', 'base', 'mantle', 'crust'],
-    },
-    {
-      name: 'Overlays & Surfaces',
-      colors: ['overlay2', 'overlay1', 'overlay0', 'surface2', 'surface1', 'surface0'],
+      name: 'Accent Ramp',
+      colors: ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F'],
     },
   ];
 
@@ -42,7 +39,7 @@
 
   function resetColor(colorName: string) {
     if (confirm(`Reset ${colorName} to original?`)) {
-      colors[colorName] = theme.colors[colorName];
+      colors[colorName] = themeColors[colorName];
     }
   }
 </script>

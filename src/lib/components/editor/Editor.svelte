@@ -142,7 +142,7 @@
   <Toolbar {editor} />
   <div
     bind:this={element}
-    class="flex-1 overflow-y-auto prose prose-invert max-w-none"
+    class="flex-1 overflow-y-auto overflow-x-hidden prose prose-invert max-w-none"
     aria-label="Article body editor"
   ></div>
 </div>

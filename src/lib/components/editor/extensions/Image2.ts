@@ -69,6 +69,7 @@ export const Image2 = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     const attrs = { ...HTMLAttributes };
+    const { src, alt, width, height, ...rest } = attrs;
     // Build the data-attrs JSON blob that Substack emits
     const dataAttrs = JSON.stringify({
       src: attrs.src || '',
@@ -97,16 +98,15 @@ export const Image2 = Node.create({
       'img',
       mergeAttributes(
         {
-          src: attrs.src || '',
-          alt: attrs.alt ?? '',
+          src: src || '',
+          alt: alt ?? '',
           'data-type': 'image2',
           'data-attrs': dataAttrs,
           class: 'sizing-normal',
-          width: attrs.width ?? undefined,
-          height: attrs.height ?? undefined,
+          width: width ?? undefined,
+          height: height ?? undefined,
         },
-        attrs,
-        { src: undefined, alt: undefined, width: undefined, height: undefined }
+        rest,
       ),
     ];
   },

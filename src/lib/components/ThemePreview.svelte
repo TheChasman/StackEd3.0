@@ -3,17 +3,15 @@
     colors: Record<string, string>;
   }
 
-  const { colors }: Props = $props();
-
-  // Show 6 key colors: base, text, blue, green, red, yellow
-  const previewColors = [
-    colors.base,
-    colors.text,
-    colors.blue,
-    colors.green,
-    colors.red,
-    colors.yellow,
-  ].filter(Boolean);
+  let { colors }: Props = $props();
+  const previewColors = $derived([
+    colors.base00 ?? colors.base,
+    colors.base05 ?? colors.text,
+    colors.base0D ?? colors.blue,
+    colors.base0B ?? colors.green,
+    colors.base08 ?? colors.red,
+    colors.base0A ?? colors.yellow,
+  ].filter(Boolean) as string[]);
 </script>
 
 <div class="flex gap-2">

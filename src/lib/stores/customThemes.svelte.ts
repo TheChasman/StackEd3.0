@@ -1,4 +1,11 @@
-import { applyCatppuccinTheme, catppuccinPalettes, type CatppuccinFlavor } from '$lib/themes/catppuccin';
+import {
+  applyBase16Colors,
+  getBase16Scheme,
+  isBase16Colors,
+  legacyThemeColorsToBase16,
+  mapLegacyFlavorToSchemeId,
+  type Base16Colors,
+} from '$lib/themes/base16';
 import { themeStorage, type CustomTheme } from '$lib/services/themeStorage';
 import { catalogueSync } from '$lib/services/catalogueSync';
 
@@ -11,12 +18,49 @@ class CustomThemesStore {
     this.loadThemes();
   }
 
+  private normalizeColors(colors: Base16Colors | Record<string, string>): Base16Colors {
+    if (isBase16Colors(colors)) return colors;
+    return legacyThemeColorsToBase16(colors);
+  }
+
+  private normalizeTheme(theme: CustomTheme): { theme: CustomTheme; changed: boolean } {
+    const colors = this.normalizeColors(theme.colors);
+    const catalogueId = theme.catalogueId
+      ?? (theme.catalogueFlavor ? mapLegacyFlavorToSchemeId(theme.catalogueFlavor) : null)
+      ?? undefined;
+    const changed = !isBase16Colors(theme.colors) || catalogueId !== theme.catalogueId || Boolean(theme.catalogueFlavor);
+    return {
+      theme: {
+        ...theme,
+        colors,
+        catalogueId,
+        catalogueFlavor: undefined,
+      },
+      changed,
+    };
+  }
+
   async loadThemes(): Promise<void> {
     try {
-      this.customThemes = await themeStorage.loadThemes();
+      const loadedThemes = await themeStorage.loadThemes();
+      const normalizedThemes: CustomTheme[] = [];
+
+      for (const loadedTheme of loadedThemes) {
+        const normalized = this.normalizeTheme(loadedTheme);
+        normalizedThemes.push(normalized.theme);
+        if (normalized.changed) {
+          await themeStorage.saveTheme(normalized.theme);
+        }
+      }
+
+      this.customThemes = normalizedThemes;
       const savedId = localStorage.getItem('activeCustomThemeId');
       if (savedId && this.customThemes.some(t => t.id === savedId)) {
         this.activeCustomId = savedId;
+        const activeTheme = this.customThemes.find((theme) => theme.id === savedId);
+        if (activeTheme) {
+          applyBase16Colors(activeTheme.colors as Base16Colors);
+        }
       }
     } catch (e) {
       console.error('Failed to load custom themes:', e);
@@ -24,13 +68,13 @@ class CustomThemesStore {
     this.isLoaded = true;
   }
 
-  async createTheme(name: string, colors: Record<string, string>, description?: string): Promise<CustomTheme> {
+  async createTheme(name: string, colors: Base16Colors | Record<string, string>, description?: string): Promise<CustomTheme> {
     const theme: CustomTheme = {
       id: themeStorage.generateId(),
       name,
       description,
       timestamp: Date.now(),
-      colors,
+      colors: this.normalizeColors(colors),
       source: 'custom',
     };
 
@@ -43,7 +87,15 @@ class CustomThemesStore {
     const theme = this.customThemes.find(t => t.id === id);
     if (!theme) throw new Error(`Theme ${id} not found`);
 
-    const updated = { ...theme, ...updates, timestamp: Date.now() };
+    const updatedColors = updates.colors
+      ? this.normalizeColors(updates.colors)
+      : (theme.colors as Base16Colors);
+    const updated = {
+      ...theme,
+      ...updates,
+      colors: updatedColors,
+      timestamp: Date.now(),
+    };
     await themeStorage.saveTheme(updated);
 
     const index = this.customThemes.indexOf(theme);
@@ -76,12 +128,9 @@ class CustomThemesStore {
 
     this.activeCustomId = id;
     localStorage.setItem('activeCustomThemeId', id);
+    localStorage.removeItem('themeSchemeId');
 
-    // Apply colors to document
-    const root = document.documentElement;
-    Object.entries(theme.colors).forEach(([name, value]) => {
-      root.style.setProperty(`--cat-${name}`, value);
-    });
+    applyBase16Colors(theme.colors as Base16Colors);
   }
 
   async toggleFavorite(id: string): Promise<void> {
@@ -91,32 +140,26 @@ class CustomThemesStore {
     }
   }
 
-  async importFromCatalogue(flavor: CatppuccinFlavor): Promise<CustomTheme> {
-    const existing = this.getThemeByCatalogueFlavor(flavor);
+  async importFromCatalogue(schemeId: string): Promise<CustomTheme> {
+    const existing = this.getThemeByCatalogueId(schemeId);
     if (existing) return existing;
-    const theme = await catalogueSync.importFromCatalogue(flavor);
-    this.customThemes = [theme, ...this.customThemes];
-    return theme;
+    const imported = await catalogueSync.importFromCatalogue(schemeId);
+    const normalized = this.normalizeTheme(imported).theme;
+    this.customThemes = [normalized, ...this.customThemes];
+    return normalized;
   }
 
-  getThemeByCatalogueFlavor(flavor: CatppuccinFlavor): CustomTheme | undefined {
-    return this.customThemes.find(theme => theme.catalogueFlavor === flavor);
+  getThemeByCatalogueId(schemeId: string): CustomTheme | undefined {
+    return this.customThemes.find(theme => theme.catalogueId === schemeId);
   }
 
-  cloneFromCatalogueFlavor(flavor: CatppuccinFlavor): Promise<CustomTheme> {
-    const paletteData = catppuccinPalettes[flavor];
-    const metadata = catalogueSync.getOfficialFlavors().find(f => f.flavor === flavor);
-    
-    // Convert palette to Record<string, string>
-    const colors: Record<string, string> = {};
-    for (const [key, value] of Object.entries(paletteData)) {
-      colors[key] = value as string;
-    }
-
+  cloneFromCatalogueScheme(schemeId: string): Promise<CustomTheme> {
+    const scheme = getBase16Scheme(schemeId);
+    if (!scheme) throw new Error(`Theme scheme ${schemeId} not found`);
     return this.createTheme(
-      `${metadata?.name} (Custom)`,
-      colors,
-      `Custom variant of ${metadata?.name}`
+      `${scheme.name} (Custom)`,
+      { ...scheme.colors },
+      `Custom variant of ${scheme.name}`,
     );
   }
 

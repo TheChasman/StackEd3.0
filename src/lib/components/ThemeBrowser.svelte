@@ -3,7 +3,7 @@
   import { themeStore } from '$lib/stores/theme.svelte';
   import { customThemesStore } from '$lib/stores/customThemes.svelte';
   import { catalogueSync } from '$lib/services/catalogueSync';
-  import { catppuccinPalettes, type CatppuccinFlavor } from '$lib/themes/catppuccin';
+  import { getBase16Scheme, type Base16Scheme } from '$lib/themes/base16';
   import ThemeEditor from './ThemeEditor.svelte';
   import ThemePreview from './ThemePreview.svelte';
 
@@ -13,12 +13,17 @@
   let searchQuery = $state('');
   let editingThemeId = $state<string | null>(null);
   let selectedThemeId = $state<string | null>(null);
+  const baseRamp = ['base00', 'base01', 'base02', 'base03', 'base04', 'base05', 'base06', 'base07'];
+  const accentRamp = ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F'];
 
-  const officialFlavors = catalogueSync.getOfficialFlavors();
-  const darkOfficialFlavors = officialFlavors.filter(({ dark }) => dark);
+  const catalogueSchemes = catalogueSync.getCatalogueSchemes();
+  const builtinSchemes = themeStore
+    .getAllSchemeIds()
+    .map((id) => getBase16Scheme(id))
+    .filter((scheme): scheme is Base16Scheme => Boolean(scheme));
 
-  function selectBuiltinTheme(flavor: string) {
-    themeStore.setFlavor(flavor as any);
+  function selectBuiltinTheme(schemeId: string) {
+    themeStore.setScheme(schemeId);
     onclose();
   }
 
@@ -43,32 +48,26 @@
     }
   }
 
-  async function importFromCatalogue(flavor: CatppuccinFlavor) {
-    const theme = await customThemesStore.importFromCatalogue(flavor);
+  async function importFromCatalogue(schemeId: string) {
+    const theme = await customThemesStore.importFromCatalogue(schemeId);
     activeTab = 'custom';
     selectedThemeId = theme.id;
   }
 
   async function importAllDarkFromCatalogue() {
-    for (const { flavor } of darkOfficialFlavors) {
-      await customThemesStore.importFromCatalogue(flavor);
+    for (const { id } of catalogueSchemes) {
+      await customThemesStore.importFromCatalogue(id);
     }
     activeTab = 'custom';
   }
 
-  function isImportedFromCatalogue(flavor: CatppuccinFlavor): boolean {
-    return customThemesStore.customThemes.some((theme) => theme.catalogueFlavor === flavor);
+  function isImportedFromCatalogue(schemeId: string): boolean {
+    return customThemesStore.customThemes.some((theme) => theme.catalogueId === schemeId);
   }
 
-  function getPaletteAsRecord(flavor: string): Record<string, string> {
-    const paletteData = catppuccinPalettes[flavor as keyof typeof catppuccinPalettes];
-    const colors: Record<string, string> = {};
-    if (paletteData) {
-      for (const [key, value] of Object.entries(paletteData)) {
-        colors[key] = value as string;
-      }
-    }
-    return colors;
+  function getPaletteAsRecord(schemeId: string): Record<string, string> {
+    const scheme = getBase16Scheme(schemeId);
+    return scheme ? { ...scheme.colors } : {};
   }
 
   const filtered = $derived(
@@ -108,9 +107,9 @@
     <!-- Tabs -->
     <div class="flex gap-0 px-6 pt-5 border-b border-dark-700 shrink-0">
       {#each [
-        { id: 'builtin', label: 'Built-in Flavors' },
+        { id: 'builtin', label: 'Built-in Schemes' },
         { id: 'custom', label: 'My Themes' },
-        { id: 'catalogue', label: 'Catppuccin Catalogue' },
+        { id: 'catalogue', label: 'Dark Catalogue' },
       ] as tab}
         <button
           onclick={() => (activeTab = tab.id as any)}
@@ -132,19 +131,19 @@
         />
       {:else if activeTab === 'builtin'}
         <div class="p-6 grid grid-cols-2 gap-5">
-          {#each darkOfficialFlavors as { flavor, name, emoji }}
+          {#each builtinSchemes as scheme (scheme.id)}
             <button
-              onclick={() => selectBuiltinTheme(flavor)}
+              onclick={() => selectBuiltinTheme(scheme.id)}
               class="group p-5 rounded-lg border border-dark-600 hover:border-primary-500 hover:bg-dark-700 transition-all text-left"
             >
               <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">{emoji}</span>
+                <span class="text-4xl">{scheme.emoji}</span>
                 <div>
-                  <div class="font-semibold text-dark-100 text-base">{name}</div>
-                  <div class="text-sm text-dark-400">Official Catppuccin</div>
+                  <div class="font-semibold text-dark-100 text-base">{scheme.name}</div>
+                  <div class="text-sm text-dark-400">{scheme.description}</div>
                 </div>
               </div>
-              <ThemePreview colors={getPaletteAsRecord(flavor)} />
+              <ThemePreview colors={getPaletteAsRecord(scheme.id)} />
             </button>
           {/each}
         </div>
@@ -161,7 +160,7 @@
 
           {#if filtered.length === 0}
             <div class="text-center py-12 text-dark-400">
-              {searchQuery ? 'No themes match your search' : 'No custom themes yet. Create one or import from the catalogue!'}
+              {searchQuery ? 'No themes match your search' : 'No custom themes yet. Import from the dark catalogue or clone a built-in theme.'}
             </div>
           {:else}
             <div class="space-y-2">
@@ -230,83 +229,63 @@
       {:else if activeTab === 'catalogue'}
         <div class="p-6 space-y-6">
           <div class="flex items-center justify-between gap-3 rounded-lg border border-dark-600 bg-dark-700/60 p-4">
-            <p class="text-sm text-dark-300">Dark Catppuccin themes only. Add all official dark flavors in one click.</p>
+            <p class="text-sm text-dark-300">Curated Base16-compatible dark themes. Add all in one click, then edit in My Themes.</p>
             <button
               onclick={importAllDarkFromCatalogue}
               class="px-4 py-2 bg-green-900/30 hover:bg-green-900/50 text-green-400 rounded text-sm font-medium transition-colors"
             >
-              + Add All Dark Themes
+              + Add All Dark Schemes
             </button>
           </div>
-          {#each darkOfficialFlavors as { flavor, name, emoji, dark }}
-            {@const paletteColors = getPaletteAsRecord(flavor)}
+          {#each catalogueSchemes as scheme (scheme.id)}
+            {@const paletteColors = getPaletteAsRecord(scheme.id)}
             <div class="p-5 rounded-lg border border-dark-600 hover:border-green-500 transition-all">
               <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-4">
-                  <span class="text-5xl">{emoji}</span>
+                  <span class="text-5xl">{scheme.emoji}</span>
                   <div>
-                    <div class="font-semibold text-dark-100 text-lg">{name}</div>
-                    <div class="text-sm text-dark-400">Catppuccin v1.8.0 · {dark ? 'Dark' : 'Light'} Theme</div>
+                    <div class="font-semibold text-dark-100 text-lg">{scheme.name}</div>
+                    <div class="text-sm text-dark-400">{scheme.description}</div>
                   </div>
                 </div>
                 <button
-                  onclick={() => importFromCatalogue(flavor)}
-                  class="px-5 py-3 rounded text-base font-medium transition-colors {isImportedFromCatalogue(flavor)
+                  onclick={() => importFromCatalogue(scheme.id)}
+                  class="px-5 py-3 rounded text-base font-medium transition-colors {isImportedFromCatalogue(scheme.id)
                     ? 'bg-dark-600 text-dark-200 hover:bg-dark-500'
                     : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'}"
                 >
-                  {isImportedFromCatalogue(flavor) ? 'Open in My Themes' : '+ Add to My Themes'}
+                  {isImportedFromCatalogue(scheme.id) ? 'Open in My Themes' : '+ Add to My Themes'}
                 </button>
               </div>
 
-              <!-- Color Grid: All 25 colors -->
               <div class="space-y-4">
-                <!-- Accents -->
                 <div>
-                  <h5 class="text-sm font-semibold text-dark-300 uppercase mb-3">Accent Colors</h5>
-                  <div class="grid grid-cols-7 gap-3">
-                    {#each ['rosewater', 'flamingo', 'pink', 'mauve', 'red', 'maroon', 'peach', 'yellow', 'green', 'teal', 'sky', 'sapphire', 'blue', 'lavender'] as colorName}
+                  <h5 class="text-sm font-semibold text-dark-300 uppercase mb-3">Base Ramp</h5>
+                  <div class="grid grid-cols-8 gap-3">
+                    {#each baseRamp as colorName}
                       <div class="flex flex-col items-center gap-2">
                         <div
                           class="w-full aspect-square rounded border border-dark-500"
                           style="background-color: {paletteColors[colorName]}"
                           title={colorName}
                         ></div>
-                        <span class="text-sm text-dark-400">{colorName.slice(0, 4)}</span>
+                        <span class="text-sm text-dark-400">{colorName}</span>
                       </div>
                     {/each}
                   </div>
                 </div>
 
-                <!-- Base & Text -->
                 <div>
-                  <h5 class="text-sm font-semibold text-dark-300 uppercase mb-3">Base & Text</h5>
-                  <div class="grid grid-cols-6 gap-3">
-                    {#each ['text', 'subtext1', 'subtext0', 'base', 'mantle', 'crust'] as colorName}
+                  <h5 class="text-sm font-semibold text-dark-300 uppercase mb-3">Accent Ramp</h5>
+                  <div class="grid grid-cols-8 gap-3">
+                    {#each accentRamp as colorName}
                       <div class="flex flex-col items-center gap-2">
                         <div
                           class="w-full aspect-square rounded border border-dark-500"
                           style="background-color: {paletteColors[colorName]}"
                           title={colorName}
                         ></div>
-                        <span class="text-sm text-dark-400">{colorName.slice(0, 5)}</span>
-                      </div>
-                    {/each}
-                  </div>
-                </div>
-
-                <!-- Overlays & Surfaces -->
-                <div>
-                  <h5 class="text-sm font-semibold text-dark-300 uppercase mb-3">Overlays & Surfaces</h5>
-                  <div class="grid grid-cols-6 gap-3">
-                    {#each ['overlay2', 'overlay1', 'overlay0', 'surface2', 'surface1', 'surface0'] as colorName}
-                      <div class="flex flex-col items-center gap-2">
-                        <div
-                          class="w-full aspect-square rounded border border-dark-500"
-                          style="background-color: {paletteColors[colorName]}"
-                          title={colorName}
-                        ></div>
-                        <span class="text-sm text-dark-400">{colorName.slice(0, 5)}</span>
+                        <span class="text-sm text-dark-400">{colorName}</span>
                       </div>
                     {/each}
                   </div>

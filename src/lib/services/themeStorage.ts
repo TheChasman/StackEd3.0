@@ -1,16 +1,17 @@
 import { invoke } from '@tauri-apps/api/core';
 import { appConfigDir, join } from '@tauri-apps/api/path';
-import type { CatppuccinFlavor } from '$lib/themes/catppuccin';
+import type { Base16Colors } from '$lib/themes/base16';
 
 export interface CustomTheme {
   id: string;
   name: string;
   description?: string;
   timestamp: number;
-  colors: Record<string, string>;
+  colors: Base16Colors | Record<string, string>;
   isFavorite?: boolean;
   source?: 'custom' | 'imported';
-  catalogueFlavor?: CatppuccinFlavor;
+  catalogueId?: string;
+  catalogueFlavor?: string;
 }
 
 class ThemeStorage {

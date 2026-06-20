@@ -621,7 +621,7 @@
   <!-- Right sidebar -->
   {#if settingsStore.sidebarVisible}
     <aside 
-      class="border-l border-dark-600 flex flex-col min-h-0 shrink-0 relative"
+      class="z-20 border-l-2 border-primary-500 bg-dark-900 flex flex-col min-h-0 shrink-0 relative"
       style="width: {sidebarWidth}px;"
     >
       <!-- Unified tab panel -->
@@ -678,7 +678,7 @@
         role="separator"
         aria-label="Resize sidebar"
         aria-orientation="vertical"
-        class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary-500 transition-colors {isResizing ? 'bg-primary-500' : 'hover:bg-primary-400'}"
+        class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize bg-primary-700/80 hover:bg-primary-500 transition-colors {isResizing ? 'bg-primary-400' : 'bg-primary-700/80'}"
         onmousedown={handleMouseDown}
       ></div>
     </aside>

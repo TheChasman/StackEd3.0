@@ -1,26 +1,28 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { catppuccinPalettes, type CatppuccinFlavor } from '$lib/themes/catppuccin';
+  import { getBase16Scheme, getDarkBase16Schemes, toAppThemeColors } from '$lib/themes/base16';
 
-  const themes: { value: CatppuccinFlavor; label: string; description: string }[] = [
-    { value: 'latte', label: 'Latte', description: 'Light theme' },
-    { value: 'frappe', label: 'Frappé', description: 'Dark theme' },
-    { value: 'macchiato', label: 'Macchiato', description: 'Dark with cool tones' },
-    { value: 'mocha', label: 'Mocha', description: 'Dark with warm tones' },
-  ];
+  const themes = getDarkBase16Schemes().map((scheme) => ({
+    value: scheme.id,
+    label: scheme.name,
+    description: scheme.description,
+    emoji: scheme.emoji,
+  }));
 
   let open = $state(false);
-
   let { onBrowse }: { onBrowse?: () => void } = $props();
+  let currentTheme = $derived(getBase16Scheme(themeStore.currentSchemeId));
 
-  function handleSelect(flavor: CatppuccinFlavor) {
-    themeStore.setFlavor(flavor);
+  function handleSelect(schemeId: string) {
+    themeStore.setScheme(schemeId);
     open = false;
   }
 
-  function getThemeColor(flavor: CatppuccinFlavor, colorName: keyof typeof catppuccinPalettes['latte']): string {
-    return catppuccinPalettes[flavor][colorName];
+  function getThemeColor(schemeId: string, colorName: 'base' | 'text' | 'blue' | 'green' | 'surface0'): string {
+    const scheme = getBase16Scheme(schemeId);
+    if (!scheme) return '#000000';
+    return toAppThemeColors(scheme.colors)[colorName];
   }
 
   function handleBrowse() {
@@ -52,7 +54,7 @@
           d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a6 6 0 016 6v4a6 6 0 016-6h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a6 6 0 00-6-6H9a6 6 0 00-6 6v4a2 2 0 002 2z"
         />
       </svg>
-      <span class="capitalize">{themeStore.currentFlavor}</span>
+      <span>{currentTheme?.name ?? themeStore.currentSchemeId}</span>
     </button>
 
     {#if open}
@@ -72,7 +74,7 @@
             onclick={() => handleSelect(theme.value)}
             class="w-full text-left px-5 py-4 flex items-center gap-4 hover:bg-dark-700 text-dark-200 transition-colors border-b border-dark-700"
           >
-            <!-- Theme color swatches -->
+            <span class="text-xl">{theme.emoji}</span>
             <div class="flex gap-2">
               <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'base')}; border: 1px solid {getThemeColor(theme.value, 'surface0')};"></div>
               <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'text')}"></div>
@@ -85,7 +87,7 @@
               <div class="text-sm text-dark-400">{theme.description}</div>
             </div>
 
-            {#if themeStore.currentFlavor === theme.value}
+            {#if themeStore.currentSchemeId === theme.value}
               <svg class="w-5 h-5 text-primary-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path
                   d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"

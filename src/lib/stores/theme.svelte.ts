@@ -1,47 +1,49 @@
-import { applyCatppuccinTheme, getCatppuccinFlavor, type CatppuccinFlavor } from '$lib/themes/catppuccin';
+import { applyBase16Theme, DEFAULT_SCHEME_ID, getDarkBase16Schemes, getStoredSchemeId } from '$lib/themes/base16';
 
-type AllThemes = readonly CatppuccinFlavor[];
+type AllThemes = readonly string[];
 
 class ThemeStore {
-  currentFlavor = $state<CatppuccinFlavor>('mocha');
+  currentSchemeId = $state(DEFAULT_SCHEME_ID);
   isLoaded = $state(false);
-  private readonly allFlavors: AllThemes = ['frappe', 'macchiato', 'mocha'] as const;
+  private readonly allSchemeIds: AllThemes = getDarkBase16Schemes().map((scheme) => scheme.id);
 
   constructor() {
     this.loadTheme();
   }
 
   loadTheme(): void {
-    const saved = getCatppuccinFlavor();
-    const normalized = saved === 'latte' ? 'mocha' : saved;
-    this.currentFlavor = normalized;
+    const saved = getStoredSchemeId();
+    const normalized = this.allSchemeIds.includes(saved) ? saved : DEFAULT_SCHEME_ID;
+    this.currentSchemeId = normalized;
     this.applyTheme(normalized);
     this.isLoaded = true;
   }
 
-  setFlavor(flavor: CatppuccinFlavor): void {
-    this.currentFlavor = flavor;
-    this.applyTheme(flavor);
+  setScheme(schemeId: string): void {
+    if (!this.allSchemeIds.includes(schemeId)) return;
+    this.currentSchemeId = schemeId;
+    localStorage.removeItem('activeCustomThemeId');
+    this.applyTheme(schemeId);
   }
 
   cycleNext(): void {
-    const currentIndex = this.allFlavors.indexOf(this.currentFlavor);
-    const nextIndex = (currentIndex + 1) % this.allFlavors.length;
-    this.setFlavor(this.allFlavors[nextIndex]);
+    const currentIndex = this.allSchemeIds.indexOf(this.currentSchemeId);
+    const nextIndex = (currentIndex + 1) % this.allSchemeIds.length;
+    this.setScheme(this.allSchemeIds[nextIndex]);
   }
 
   cyclePrev(): void {
-    const currentIndex = this.allFlavors.indexOf(this.currentFlavor);
-    const prevIndex = (currentIndex - 1 + this.allFlavors.length) % this.allFlavors.length;
-    this.setFlavor(this.allFlavors[prevIndex]);
+    const currentIndex = this.allSchemeIds.indexOf(this.currentSchemeId);
+    const prevIndex = (currentIndex - 1 + this.allSchemeIds.length) % this.allSchemeIds.length;
+    this.setScheme(this.allSchemeIds[prevIndex]);
   }
 
-  getAllFlavors(): AllThemes {
-    return this.allFlavors;
+  getAllSchemeIds(): AllThemes {
+    return this.allSchemeIds;
   }
 
-  private applyTheme(flavor: CatppuccinFlavor): void {
-    applyCatppuccinTheme(flavor);
+  private applyTheme(schemeId: string): void {
+    applyBase16Theme(schemeId);
   }
 }
 
