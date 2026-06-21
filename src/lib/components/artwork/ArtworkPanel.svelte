@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
   import { documentStore } from '$lib/stores/document.svelte';
 
@@ -11,6 +12,8 @@
   let images = $state<ArtworkImage[]>([]);
   let loading = $state(true);
   let error = $state('');
+  let inlineAsHero = $state(false);
+
   $effect(() => {
     void loadArtwork(documentStore.filePath);
   });
@@ -27,14 +30,31 @@
     }
   }
 
-  function insertArtwork(image: ArtworkImage) {
+  function imageAlt(image: ArtworkImage): string {
+    return image.name.replace(/\.[^.]+$/, '');
+  }
+
+  async function dispatchInsert(image: ArtworkImage, hero: boolean, replaceHero: boolean) {
+    window.dispatchEvent(new CustomEvent('stacked:open-editor'));
+    await tick();
     window.dispatchEvent(new CustomEvent('stacked:insert-image', {
       detail: {
         src: image.data_url,
-        alt: image.name.replace(/\.[^.]+$/, ''),
-        hero: true,
+        alt: imageAlt(image),
+        hero,
+        replaceHero,
       },
     }));
+  }
+
+  async function setHero(image: ArtworkImage) {
+    await dispatchInsert(image, true, true);
+  }
+
+  async function insertInline(image: ArtworkImage) {
+    const hero = inlineAsHero;
+    await dispatchInsert(image, hero, false);
+    inlineAsHero = false;
   }
 </script>
 
@@ -52,6 +72,10 @@
       Refresh
     </button>
   </div>
+  <label class="flex items-center gap-2 px-3 py-2 border-b border-dark-700 text-xs text-dark-300">
+    <input type="checkbox" bind:checked={inlineAsHero} class="accent-primary-500" />
+    Mark inline insert as Hero
+  </label>
 
   <div class="flex-1 overflow-y-auto p-3">
     {#if loading}
@@ -63,12 +87,7 @@
     {:else}
       <div class="grid grid-cols-2 gap-3">
         {#each images as image (image.path)}
-          <button
-            type="button"
-            onclick={() => insertArtwork(image)}
-            class="group overflow-hidden rounded-lg border border-dark-600 bg-dark-800 text-left hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            title={`Insert ${image.name}`}
-          >
+          <div class="group overflow-hidden rounded-lg border border-dark-600 bg-dark-800">
             <img
               src={image.data_url}
               alt={image.name}
@@ -77,7 +96,25 @@
             <span class="block truncate px-2 py-1.5 text-xs text-dark-300 group-hover:text-dark-100">
               {image.name}
             </span>
-          </button>
+            <div class="grid grid-cols-2 gap-1 p-2">
+              <button
+                type="button"
+                onclick={() => setHero(image)}
+                class="rounded border border-amber-600/50 bg-amber-900/30 px-2 py-1 text-[11px] text-amber-300 hover:bg-amber-800/40"
+                title={`Set ${image.name} as hero (replaces existing hero)`}
+              >
+                Set Hero
+              </button>
+              <button
+                type="button"
+                onclick={() => insertInline(image)}
+                class="rounded border border-dark-500 bg-dark-700 px-2 py-1 text-[11px] text-dark-200 hover:bg-dark-600"
+                title={`Insert ${image.name} at cursor`}
+              >
+                Inline
+              </button>
+            </div>
+          </div>
         {/each}
       </div>
     {/if}

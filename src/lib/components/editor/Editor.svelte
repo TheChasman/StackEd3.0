@@ -18,6 +18,7 @@
   import { FinancialChart } from './extensions/FinancialChart';
   import { PredictionMarket } from './extensions/PredictionMarket';
   import { Recipe } from './extensions/Recipe';
+  import { clearHeroImageFlags, insertHeroImageAtTop, replaceHeroImage } from './extensions/heroImage';
   import { documentStore } from '$lib/stores/document.svelte';
   import Toolbar from './Toolbar.svelte';
 
@@ -124,8 +125,45 @@
       editor?.commands.insertContent((e as CustomEvent).detail.text);
     };
     const imageHandler = (e: Event) => {
-      const { src, alt, hero } = (e as CustomEvent).detail || {};
-      editor?.chain().focus().insertCaptionedImage({ src: src ?? '', alt: alt ?? '', topImage: hero ?? false }).run();
+      if (!editor) return;
+      const { src, alt, hero, replaceHero } = (e as CustomEvent<{
+        src?: string;
+        alt?: string;
+        hero?: boolean;
+        replaceHero?: boolean;
+      }>).detail || {};
+
+      const imageSrc = String(src ?? '').trim();
+      if (!imageSrc) return;
+      const imageAlt = String(alt ?? '').trim();
+      const isHero = Boolean(hero);
+      const shouldReplaceHero = Boolean(replaceHero);
+
+      if (isHero && shouldReplaceHero && replaceHeroImage(editor, {
+        src: imageSrc,
+        alt: imageAlt,
+      })) {
+        return;
+      }
+
+      if (isHero && shouldReplaceHero) {
+        clearHeroImageFlags(editor);
+        insertHeroImageAtTop(editor, {
+          src: imageSrc,
+          alt: imageAlt,
+        });
+        return;
+      }
+
+      if (isHero) {
+        clearHeroImageFlags(editor);
+      }
+
+      editor.chain().focus().insertCaptionedImage({
+        src: imageSrc,
+        alt: imageAlt,
+        topImage: isHero,
+      }).run();
     };
     window.addEventListener('stacked:insert', textHandler);
     window.addEventListener('stacked:insert-image', imageHandler);

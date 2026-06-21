@@ -26,6 +26,20 @@ export interface Image2Attrs {
   offset: boolean;
 }
 
+function parseDataAttrs(el: HTMLElement): Partial<Image2Attrs> {
+  const raw = el.getAttribute('data-attrs');
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      return parsed as Partial<Image2Attrs>;
+    }
+  } catch {
+    // ignore invalid payload
+  }
+  return {};
+}
+
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     image2: {
@@ -42,20 +56,38 @@ export const Image2 = Node.create({
 
   addAttributes() {
     return {
-      src: { default: '' },
-      srcNoWatermark: { default: null },
+      src: {
+        default: '',
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).src ?? el.getAttribute('src') ?? '',
+      },
+      srcNoWatermark: {
+        default: null,
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).srcNoWatermark ?? null,
+      },
       fullscreen: { default: null },
       imageSize: { default: null },
-      height: { default: null },
-      width: { default: null },
+      height: {
+        default: null,
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).height ?? null,
+      },
+      width: {
+        default: null,
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).width ?? null,
+      },
       resizeWidth: { default: null },
       bytes: { default: null },
-      alt: { default: null },
+      alt: {
+        default: null,
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).alt ?? el.getAttribute('alt') ?? null,
+      },
       title: { default: null },
       type: { default: null },
       href: { default: null },
       belowTheFold: { default: false },
-      topImage: { default: false },
+      topImage: {
+        default: false,
+        parseHTML: (el: HTMLElement) => Boolean(parseDataAttrs(el).topImage),
+      },
       internalRedirect: { default: null },
       isProcessing: { default: false },
       align: { default: null },

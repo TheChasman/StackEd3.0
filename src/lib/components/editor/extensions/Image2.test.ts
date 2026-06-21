@@ -15,4 +15,15 @@ describe('Image2 extension', () => {
     expect(output[1].src).toBe('data:image/png;base64,aGVybw==');
     expect(output[1].alt).toBe('Generated image');
   });
+
+  it('reads topImage from data-attrs when parsing saved HTML', () => {
+    const addAttributes = (Image2 as any).config.addAttributes() as Record<string, { parseHTML?: (el: HTMLElement) => unknown }>;
+    const parseTopImage = addAttributes.topImage.parseHTML as (el: HTMLElement) => unknown;
+
+    const el = document.createElement('img');
+    el.setAttribute('data-type', 'image2');
+    el.setAttribute('data-attrs', JSON.stringify({ topImage: true }));
+
+    expect(parseTopImage(el)).toBe(true);
+  });
 });
