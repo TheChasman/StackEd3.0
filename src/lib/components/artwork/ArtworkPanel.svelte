@@ -2,11 +2,14 @@
   import { tick } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
   import { documentStore } from '$lib/stores/document.svelte';
+  import { relativeArtworkSrc } from '$lib/utils/artworkReferences';
 
   interface ArtworkImage {
     name: string;
     path: string;
     data_url: string;
+    subtitle: string;
+    credit: string;
   }
 
   let images = $state<ArtworkImage[]>([]);
@@ -34,13 +37,48 @@
     return image.name.replace(/\.[^.]+$/, '');
   }
 
+  async function saveMetadata(image: ArtworkImage, subtitle: string, credit: string) {
+    if (!documentStore.filePath) return;
+    await invoke('save_artwork_metadata', {
+      articlePath: documentStore.filePath,
+      imageName: image.name,
+      metadata: { subtitle, credit },
+    });
+    image.subtitle = subtitle;
+    image.credit = credit;
+  }
+
+  async function editMetadata(image: ArtworkImage) {
+    const subtitle = window.prompt('Image subtitle:', image.subtitle) ?? image.subtitle;
+    const credit = window.prompt('Image credit:', image.credit) ?? image.credit;
+    await saveMetadata(image, subtitle.trim(), credit.trim());
+  }
+
+  async function metadataForInsert(image: ArtworkImage): Promise<{ subtitle: string; credit: string }> {
+    let subtitle = image.subtitle.trim();
+    let credit = image.credit.trim();
+    if (!subtitle) {
+      subtitle = window.prompt('Image subtitle (optional):', '')?.trim() ?? '';
+    }
+    if (!credit) {
+      credit = window.prompt('Image credit (optional):', '')?.trim() ?? '';
+    }
+    if (subtitle !== image.subtitle || credit !== image.credit) {
+      await saveMetadata(image, subtitle, credit);
+    }
+    return { subtitle, credit };
+  }
+
   async function dispatchInsert(image: ArtworkImage, hero: boolean, replaceHero: boolean) {
+    const metadata = await metadataForInsert(image);
     window.dispatchEvent(new CustomEvent('stacked:open-editor'));
     await tick();
     window.dispatchEvent(new CustomEvent('stacked:insert-image', {
       detail: {
-        src: image.data_url,
+        src: relativeArtworkSrc(image.name),
         alt: imageAlt(image),
+        subtitle: metadata.subtitle,
+        credit: metadata.credit,
         hero,
         replaceHero,
       },
@@ -96,6 +134,12 @@
             <span class="block truncate px-2 py-1.5 text-xs text-dark-300 group-hover:text-dark-100">
               {image.name}
             </span>
+            {#if image.subtitle || image.credit}
+              <div class="px-2 pb-1 text-[11px] text-dark-400">
+                {#if image.subtitle}<div class="truncate">{image.subtitle}</div>{/if}
+                {#if image.credit}<div class="truncate">Credit: {image.credit}</div>{/if}
+              </div>
+            {/if}
             <div class="grid grid-cols-2 gap-1 p-2">
               <button
                 type="button"
@@ -114,6 +158,13 @@
                 Inline
               </button>
             </div>
+            <button
+              type="button"
+              onclick={() => editMetadata(image)}
+              class="mx-2 mb-2 w-[calc(100%-1rem)] rounded border border-dark-600 px-2 py-1 text-[11px] text-dark-300 hover:bg-dark-700"
+            >
+              Edit subtitle/credit
+            </button>
           </div>
         {/each}
       </div>

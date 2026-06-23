@@ -1,4 +1,5 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
@@ -9,6 +10,14 @@ pub struct ArtworkImage {
     name: String,
     path: String,
     data_url: String,
+    subtitle: String,
+    credit: String,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct ArtworkMetadata {
+    subtitle: String,
+    credit: String,
 }
 
 pub fn is_article_path(path: &str) -> bool {
@@ -142,6 +151,40 @@ fn image_data_url(path: &Path) -> Result<String, String> {
         mime_type(path),
         base64_encode(&bytes)
     ))
+}
+
+fn artwork_metadata_path(artwork_dir: &Path) -> PathBuf {
+    artwork_dir.join(".stacked-metadata.json")
+}
+
+fn read_artwork_metadata_map(artwork_dir: &Path) -> Result<BTreeMap<String, ArtworkMetadata>, String> {
+    let path = artwork_metadata_path(artwork_dir);
+    if !path.exists() {
+        return Ok(BTreeMap::new());
+    }
+    let raw = std::fs::read_to_string(&path)
+        .map_err(|e| format!("failed to read {}: {}", path.display(), e))?;
+    serde_json::from_str(&raw).map_err(|e| format!("failed to parse {}: {}", path.display(), e))
+}
+
+fn write_artwork_metadata_map(
+    artwork_dir: &Path,
+    metadata: &BTreeMap<String, ArtworkMetadata>,
+) -> Result<(), String> {
+    std::fs::create_dir_all(artwork_dir)
+        .map_err(|e| format!("failed to create directory {}: {}", artwork_dir.display(), e))?;
+    let path = artwork_metadata_path(artwork_dir);
+    let raw = serde_json::to_string_pretty(metadata)
+        .map_err(|e| format!("failed to serialize artwork metadata: {}", e))?;
+    std::fs::write(&path, raw).map_err(|e| format!("failed to write {}: {}", path.display(), e))
+}
+
+fn artwork_dir_for_article_path(article_path: &str) -> Result<PathBuf, String> {
+    let article_path = PathBuf::from(article_path.trim());
+    let article_dir = article_path
+        .parent()
+        .ok_or_else(|| "article path must include a parent directory".to_string())?;
+    Ok(article_dir.join("_artwork"))
 }
 
 fn base64_value(byte: u8) -> Option<u8> {
@@ -298,12 +341,36 @@ pub fn save_generated_image_to_artwork(
             .to_string(),
         path: path.display().to_string(),
         data_url: image_data_url(&path)?,
+        subtitle: String::new(),
+        credit: String::new(),
     })
 }
 
 #[tauri::command]
 pub fn read_image_data_url(path: String) -> Result<String, String> {
     image_data_url(&PathBuf::from(path))
+}
+
+#[tauri::command]
+pub fn load_artwork_metadata(
+    article_path: String,
+    image_name: String,
+) -> Result<ArtworkMetadata, String> {
+    let artwork_dir = artwork_dir_for_article_path(&article_path)?;
+    let metadata = read_artwork_metadata_map(&artwork_dir)?;
+    Ok(metadata.get(&image_name).cloned().unwrap_or_default())
+}
+
+#[tauri::command]
+pub fn save_artwork_metadata(
+    article_path: String,
+    image_name: String,
+    metadata: ArtworkMetadata,
+) -> Result<(), String> {
+    let artwork_dir = artwork_dir_for_article_path(&article_path)?;
+    let mut map = read_artwork_metadata_map(&artwork_dir)?;
+    map.insert(image_name, metadata);
+    write_artwork_metadata_map(&artwork_dir, &map)
 }
 
 fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, String> {
@@ -330,6 +397,7 @@ pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkIm
         return Ok(Vec::new());
     };
 
+    let metadata = read_artwork_metadata_map(&artwork_dir)?;
     let entries = std::fs::read_dir(&artwork_dir)
         .map_err(|e| format!("failed to read directory {}: {}", artwork_dir.display(), e))?;
 
@@ -342,10 +410,13 @@ pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkIm
         }
 
         let name = entry.file_name().to_string_lossy().to_string();
+        let image_metadata = metadata.get(&name).cloned().unwrap_or_default();
         images.push(ArtworkImage {
             name,
             path: path.display().to_string(),
             data_url: image_data_url(&path)?,
+            subtitle: image_metadata.subtitle,
+            credit: image_metadata.credit,
         });
     }
 
@@ -856,6 +927,47 @@ mod tests {
 
         assert_eq!(saved.name, "hero-concept-2.png");
         assert_eq!(std::fs::read(artwork_dir.join("hero-concept-2.png")).unwrap(), b"new");
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_artwork_metadata_round_trips_and_populates_list_results() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-artwork-metadata-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let article_dir = root.join("A_Checkmate");
+        let artwork_dir = article_dir.join("_artwork");
+        std::fs::create_dir_all(&artwork_dir).unwrap();
+        let article_path = article_dir.join("Checkmate.md");
+        std::fs::write(&article_path, "article").unwrap();
+        std::fs::write(artwork_dir.join("hero.png"), b"hero").unwrap();
+
+        save_artwork_metadata(
+            article_path.to_string_lossy().to_string(),
+            "hero.png".to_string(),
+            ArtworkMetadata {
+                subtitle: "Visible subtitle".to_string(),
+                credit: "Jane Doe".to_string(),
+            },
+        )
+        .unwrap();
+
+        let metadata = load_artwork_metadata(
+            article_path.to_string_lossy().to_string(),
+            "hero.png".to_string(),
+        )
+        .unwrap();
+        assert_eq!(metadata.subtitle, "Visible subtitle");
+        assert_eq!(metadata.credit, "Jane Doe");
+
+        let images = list_artwork_images(Some(article_path.to_string_lossy().to_string())).unwrap();
+        assert_eq!(images[0].subtitle, "Visible subtitle");
+        assert_eq!(images[0].credit, "Jane Doe");
 
         std::fs::remove_dir_all(root).unwrap();
     }

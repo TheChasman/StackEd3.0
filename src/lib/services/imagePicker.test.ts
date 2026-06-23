@@ -37,11 +37,24 @@ describe('imagePicker service', () => {
       defaultPath: '/vault/O_Substack/A_Checkmate/_artwork',
       filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] }],
     });
-    expect(invokeMock).toHaveBeenCalledWith('read_image_data_url', {
-      path: '/vault/A_Checkmate/_artwork/hero.png',
-    });
+    expect(invokeMock).not.toHaveBeenCalled();
     expect(image).toEqual({
       path: '/vault/A_Checkmate/_artwork/hero.png',
+      src: '_artwork/hero.png',
+      alt: 'hero',
+    });
+  });
+
+  it('falls back to data URLs for images outside _artwork', async () => {
+    openDialogMock.mockResolvedValue('/vault/Downloads/hero.png');
+
+    const image = await pickImageForArticle('/vault/O_Substack/A_Checkmate/Checkmate.md');
+
+    expect(invokeMock).toHaveBeenCalledWith('read_image_data_url', {
+      path: '/vault/Downloads/hero.png',
+    });
+    expect(image).toEqual({
+      path: '/vault/Downloads/hero.png',
       src: 'data:image/png;base64,aGVybw==',
       alt: 'hero',
     });

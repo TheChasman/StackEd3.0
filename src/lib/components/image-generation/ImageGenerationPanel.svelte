@@ -9,6 +9,7 @@
     saveGeneratedImageToArtwork,
   } from '$lib/services/imageGeneration';
   import { documentStore } from '$lib/stores/document.svelte';
+  import { relativeArtworkSrc } from '$lib/utils/artworkReferences';
 
   let prompt = $state('');
   let model = $state<ImageGenerationModel>('openai/gpt-5.4-image-2');
@@ -18,6 +19,9 @@
   let error = $state('');
   let altText = $state('');
   let savedPath = $state('');
+  let savedSrc = $state('');
+  let subtitleText = $state('');
+  let creditText = $state('');
 
   function defaultAltText(text: string): string {
     return text.trim().replace(/\s+/g, ' ').slice(0, 80) || 'Generated image';
@@ -43,6 +47,9 @@
     error = '';
     image = null;
     savedPath = '';
+    savedSrc = '';
+    subtitleText = '';
+    creditText = '';
     const unlisten = await listen<string>('image-gen:status', (e) => { status = e.payload; });
     try {
       const generated = await generateImage({ prompt: trimmed, model });
@@ -53,6 +60,7 @@
       });
       image = { ...generated, data_url: saved.data_url };
       savedPath = saved.path;
+      savedSrc = relativeArtworkSrc(saved.name);
       altText = defaultAltText(trimmed);
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -64,13 +72,21 @@
   }
 
   async function insertImage() {
-    if (!image) return;
+    if (!image || !savedSrc) return;
+    if (!subtitleText) {
+      subtitleText = window.prompt('Image subtitle (optional):', '')?.trim() ?? '';
+    }
+    if (!creditText) {
+      creditText = window.prompt('Image credit (optional):', '')?.trim() ?? '';
+    }
     window.dispatchEvent(new CustomEvent('stacked:open-editor'));
     await tick();
     window.dispatchEvent(new CustomEvent('stacked:insert-image', {
       detail: {
-        src: image.data_url,
+        src: savedSrc,
         alt: altText.trim() || defaultAltText(prompt),
+        subtitle: subtitleText,
+        credit: creditText,
         hero: false,
       },
     }));
@@ -138,6 +154,20 @@
           Alt text
           <input
             bind:value={altText}
+            class="rounded border border-dark-600 bg-dark-900 px-2 py-1.5 text-sm text-dark-100"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-dark-300">
+          Subtitle
+          <input
+            bind:value={subtitleText}
+            class="rounded border border-dark-600 bg-dark-900 px-2 py-1.5 text-sm text-dark-100"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-xs text-dark-300">
+          Credit
+          <input
+            bind:value={creditText}
             class="rounded border border-dark-600 bg-dark-900 px-2 py-1.5 text-sm text-dark-100"
           />
         </label>

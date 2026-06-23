@@ -4,6 +4,8 @@ import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 export interface HeroImagePayload {
   src: string;
   alt: string;
+  subtitle?: string;
+  credit?: string;
 }
 
 function inferDimensionsFromSrc(src: string): { width: number | null; height: number | null } {
@@ -21,10 +23,21 @@ function createHeroImageNode(editor: Editor, payload: HeroImagePayload) {
     editor.schema.node('image2', {
       src: payload.src,
       alt: payload.alt,
+      title: payload.credit ? `Credit: ${payload.credit}` : null,
+      credit: payload.credit ?? null,
       topImage: true,
       width,
       height,
     }),
+    ...(payload.subtitle
+      ? [
+          editor.schema.node('caption', undefined, [
+            editor.schema.node('paragraph', undefined, [
+              editor.schema.text(payload.subtitle),
+            ]),
+          ]),
+        ]
+      : []),
   ]);
 }
 

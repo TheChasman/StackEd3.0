@@ -126,11 +126,13 @@
     };
     const imageHandler = (e: Event) => {
       if (!editor) return;
-      const { src, alt, hero, replaceHero } = (e as CustomEvent<{
+      const { src, alt, hero, replaceHero, subtitle, credit } = (e as CustomEvent<{
         src?: string;
         alt?: string;
         hero?: boolean;
         replaceHero?: boolean;
+        subtitle?: string;
+        credit?: string;
       }>).detail || {};
 
       const imageSrc = String(src ?? '').trim();
@@ -138,10 +140,14 @@
       const imageAlt = String(alt ?? '').trim();
       const isHero = Boolean(hero);
       const shouldReplaceHero = Boolean(replaceHero);
+      const imageSubtitle = String(subtitle ?? '').trim();
+      const imageCredit = String(credit ?? '').trim();
 
       if (isHero && shouldReplaceHero && replaceHeroImage(editor, {
         src: imageSrc,
         alt: imageAlt,
+        subtitle: imageSubtitle || undefined,
+        credit: imageCredit || undefined,
       })) {
         return;
       }
@@ -151,6 +157,8 @@
         insertHeroImageAtTop(editor, {
           src: imageSrc,
           alt: imageAlt,
+          subtitle: imageSubtitle || undefined,
+          credit: imageCredit || undefined,
         });
         return;
       }
@@ -162,8 +170,10 @@
       editor.chain().focus().insertCaptionedImage({
         src: imageSrc,
         alt: imageAlt,
+        title: imageCredit ? `Credit: ${imageCredit}` : null,
+        credit: imageCredit || null,
         topImage: isHero,
-      }).run();
+      }, imageSubtitle || undefined).run();
     };
     window.addEventListener('stacked:insert', textHandler);
     window.addEventListener('stacked:insert-image', imageHandler);

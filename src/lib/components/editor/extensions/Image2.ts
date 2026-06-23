@@ -1,4 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import { invoke } from '@tauri-apps/api/core';
+import { documentStore } from '$lib/stores/document.svelte';
+import { isArtworkRelativeSrc, resolveArtworkImagePath } from '$lib/utils/artworkReferences';
 
 /**
  * Substack image2 node — block-level atom with full metadata.
@@ -16,6 +19,7 @@ export interface Image2Attrs {
   bytes: number | null;
   alt: string | null;
   title: string | null;
+  credit: string | null;
   type: string | null;
   href: string | null;
   belowTheFold: boolean;
@@ -24,6 +28,33 @@ export interface Image2Attrs {
   isProcessing: boolean;
   align: string | null;
   offset: boolean;
+}
+
+function applyThumbnailDisplay(img: HTMLImageElement, thumbnail: boolean): void {
+  img.style.maxHeight = thumbnail ? '180px' : '';
+  img.style.objectFit = thumbnail ? 'contain' : '';
+}
+
+function setEditorImageSrc(img: HTMLImageElement, src: string): void {
+  img.dataset.sourceSrc = src;
+  if (!isArtworkRelativeSrc(src)) {
+    img.src = src;
+    return;
+  }
+
+  const path = resolveArtworkImagePath(documentStore.filePath, src);
+  if (!path) {
+    img.src = src;
+    return;
+  }
+
+  void invoke<string>('read_image_data_url', { path })
+    .then((dataUrl) => {
+      if (img.dataset.sourceSrc === src) img.src = dataUrl;
+    })
+    .catch(() => {
+      if (img.dataset.sourceSrc === src) img.src = src;
+    });
 }
 
 function parseDataAttrs(el: HTMLElement): Partial<Image2Attrs> {
@@ -81,6 +112,10 @@ export const Image2 = Node.create({
         parseHTML: (el: HTMLElement) => parseDataAttrs(el).alt ?? el.getAttribute('alt') ?? null,
       },
       title: { default: null },
+      credit: {
+        default: null,
+        parseHTML: (el: HTMLElement) => parseDataAttrs(el).credit ?? null,
+      },
       type: { default: null },
       href: { default: null },
       belowTheFold: { default: false },
@@ -114,6 +149,7 @@ export const Image2 = Node.create({
       bytes: attrs.bytes ?? null,
       alt: attrs.alt ?? null,
       title: attrs.title ?? null,
+      credit: attrs.credit ?? null,
       type: attrs.type ?? null,
       href: attrs.href ?? null,
       belowTheFold: attrs.belowTheFold ?? false,
@@ -149,12 +185,14 @@ export const Image2 = Node.create({
       dom.className = 'image2-inset flex flex-col items-center select-none';
       dom.contentEditable = 'false';
       dom.style.position = 'relative';
+      let thumbnail = false;
 
       const img = document.createElement('img');
-      img.src = node.attrs.src || '';
       img.alt = node.attrs.alt || '';
+      img.title = node.attrs.title || (node.attrs.credit ? `Credit: ${node.attrs.credit}` : '');
       img.className = 'sizing-normal max-w-full rounded';
       img.style.display = 'block';
+      setEditorImageSrc(img, node.attrs.src || '');
 
       if (node.attrs.width) img.width = node.attrs.width;
       if (node.attrs.height) img.height = node.attrs.height;
@@ -170,10 +208,25 @@ export const Image2 = Node.create({
         dom.appendChild(img);
       }
 
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs font-medium text-white hover:bg-black/85 focus:outline-none focus:ring-2 focus:ring-primary-400';
+      toggle.textContent = 'Thumb';
+      toggle.setAttribute('aria-label', 'Show as thumbnail');
+      toggle.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        thumbnail = !thumbnail;
+        applyThumbnailDisplay(img, thumbnail);
+        toggle.textContent = thumbnail ? 'Full' : 'Thumb';
+        toggle.setAttribute('aria-label', thumbnail ? 'Show full size' : 'Show as thumbnail');
+      });
+      dom.appendChild(toggle);
+
       // Hero badge
       if (node.attrs.topImage) {
         const badge = document.createElement('span');
-        badge.className = 'absolute top-2 left-2 px-2 py-0.5 text-xs rounded bg-amber-500/90 text-black font-medium';
+        badge.className = 'absolute top-2 right-2 px-2 py-0.5 text-xs rounded bg-amber-500/90 text-black font-medium';
         badge.textContent = 'HERO';
         dom.appendChild(badge);
       }
@@ -184,8 +237,9 @@ export const Image2 = Node.create({
           if (updatedNode.type.name !== 'image2') return false;
           const imgEl = dom.querySelector('img');
           if (imgEl) {
-            imgEl.src = updatedNode.attrs.src || '';
+            setEditorImageSrc(imgEl, updatedNode.attrs.src || '');
             imgEl.alt = updatedNode.attrs.alt || '';
+            imgEl.title = updatedNode.attrs.title || (updatedNode.attrs.credit ? `Credit: ${updatedNode.attrs.credit}` : '');
           }
           // Remove old link if href changed
           const oldLink = dom.querySelector('a');
@@ -202,6 +256,7 @@ export const Image2 = Node.create({
           }
           return true;
         },
+        stopEvent: (event) => event.target instanceof HTMLElement && toggle.contains(event.target),
       };
     };
   },

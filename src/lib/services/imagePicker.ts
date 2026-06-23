@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
+import { isPathInArtworkFolder, relativeArtworkSrcFromPath } from '$lib/utils/artworkReferences';
 
 const IMAGE_FILTERS = [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] }];
 
@@ -35,11 +36,12 @@ export async function pickImageForArticle(currentFilePath: string | null): Promi
   const path = Array.isArray(selected) ? selected[0] : selected;
   if (!path) return null;
 
-  const src = await invoke<string>('read_image_data_url', { path });
   const fileName = getFileName(path);
   return {
     path,
-    src,
+    src: isPathInArtworkFolder(path)
+      ? relativeArtworkSrcFromPath(path)
+      : await invoke<string>('read_image_data_url', { path }),
     alt: fileName.replace(/\.[^.]+$/, ''),
   };
 }
