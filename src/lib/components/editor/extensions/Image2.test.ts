@@ -1,4 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import { CaptionedImage } from './CaptionedImage';
+import { Caption } from './Caption';
 
 const invokeMock = vi.hoisted(() => vi.fn());
 
@@ -137,6 +141,33 @@ describe('Image2 extension', () => {
 
     expect(setNodeMarkup).toHaveBeenCalledWith(7, undefined, expect.objectContaining({ thumbnail: true }));
     expect(dispatch).toHaveBeenCalledWith('thumbnail transaction');
+  });
+
+  it('fires a real editor update and serializes thumbnail state when toggled', () => {
+    const onUpdate = vi.fn();
+    const element = document.createElement('div');
+    const editor = new Editor({
+      element,
+      extensions: [StarterKit, CaptionedImage, Image2, Caption],
+      content: '',
+      onUpdate,
+    });
+
+    editor.chain().focus().insertCaptionedImage({
+      src: 'https://example.com/inline_1200x800.png',
+      alt: 'Inline image',
+      width: 1200,
+      height: 800,
+    }).run();
+    onUpdate.mockClear();
+
+    const button = element.querySelector('button[aria-label="Show as thumbnail"]') as HTMLButtonElement;
+    button.click();
+
+    expect(onUpdate).toHaveBeenCalled();
+    expect(editor.getHTML()).toContain('&quot;thumbnail&quot;:true');
+
+    editor.destroy();
   });
 
   it('loads compact artwork links for editor preview without changing saved src', async () => {

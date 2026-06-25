@@ -3,6 +3,8 @@
   import type { SvelteHTMLElements } from 'svelte/elements';
   import { invoke } from '@tauri-apps/api/core';
   import { listen } from '@tauri-apps/api/event';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
+  import { message } from '@tauri-apps/plugin-dialog';
   import { Clock3, FilePlus2, FolderOpen, PanelRight, Save, SaveAll, Settings } from 'lucide-svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import YamlPanel from '$lib/components/yaml/YamlPanel.svelte';
@@ -61,6 +63,9 @@
     let unlistenMenuOpenRecent: (() => void) | undefined;
     let unlistenMenuSave: (() => void) | undefined;
     let unlistenMenuSaveAs: (() => void) | undefined;
+    let unlistenCloseRequested: (() => void) | undefined;
+    let closeAllowed = false;
+    const appWindow = getCurrentWindow();
     void listen<string>('stacked:open-file', (event) => {
       void loadFilePath(event.payload);
     }).then((unlisten) => {
@@ -85,6 +90,37 @@
     });
     void listen('stacked:menu-save-as', () => { void handleSaveAs(); }).then((unlisten) => {
       unlistenMenuSaveAs = unlisten;
+    });
+    void appWindow.onCloseRequested(async (event) => {
+      if (closeAllowed) return;
+      const dirtyIndex = documentStore.tabMetas.findIndex((tab) => tab.dirty);
+      if (dirtyIndex === -1) return;
+
+      event.preventDefault();
+      const dirtyTitle = documentStore.tabMetas[dirtyIndex]?.title ?? 'Untitled';
+      const choice = await message(`Save changes to "${dirtyTitle}" before quitting?`, {
+        title: 'Unsaved Changes',
+        kind: 'warning',
+        buttons: { yes: 'Save', no: "Don't Save", cancel: 'Cancel' },
+      });
+
+      if (choice === 'Cancel') return;
+      if (choice === "Don't Save") {
+        closeAllowed = true;
+        await appWindow.destroy();
+        return;
+      }
+
+      if (choice === 'Save') {
+        documentStore.switchTab(dirtyIndex);
+        await handleSave();
+        if (!documentStore.tabMetas.some((tab) => tab.dirty)) {
+          closeAllowed = true;
+          await appWindow.destroy();
+        }
+      }
+    }).then((unlisten) => {
+      unlistenCloseRequested = unlisten;
     });
 
     void (async () => {
@@ -111,6 +147,7 @@
       unlistenMenuOpenRecent?.();
       unlistenMenuSave?.();
       unlistenMenuSaveAs?.();
+      unlistenCloseRequested?.();
     };
   });
 
@@ -617,7 +654,7 @@
     {/if}
 
     <!-- Content -->
-    <div class="flex-1 min-h-0 overflow-hidden">
+    <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
       {#if activeEditorTab === 'editor' || documentStore.phase === 'final'}
         <Editor />
       {:else}
