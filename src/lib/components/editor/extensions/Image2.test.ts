@@ -82,6 +82,63 @@ describe('Image2 extension', () => {
     expect(img.style.maxHeight).toBe('');
   });
 
+  it('persists thumbnail state in rendered data attrs', () => {
+    const renderHTML = (Image2 as any).config.renderHTML as (args: { HTMLAttributes: Record<string, unknown> }) => [string, Record<string, unknown>];
+    const output = renderHTML({
+      HTMLAttributes: {
+        src: 'https://example.com/large.png',
+        alt: 'Large image',
+        thumbnail: true,
+      },
+    });
+
+    expect(JSON.parse(String(output[1]['data-attrs'])).thumbnail).toBe(true);
+  });
+
+  it('reads thumbnail state from saved data attrs', () => {
+    const addAttributes = (Image2 as any).config.addAttributes() as Record<string, { parseHTML?: (el: HTMLElement) => unknown }>;
+    const parseThumbnail = addAttributes.thumbnail.parseHTML as (el: HTMLElement) => unknown;
+
+    const el = document.createElement('img');
+    el.setAttribute('data-type', 'image2');
+    el.setAttribute('data-attrs', JSON.stringify({ thumbnail: true }));
+
+    expect(parseThumbnail(el)).toBe(true);
+  });
+
+  it('updates the image node when thumbnail is toggled so the document becomes dirty', () => {
+    const dispatch = vi.fn();
+    const setNodeMarkup = vi.fn().mockReturnValue('thumbnail transaction');
+    const addNodeView = (Image2 as any).config.addNodeView as () => (args: {
+      node: { attrs: Record<string, unknown> };
+      editor: unknown;
+      getPos: () => number;
+    }) => { dom: HTMLElement };
+    const nodeView = addNodeView()({
+      node: {
+        attrs: {
+          src: 'https://example.com/large_1200x800.png',
+          alt: 'Large image',
+          thumbnail: false,
+        },
+      },
+      editor: {
+        state: {
+          tr: { setNodeMarkup },
+        },
+        view: { dispatch },
+      },
+      getPos: () => 7,
+    });
+
+    const button = nodeView.dom.querySelector('button[aria-label="Show as thumbnail"]') as HTMLButtonElement;
+
+    button.click();
+
+    expect(setNodeMarkup).toHaveBeenCalledWith(7, undefined, expect.objectContaining({ thumbnail: true }));
+    expect(dispatch).toHaveBeenCalledWith('thumbnail transaction');
+  });
+
   it('loads compact artwork links for editor preview without changing saved src', async () => {
     invokeMock.mockResolvedValue('data:image/png;base64,aGVybw==');
     const addNodeView = (Image2 as any).config.addNodeView as () => (args: {

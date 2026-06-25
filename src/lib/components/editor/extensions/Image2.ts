@@ -28,6 +28,7 @@ export interface Image2Attrs {
   isProcessing: boolean;
   align: string | null;
   offset: boolean;
+  thumbnail: boolean;
 }
 
 function applyThumbnailDisplay(img: HTMLImageElement, thumbnail: boolean): void {
@@ -127,6 +128,10 @@ export const Image2 = Node.create({
       isProcessing: { default: false },
       align: { default: null },
       offset: { default: false },
+      thumbnail: {
+        default: false,
+        parseHTML: (el: HTMLElement) => Boolean(parseDataAttrs(el).thumbnail),
+      },
     };
   },
 
@@ -136,7 +141,7 @@ export const Image2 = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     const attrs = { ...HTMLAttributes };
-    const { src, alt, width, height, ...rest } = attrs;
+    const { src, alt, width, height, thumbnail, ...rest } = attrs;
     // Build the data-attrs JSON blob that Substack emits
     const dataAttrs = JSON.stringify({
       src: attrs.src || '',
@@ -158,6 +163,7 @@ export const Image2 = Node.create({
       isProcessing: attrs.isProcessing ?? false,
       align: attrs.align ?? null,
       offset: attrs.offset ?? false,
+      thumbnail: attrs.thumbnail ?? false,
     });
 
     // The wrapping is handled by captionedImage parent node.
@@ -185,7 +191,8 @@ export const Image2 = Node.create({
       dom.className = 'image2-inset flex flex-col items-center select-none';
       dom.contentEditable = 'false';
       dom.style.position = 'relative';
-      let thumbnail = false;
+      let currentAttrs = { ...node.attrs };
+      let thumbnail = Boolean(currentAttrs.thumbnail);
 
       const img = document.createElement('img');
       img.alt = node.attrs.alt || '';
@@ -196,6 +203,7 @@ export const Image2 = Node.create({
 
       if (node.attrs.width) img.width = node.attrs.width;
       if (node.attrs.height) img.height = node.attrs.height;
+      applyThumbnailDisplay(img, thumbnail);
 
       if (node.attrs.href) {
         const link = document.createElement('a');
@@ -211,12 +219,24 @@ export const Image2 = Node.create({
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs font-medium text-white hover:bg-black/85 focus:outline-none focus:ring-2 focus:ring-primary-400';
-      toggle.textContent = 'Thumb';
-      toggle.setAttribute('aria-label', 'Show as thumbnail');
+      toggle.textContent = thumbnail ? 'Full' : 'Thumb';
+      toggle.setAttribute('aria-label', thumbnail ? 'Show full size' : 'Show as thumbnail');
       toggle.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        thumbnail = !thumbnail;
+        const nextThumbnail = !thumbnail;
+        if (typeof getPos === 'function') {
+          const pos = getPos();
+          if (typeof pos !== 'number') return;
+          editor.view.dispatch(
+            editor.state.tr.setNodeMarkup(pos, undefined, {
+              ...currentAttrs,
+              thumbnail: nextThumbnail,
+            }),
+          );
+        }
+        thumbnail = nextThumbnail;
+        currentAttrs = { ...currentAttrs, thumbnail };
         applyThumbnailDisplay(img, thumbnail);
         toggle.textContent = thumbnail ? 'Full' : 'Thumb';
         toggle.setAttribute('aria-label', thumbnail ? 'Show full size' : 'Show as thumbnail');
@@ -235,12 +255,17 @@ export const Image2 = Node.create({
         dom,
         update: (updatedNode) => {
           if (updatedNode.type.name !== 'image2') return false;
+          currentAttrs = { ...updatedNode.attrs };
+          thumbnail = Boolean(updatedNode.attrs.thumbnail);
           const imgEl = dom.querySelector('img');
           if (imgEl) {
             setEditorImageSrc(imgEl, updatedNode.attrs.src || '');
             imgEl.alt = updatedNode.attrs.alt || '';
             imgEl.title = updatedNode.attrs.title || (updatedNode.attrs.credit ? `Credit: ${updatedNode.attrs.credit}` : '');
+            applyThumbnailDisplay(imgEl, thumbnail);
           }
+          toggle.textContent = thumbnail ? 'Full' : 'Thumb';
+          toggle.setAttribute('aria-label', thumbnail ? 'Show full size' : 'Show as thumbnail');
           // Remove old link if href changed
           const oldLink = dom.querySelector('a');
           if (updatedNode.attrs.href && !oldLink) {
