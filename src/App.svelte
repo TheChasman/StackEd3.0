@@ -40,6 +40,14 @@
   let promotionLoading = $state(false);
   let activeEditorTab = $state<'editor' | 'preview'>('editor');
 
+  const SIDEBAR_MIN_WIDTH = 320;
+  const SIDEBAR_MAX_WIDTH = 600;
+
+  function clampSidebarWidth(width: number): number {
+    if (!Number.isFinite(width)) return SIDEBAR_MIN_WIDTH;
+    return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
+  }
+
   async function loadFilePath(filePath: string) {
     const parsed = await openFilePath(filePath);
     documentStore.openInNewTab(parsed);
@@ -90,7 +98,7 @@
         ? savedToolTab as typeof activeToolTab
         : 'yaml';
       const savedWidth = localStorage.getItem('sidebarWidth');
-      if (savedWidth) sidebarWidth = parseInt(savedWidth, 10);
+      if (savedWidth) sidebarWidth = clampSidebarWidth(parseInt(savedWidth, 10));
       setupZoomShortcuts();
       await syncRecentFilesMenu();
     })();
@@ -117,9 +125,7 @@
   function handleMouseMove(e: MouseEvent) {
     if (!isResizing) return;
     const newWidth = window.innerWidth - e.clientX;
-    if (newWidth >= 200 && newWidth <= 600) {
-      sidebarWidth = newWidth;
-    }
+    sidebarWidth = clampSidebarWidth(newWidth);
   }
 
   async function handleOpen() {
@@ -621,15 +627,15 @@
   <!-- Right sidebar -->
   {#if settingsStore.sidebarVisible}
     <aside 
-      class="z-20 border-l-2 border-primary-500 bg-dark-900 flex flex-col min-h-0 shrink-0 relative"
+      class="z-20 border-l-2 border-primary-500 bg-dark-900 flex flex-col h-full min-h-0 shrink-0 relative"
       style="width: {sidebarWidth}px;"
     >
       <!-- Unified tab panel -->
       <div class="flex flex-col flex-1 min-h-0">
-        <div class="flex border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
+        <div class="flex overflow-x-auto border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
           <button
             onclick={() => activeToolTab = 'yaml'}
-            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'yaml'
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'yaml'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
@@ -637,7 +643,7 @@
           </button>
           <button
             onclick={() => activeToolTab = 'research'}
-            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
@@ -645,7 +651,7 @@
           </button>
           <button
             onclick={() => activeToolTab = 'artwork'}
-            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
@@ -653,7 +659,7 @@
           </button>
           <button
             onclick={() => activeToolTab = 'generate'}
-            class="px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
