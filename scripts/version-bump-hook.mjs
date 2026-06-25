@@ -30,17 +30,26 @@ export function bumpCargoTomlVersion(content, nextVersion) {
   );
 }
 
+export function bumpCargoLockVersion(content, nextVersion) {
+  return content.replace(
+    /^(\[\[package\]\]\nname = "stacked"\nversion = )"[^"]+"/m,
+    `$1"${nextVersion}"`,
+  );
+}
+
 export async function applyPatchVersionBump({
   packagePath = join(projectRoot, 'package.json'),
   packageLockPath = join(projectRoot, 'package-lock.json'),
   tauriConfigPath = join(projectRoot, 'src-tauri', 'tauri.conf.json'),
   cargoTomlPath = join(projectRoot, 'src-tauri', 'Cargo.toml'),
+  cargoLockPath = join(projectRoot, 'src-tauri', 'Cargo.lock'),
 } = {}) {
-  const [packageJson, packageLockJson, tauriConfigJson, cargoToml] = await Promise.all([
+  const [packageJson, packageLockJson, tauriConfigJson, cargoToml, cargoLock] = await Promise.all([
     readJson(packagePath),
     readJson(packageLockPath),
     readJson(tauriConfigPath),
     readFile(cargoTomlPath, 'utf8'),
+    readFile(cargoLockPath, 'utf8'),
   ]);
 
   const nextVersion = bumpPatchVersionString(packageJson.version);
@@ -51,12 +60,14 @@ export async function applyPatchVersionBump({
   }
   tauriConfigJson.version = nextVersion;
   const nextCargoToml = bumpCargoTomlVersion(cargoToml, nextVersion);
+  const nextCargoLock = bumpCargoLockVersion(cargoLock, nextVersion);
 
   await Promise.all([
     writeFile(packagePath, toJson(packageJson)),
     writeFile(packageLockPath, toJson(packageLockJson)),
     writeFile(tauriConfigPath, toJson(tauriConfigJson)),
     writeFile(cargoTomlPath, nextCargoToml),
+    writeFile(cargoLockPath, nextCargoLock),
   ]);
 
   return nextVersion;
@@ -65,7 +76,7 @@ export async function applyPatchVersionBump({
 function stageVersionFiles() {
   execFileSync(
     'git',
-    ['add', 'package.json', 'package-lock.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml'],
+    ['add', 'package.json', 'package-lock.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock'],
     { stdio: 'inherit' },
   );
 }

@@ -1,7 +1,7 @@
 {
   "name": "stacked",
   "private": true,
-  "version": "0.1.19",
+  "version": "0.1.20",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build --target aarch64-apple-darwin && npm run install:app",
+    "tauri:build": "node scripts/deploy-guard.mjs && tauri build --target aarch64-apple-darwin && node scripts/deploy-guard.mjs && npm run install:app",
     "install:app": "node scripts/install-macos-app.mjs",
     "version:bump:hook": "node scripts/version-bump-hook.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
