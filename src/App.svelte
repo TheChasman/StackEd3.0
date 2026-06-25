@@ -617,11 +617,13 @@
     {/if}
 
     <!-- Content -->
-    {#if activeEditorTab === 'editor' || documentStore.phase === 'final'}
-      <Editor />
-    {:else}
-      <PreviewPanel />
-    {/if}
+    <div class="flex-1 min-h-0 overflow-hidden">
+      {#if activeEditorTab === 'editor' || documentStore.phase === 'final'}
+        <Editor />
+      {:else}
+        <PreviewPanel />
+      {/if}
+    </div>
   </div>
 
   <!-- Right sidebar -->
@@ -632,7 +634,7 @@
     >
       <!-- Unified tab panel -->
       <div class="flex flex-col flex-1 min-h-0">
-        <div class="flex overflow-x-auto border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
+        <div class="flex overflow-x-auto min-h-10 border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
           <button
             onclick={() => activeToolTab = 'yaml'}
             class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'yaml'

@@ -19,7 +19,7 @@
   async function open(file: RecentFile) {
     try {
       const parsed = await openFilePath(file.filePath);
-      documentStore.load(parsed.frontmatter, parsed.body, parsed.fieldOrder, parsed.fileHandle, parsed.filePath, parsed.dirty);
+      documentStore.openInNewTab(parsed);
       onclose();
     } catch {
       if (typeof file.id === 'number') {

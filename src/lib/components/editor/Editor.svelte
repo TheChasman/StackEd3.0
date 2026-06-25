@@ -186,11 +186,11 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="flex flex-col h-full">
+<div class="flex flex-col flex-1 min-h-0 overflow-hidden">
   <Toolbar {editor} />
   <div
     bind:this={element}
-    class="flex-1 overflow-y-auto overflow-x-hidden prose prose-invert max-w-none"
+    class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden prose prose-invert max-w-none"
     aria-label="Article body editor"
   ></div>
 </div>
