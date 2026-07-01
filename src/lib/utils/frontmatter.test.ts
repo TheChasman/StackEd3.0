@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ArticleFrontmatter } from '$lib/types/article';
-import { backfillArticleFrontmatter, parseMarkdownFile, runBodyParser, runBodyParserUpsertOnly, serializeMarkdownFile } from './frontmatter';
+import { backfillArticleFrontmatter, extractTitleFromBody, parseMarkdownFile, runBodyParser, runBodyParserUpsertOnly, serializeMarkdownFile } from './frontmatter';
 
 const SAMPLE_WITH_FRONTMATTER = `---
 TITLE: "Test Article"
@@ -45,6 +45,28 @@ const EVERNOTE_TASKS_ARTIFACT = `Content not supported
 This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote.`;
 const EVERNOTE_TASKS_HTML_ARTIFACT = `<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"><en-note><div style="--en-task-group:true; --en-id:abc"><div style="font-weight:600">Content not supported</div><div>This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote.</div></div><div>Real article text.</div></en-note>`;
 
+describe('extractTitleFromBody', () => {
+  it('strips a leading "# " marker from line 1', () => {
+    expect(extractTitleFromBody('# My Title\n\nBody text.')).toBe('My Title');
+  });
+
+  it('returns line 1 as-is when there is no heading marker', () => {
+    expect(extractTitleFromBody('Plain first line\n\nBody text.')).toBe('Plain first line');
+  });
+
+  it('strips multiple leading # characters', () => {
+    expect(extractTitleFromBody('## Odd Heading\nRest')).toBe('Odd Heading');
+  });
+
+  it('trims surrounding whitespace', () => {
+    expect(extractTitleFromBody('#   Spacey Title   \nRest')).toBe('Spacey Title');
+  });
+
+  it('returns an empty string for an empty body', () => {
+    expect(extractTitleFromBody('')).toBe('');
+  });
+});
+
 describe('parseMarkdownFile', () => {
   it('parses TITLE from frontmatter', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_WITH_FRONTMATTER);
@@ -64,7 +86,6 @@ describe('parseMarkdownFile', () => {
   it('extracts all sections from body when YAML is empty', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_NO_FRONTMATTER_WITH_SECTIONS);
     expect(String(frontmatter.SPARK)).toContain('Initial idea here');
-    expect(String(frontmatter.TITLE)).toContain('My Article Title');
     expect(String(frontmatter.SUBTITLE)).toContain('The subtitle or hook promise');
     expect(String(frontmatter.HOOK)).toContain('Refined opening for reader attention');
     expect(String(frontmatter.LANDING)).toContain('Closing thoughts');
@@ -73,7 +94,6 @@ describe('parseMarkdownFile', () => {
   it('extracts StackEd fields from inline body labels when YAML is empty', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS);
     expect(frontmatter.SPARK).toBe('Initial idea here.');
-    expect(frontmatter.TITLE).toBe('My Article Title');
     expect(frontmatter.SUBTITLE).toBe('The subtitle or hook promise.');
     expect(frontmatter.HOOK).toBe('Refined opening for reader attention.');
   });
@@ -81,7 +101,6 @@ describe('parseMarkdownFile', () => {
   it('extracts StackEd fields from flattened inline body labels when YAML is empty', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_FLATTENED_INLINE_LABELS);
     expect(frontmatter.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
-    expect(frontmatter.TITLE).toBe('Partial Solution');
     expect(frontmatter.SUBTITLE).toBe('What does impartiality look like?');
     expect(frontmatter.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
   });
@@ -324,7 +343,6 @@ describe('backfillArticleFrontmatter', () => {
     const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_SECTIONS);
 
     expect(backfilled.SPARK).toBe('Initial idea here.');
-    expect(backfilled.TITLE).toBe('My Article Title');
     expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
     expect(backfilled.HOOK).toBe('Refined opening for reader attention.');
     expect(backfilled.LANDING).toBe('Closing thoughts.');
@@ -354,7 +372,6 @@ describe('backfillArticleFrontmatter', () => {
     const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS);
 
     expect(backfilled.SPARK).toBe('Initial idea here.');
-    expect(backfilled.TITLE).toBe('My Article Title');
     expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
     expect(backfilled.HOOK).toBe('Refined opening for reader attention.');
   });
@@ -383,7 +400,6 @@ describe('backfillArticleFrontmatter', () => {
     const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_FLATTENED_INLINE_LABELS);
 
     expect(backfilled.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
-    expect(backfilled.TITLE).toBe('Partial Solution');
     expect(backfilled.SUBTITLE).toBe('What does impartiality look like?');
     expect(backfilled.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
   });
@@ -413,6 +429,32 @@ describe('backfillArticleFrontmatter', () => {
 
     expect(backfilled.TITLE).toBe('Manual title');
     expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
+  });
+
+  it('fills blank TITLE from body line 1 on save', () => {
+    const frontmatter = {
+      IMAGE: '',
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      TITLE_SELECTED: '',
+      SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '',
+      LANDING_SELECTED: '',
+      AI_GEN: false,
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
+      created: '2026-06-04T00:00:00.000Z',
+      updated: '2026-06-04T00:00:00.000Z',
+    };
+
+    const backfilled = backfillArticleFrontmatter(frontmatter, '# Article headline\n\nBody text.');
+
+    expect(backfilled.TITLE).toBe('Article headline');
   });
 });
 
@@ -445,7 +487,7 @@ describe('runBodyParser', () => {
       SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
       created: '2026-06-13', updated: '2026-06-13',
     };
-    const body = `## TITLE\nMy Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
+    const body = `# My Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
     const result = runBodyParser(fm, body);
     expect(result.TITLE).toBe('My Title');
     expect(result.TITLE_SELECTED).toBe('Better Title');
@@ -474,7 +516,7 @@ describe('runBodyParserUpsertOnly', () => {
       SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
       created: '2026-06-13', updated: '2026-06-13',
     };
-    const body = `## TITLE\nNew Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
+    const body = `# New Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
 
     const result = runBodyParserUpsertOnly(fm, body);
 
@@ -495,7 +537,6 @@ describe('runBodyParserUpsertOnly', () => {
     const result = runBodyParserUpsertOnly(fm, body);
 
     expect(result.SPARK).toBe('Kept Spark');
-    expect(result.TITLE).toBe('Kept Title');
     expect(result.TITLE_SELECTED).toBe('Previously Selected');
   });
 });

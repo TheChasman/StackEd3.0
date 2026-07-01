@@ -14,7 +14,8 @@ const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
 const EVERNOTE_TASKS_ARTIFACT_RE = /(?:^|\n)\s*Content not supported\s*\n+\s*This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.\s*(?=\n|$)/g;
 const EVERNOTE_TASKS_HTML_ARTIFACT_RE = /<div\b[^>]*--en-task-group:true;[\s\S]*?This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.[\s\S]*?<\/div>\s*<\/div>/g;
 const EVERNOTE_ENML_WRAPPER_RE = /^\s*<!DOCTYPE en-note SYSTEM "http:\/\/xml\.evernote\.com\/pub\/enml2\.dtd">\s*<en-note>([\s\S]*)<\/en-note>\s*$/;
-const ARTICLE_SECTIONS = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
+const ARTICLE_SECTIONS = ['SPARK', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
+const INLINE_LABEL_BOUNDARIES = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 
 const ALT_SECTIONS = ['TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 type AltSection = typeof ALT_SECTIONS[number];
@@ -78,7 +79,7 @@ function extractSection(body: string, sectionName: string): string {
 
 function extractInlineLabel(body: string, sectionName: string): string {
   const labelPattern = new RegExp(`(?:^|\\s)${sectionName}\\s*:\\s*`);
-  const nextLabelPattern = new RegExp(`\\s(?:${ARTICLE_SECTIONS.join('|')})\\s*:\\s*`);
+  const nextLabelPattern = new RegExp(`\\s(?:${INLINE_LABEL_BOUNDARIES.join('|')})\\s*:\\s*`);
 
   const match = body.match(labelPattern);
   if (!match || match.index === undefined) return '';
@@ -94,6 +95,11 @@ function extractInlineLabel(body: string, sectionName: string): string {
   return remainingText.substring(0, endIndex).trim();
 }
 
+export function extractTitleFromBody(body: string): string {
+  const firstLine = body.split('\n', 1)[0] ?? '';
+  return firstLine.replace(/^#+\s*/, '').trim();
+}
+
 export function backfillArticleFrontmatter(
   frontmatter: ArticleFrontmatter,
   body: string,
@@ -105,6 +111,11 @@ export function backfillArticleFrontmatter(
       const extracted = extractSection(body, section);
       if (extracted) backfilled[section] = extracted;
     }
+  }
+
+  if (!backfilled.TITLE) {
+    const extractedTitle = extractTitleFromBody(body);
+    if (extractedTitle) backfilled.TITLE = extractedTitle;
   }
 
   return backfilled;
@@ -240,6 +251,11 @@ export function runBodyParser(
     }
   }
 
+  const extractedTitle = extractTitleFromBody(body);
+  if (extractedTitle) {
+    updated.TITLE = extractedTitle;
+  }
+
   // Extract Alt selections (always overwrites — selection is canonical state)
   const altSelections = extractAltSelections(body);
   for (const [key, value] of Object.entries(altSelections)) {
@@ -269,6 +285,11 @@ export function runBodyParserUpsertOnly(
     if (extracted) {
       (updated as Record<string, unknown>)[section] = extracted;
     }
+  }
+
+  const extractedTitle = extractTitleFromBody(body);
+  if (extractedTitle) {
+    updated.TITLE = extractedTitle;
   }
 
   const altSelections = extractAltSelections(body);
