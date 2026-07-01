@@ -34,7 +34,7 @@
       <div class="flex flex-col gap-3">
         <FieldFree label="Hero Image" field="IMAGE" type="text" readonly={true} />
         <FieldFree label="Spark" field="SPARK" type="textarea" rows={3} readonly={true} />
-        <FieldFree label="Title" field="TITLE" type="textarea" rows={2} readonly={true} />
+        <FieldFree label="Title" field="TITLE" type="textarea" rows={2} readonly={true} overrideValue={documentStore.titleFromBody} />
         {#if fm.TITLE_SELECTED}
           <FieldFree label="Title (Selected)" field="TITLE_SELECTED" type="textarea" rows={2} readonly={true} />
         {/if}

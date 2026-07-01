@@ -9,6 +9,7 @@
     options,
     rows = 3,
     readonly = false,
+    overrideValue,
   }: {
     label: string;
     field: keyof ArticleFrontmatter;
@@ -16,9 +17,10 @@
     options?: string[];
     rows?: number;
     readonly?: boolean;
+    overrideValue?: string;
   } = $props();
 
-  let value = $derived(documentStore.frontmatter?.[field] ?? '');
+  let value = $derived(overrideValue !== undefined ? overrideValue : (documentStore.frontmatter?.[field] ?? ''));
   let inputId = $derived(`field-${String(field).toLowerCase().replaceAll('_', '-')}`);
 
   function update(newValue: unknown) {
