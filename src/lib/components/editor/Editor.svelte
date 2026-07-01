@@ -94,6 +94,11 @@
     });
 
     // Load initial body from store
+    // Note: setMarkdown() uses emitUpdate: false, so if ProtectedTitle's
+    // ProseMirror plugin normalizes line 1 into an H1 here, that normalized
+    // markdown is never written back to documentStore.body (onUpdate doesn't
+    // fire). A legacy file opened and saved without an edit will keep its
+    // original line 1 on disk, even though the editor renders it as an H1.
     if (documentStore.body) {
       setMarkdown(documentStore.body);
     }
@@ -104,6 +109,8 @@
     documentStore.loadVersion;
     const body = untrack(() => documentStore.body);
     if (editor) {
+      // Same emitUpdate: false caveat as onMount above: ProtectedTitle's
+      // load-time H1 normalization doesn't dirty documentStore.body.
       setMarkdown(body);
     }
   });
