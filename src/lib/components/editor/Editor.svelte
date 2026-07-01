@@ -18,6 +18,7 @@
   import { FinancialChart } from './extensions/FinancialChart';
   import { PredictionMarket } from './extensions/PredictionMarket';
   import { Recipe } from './extensions/Recipe';
+  import { ProtectedTitle } from './extensions/ProtectedTitle';
   import { clearHeroImageFlags, insertHeroImageAtTop, replaceHeroImage } from './extensions/heroImage';
   import { documentStore } from '$lib/stores/document.svelte';
   import Toolbar from './Toolbar.svelte';
@@ -80,6 +81,7 @@
         FinancialChart,
         PredictionMarket,
         Recipe,
+        ProtectedTitle,
       ],
       content: '',
       onUpdate: () => {
