@@ -121,6 +121,29 @@ describe('document store', () => {
     documentStore.load(BASE, '# Heading\n\nA paragraph.', [], FAKE_HANDLE);
     expect(documentStore.wordCount).toBeGreaterThan(0);
   });
+
+  it('titleFromBody reads line 1 of the active tab body', () => {
+    documentStore.load(BASE, '# Live Title\n\nBody text.', ['TITLE'], FAKE_HANDLE);
+    expect(documentStore.titleFromBody).toBe('Live Title');
+  });
+
+  it('titleFromBody updates as body changes', () => {
+    documentStore.load(BASE, '# First\n\nBody.', ['TITLE'], FAKE_HANDLE);
+    documentStore.setBody('# Second\n\nBody.');
+    expect(documentStore.titleFromBody).toBe('Second');
+  });
+});
+
+describe('documentStore.tabMetas title', () => {
+  it('derives the tab title from body line 1, not frontmatter.TITLE', () => {
+    documentStore.load({ ...BASE, TITLE: 'Stale Frontmatter Title' }, '# Body Title\n\nText.', ['TITLE'], FAKE_HANDLE);
+    expect(documentStore.tabMetas[documentStore.activeIndex].title).toBe('Body Title');
+  });
+
+  it('falls back to the file name when body has no usable title', () => {
+    documentStore.load({ ...BASE, TITLE: '' }, '', ['TITLE'], FAKE_HANDLE, '/path/to/my-draft.md');
+    expect(documentStore.tabMetas[documentStore.activeIndex].title).toBe('my-draft');
+  });
 });
 
 describe('documentStore.phase', () => {

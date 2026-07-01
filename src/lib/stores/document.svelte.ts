@@ -1,5 +1,6 @@
 import type { ArticleFrontmatter } from '$lib/types/article';
 import type { ParsedFile } from '$lib/types/article';
+import { extractTitleFromBody } from '$lib/utils/frontmatter';
 
 interface TabState {
   frontmatter: ArticleFrontmatter | null;
@@ -28,7 +29,8 @@ function emptyTab(): TabState {
 }
 
 function tabTitle(tab: TabState): string {
-  if (tab.frontmatter?.TITLE?.trim()) return tab.frontmatter.TITLE.trim();
+  const bodyTitle = extractTitleFromBody(tab.body);
+  if (bodyTitle) return bodyTitle;
   if (tab.filePath) return tab.filePath.split('/').pop()?.replace(/\.md$/i, '') ?? 'Untitled';
   return 'Untitled';
 }
@@ -61,6 +63,10 @@ class DocumentStore {
 
   get body(): string {
     return this._tabs[this._activeIndex].body;
+  }
+
+  get titleFromBody(): string {
+    return extractTitleFromBody(this._tabs[this._activeIndex].body);
   }
 
   get fieldOrder(): string[] {
