@@ -52,3 +52,7 @@ Transform tasks into verifiable goals:
 - "Refactor X" → "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
+
+## Secrets Management
+
+This project uses SpockLock for secrets. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for how secrets are managed here — what to touch, what not to touch.

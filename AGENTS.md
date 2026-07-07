@@ -207,3 +207,7 @@ npm run tauri:build    # Build native app
 - **Changes tracked**: Use `git status` and `git diff` before commits
 - **Message style**: Follow Conventional Commits (feat:, fix:, refactor:, etc.)
 - **No force pushes** unless coordinating with team
+
+## Secrets Management
+
+This project uses SpockLock for secrets. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for how secrets are managed here — what to touch, what not to touch.

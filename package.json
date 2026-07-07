@@ -15,8 +15,7 @@
     "version:bump:hook": "node scripts/version-bump-hook.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "husky"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
@@ -47,7 +46,6 @@
     "@types/katex": "^0.16.7",
     "@types/marked": "^6.0.0",
     "@types/turndown": "^5.0.5",
-    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "svelte": "^5.39.6",
     "svelte-check": "^4.4.8",
