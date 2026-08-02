@@ -1,11 +1,10 @@
 <script lang="ts">
+  import { invoke } from '@tauri-apps/api/core';
   import { documentStore } from '$lib/stores/document.svelte';
-  import { settingsStore } from '$lib/stores/settings.svelte';
   import { readiness } from '$lib/utils/scaffold';
   import { isPostPayload, isNotePayload, type PostPayload } from '$lib/types/scaffold';
   import { publishToSubstack } from '$lib/services/substack/publisher';
-  import { applySeoDraft, SEO_FIELD_PATHS } from '$lib/services/seo';
-  import { createAdapter } from '$lib/services/ai/adapter';
+  import { applySeoDraft, SEO_FIELD_PATHS, buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
   import { getTagVocabulary, cachePublicationTags } from '$lib/services/tagVocabulary';
   import { pmDocToText } from '$lib/utils/pmText';
 
@@ -23,10 +22,6 @@
 
   async function generateSeo() {
     if (!scaffold || !isPostPayload(scaffold.payload)) return;
-    if (!settingsStore.hasValidKey) {
-      seoError = 'No API key set — open Settings to add one.';
-      return;
-    }
     const p = scaffold.payload;
     const anyFilled = Boolean(
       p.search_engine_title.trim() || p.search_engine_description.trim() || p.slug.trim() || p.tags.length > 0,
@@ -39,16 +34,18 @@
     seoLoading = true;
     try {
       const vocabulary = await getTagVocabulary(documentStore.filePath, scaffold.remote.publication);
-      const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
-      const draft = await adapter.generateSeoDraft({
+      const prompt = buildSeoPrompt({
         scaffold,
         bodyText: pmDocToText(documentStore.body),
         filePath: documentStore.filePath,
         tagVocabulary: vocabulary,
       });
+      // Key is resolved from SpockLock inside the Rust command; it never enters the WebView.
+      const raw = await invoke<string>('generate_seo_text', { prompt });
+      const draft = parseSeoDraftJson(raw);
       documentStore.replaceScaffold(applySeoDraft(scaffold, draft, vocabulary));
     } catch (e) {
-      seoError = e instanceof Error ? e.message : 'SEO generation failed.';
+      seoError = typeof e === 'string' ? e : e instanceof Error ? e.message : 'SEO generation failed.';
     } finally {
       seoLoading = false;
     }

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { settingsStore } from '$lib/stores/settings.svelte';
+  import { invoke } from '@tauri-apps/api/core';
   import { documentStore } from '$lib/stores/document.svelte';
-  import { createAdapter } from '$lib/services/ai/adapter';
   import { pmDocToText } from '$lib/utils/pmText';
+  import { buildResearchPrompt } from '$lib/services/ai/context';
   import type { SearchResult } from '$lib/services/ai/adapter';
 
   let query = $state('');
@@ -17,22 +17,24 @@
 
   async function search() {
     if (!query.trim()) return;
-    if (!settingsStore.hasValidKey) {
-      error = 'No API key set — open Settings to add one.';
-      return;
-    }
     error = '';
     loading = true;
     result = null;
     try {
-      const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
-      result = await adapter.search(query, {
+      const prompt = buildResearchPrompt(query, {
         scaffold: documentStore.scaffold,
         bodyText: pmDocToText(documentStore.body),
         filePath: documentStore.filePath,
       });
+      // Key is resolved from SpockLock inside the Rust command; it never enters the WebView.
+      const { summary, citations } = await invoke<{ summary: string; citations: string[] }>('research_web', { prompt });
+      result = {
+        query,
+        summary,
+        citations: citations.map((url) => ({ title: url, url, snippet: '' })),
+      };
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Research failed.';
+      error = typeof e === 'string' ? e : e instanceof Error ? e.message : 'Research failed.';
     } finally {
       loading = false;
     }

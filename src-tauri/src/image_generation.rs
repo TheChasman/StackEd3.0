@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::{json, Value};
 use std::time::Duration;
 use tauri::Emitter;
@@ -8,17 +8,11 @@ const NANOBANANA_MODEL: &str = "google/gemini-3.1-flash-image-preview";
 const OPENROUTER_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_SECRET_ITEM: &str = "spock-openrouter";
 const OPENROUTER_SECRET_FIELD: &str = "credential";
-const SPOCKLOCK_DAEMON_URL: &str = "http://localhost:9090/v1/resolve";
 
 #[derive(Serialize)]
 pub struct GeneratedImage {
     data_url: String,
     model: String,
-}
-
-#[derive(Deserialize)]
-struct SpocklockResolveResponse {
-    value: String,
 }
 
 fn is_allowed_model(model: &str) -> bool {
@@ -43,32 +37,7 @@ fn extract_generated_image_url(response: &Value) -> Result<String, String> {
 }
 
 async fn resolve_openrouter_api_key() -> Result<String, String> {
-    let client = reqwest::Client::builder()
-        .timeout(Duration::from_secs(5))
-        .build()
-        .map_err(|e| format!("failed to create SpockLock client: {}", e))?;
-
-    let response = client
-        .post(SPOCKLOCK_DAEMON_URL)
-        .json(&json!({ "item": OPENROUTER_SECRET_ITEM, "field": OPENROUTER_SECRET_FIELD }))
-        .send()
-        .await
-        .map_err(|e| format!("SpockLock daemon unreachable: {}", e))?;
-
-    if !response.status().is_success() {
-        return Err(format!("SpockLock daemon returned {}", response.status()));
-    }
-
-    let body: SpocklockResolveResponse = response
-        .json()
-        .await
-        .map_err(|e| format!("failed to parse SpockLock response: {}", e))?;
-
-    let key = body.value.trim().to_string();
-    if key.is_empty() {
-        return Err("SpockLock returned an empty OpenRouter key".to_string());
-    }
-    Ok(key)
+    crate::spocklock::resolve(OPENROUTER_SECRET_ITEM, OPENROUTER_SECRET_FIELD).await
 }
 
 async fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Result<Value, String> {
@@ -173,10 +142,5 @@ mod tests {
             extract_generated_image_url(&response).unwrap_err(),
             "OpenRouter response did not include a generated image"
         );
-    }
-
-    #[test]
-    fn test_spocklock_daemon_url_is_localhost() {
-        assert!(SPOCKLOCK_DAEMON_URL.starts_with("http://localhost:"));
     }
 }

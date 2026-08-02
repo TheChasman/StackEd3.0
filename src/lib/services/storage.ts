@@ -16,37 +16,25 @@ const DB_PROMISE: Promise<IDBPDatabase<StackEdDB>> = openDB<StackEdDB>('stacked'
   },
 });
 
-export type ApiProvider = 'claude' | 'openai';
+// Legacy IndexedDB keys where API credentials used to live before StackEd
+// moved secret resolution to SpockLock. Kept only so we can purge them.
+const LEGACY_API_KEY_STORAGE_KEYS = [
+  'anthropicApiKey',
+  'openaiApiKey',
+  'anthropicApiKeySaved',
+  'openaiApiKeySaved',
+  'apiKey',
+] as const;
 
-const API_KEY_STORAGE_KEYS: Record<ApiProvider, string> = {
-  claude: 'anthropicApiKey',
-  openai: 'openaiApiKey',
-};
-
-const API_KEY_SAVED_KEYS: Record<ApiProvider, string> = {
-  claude: 'anthropicApiKeySaved',
-  openai: 'openaiApiKeySaved',
-};
-
-export async function saveApiKey(provider: ApiProvider, key: string): Promise<void> {
+/**
+ * Eradicate any API credentials previously persisted to disk (IndexedDB).
+ * Idempotent — safe to call on every startup. Doctrine: no secrets on disk.
+ */
+export async function clearStoredApiKeys(): Promise<void> {
   const db = await DB_PROMISE;
-  await db.put('settings', key, API_KEY_STORAGE_KEYS[provider]);
-  await db.put('settings', key.trim().length > 0, API_KEY_SAVED_KEYS[provider]);
-}
-
-export async function loadApiKey(provider: ApiProvider): Promise<string> {
-  const db = await DB_PROMISE;
-  const key = (await db.get('settings', API_KEY_STORAGE_KEYS[provider])) as string | undefined;
-  if (key !== undefined) return key;
-  if (provider === 'claude') {
-    return ((await db.get('settings', 'apiKey')) as string | undefined) ?? '';
+  for (const key of LEGACY_API_KEY_STORAGE_KEYS) {
+    await db.delete('settings', key);
   }
-  return '';
-}
-
-export async function hasExplicitApiKey(provider: ApiProvider): Promise<boolean> {
-  const db = await DB_PROMISE;
-  return ((await db.get('settings', API_KEY_SAVED_KEYS[provider])) as boolean | undefined) ?? false;
 }
 
 export async function savePipelineFolderPath(path: string): Promise<void> {

@@ -1,5 +1,7 @@
+mod ai;
 mod file_io;
 mod image_generation;
+mod spocklock;
 
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -225,6 +227,8 @@ pub fn run() {
             file_io::create_dir_recursive,
             file_io::organize_pipeline_article,
             image_generation::generate_openrouter_image,
+            ai::generate_seo_text,
+            ai::research_web,
             set_recent_files_menu,
             eval_in_webview,
         ])

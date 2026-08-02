@@ -9,6 +9,7 @@ vi.mock('idb', () => {
   const mockDB = {
     put: vi.fn(async (_store: string, val: unknown, key: string) => { store[key] = val; }),
     get: vi.fn(async (_store: string, key: string) => store[key] ?? undefined),
+    delete: vi.fn(async (_store: string, key: string) => { delete store[key]; }),
     getAll: vi.fn(async (_store: string) => [...recents]),
     transaction: vi.fn(() => ({
       store: {
@@ -31,9 +32,7 @@ vi.mock('idb', () => {
 });
 
 import {
-  saveApiKey,
-  loadApiKey,
-  hasExplicitApiKey,
+  clearStoredApiKeys,
   savePipelineFolderPath,
   loadPipelineFolderPath,
   addRecentFile,
@@ -49,29 +48,22 @@ describe('storage service', () => {
     nextId = 1;
   });
 
-  it('saves and loads API key', async () => {
-    await saveApiKey('claude', 'sk-ant-test123');
-    const loaded = await loadApiKey('claude');
-    expect(loaded).toBe('sk-ant-test123');
+  it('clearStoredApiKeys deletes any legacy on-disk credentials', async () => {
+    store['anthropicApiKey'] = 'sk-ant-legacy';
+    store['openaiApiKey'] = 'sk-openai-legacy';
+    store['anthropicApiKeySaved'] = true;
+    store['openaiApiKeySaved'] = true;
+    store['apiKey'] = 'sk-legacy';
+
+    await clearStoredApiKeys();
+
+    for (const key of ['anthropicApiKey', 'openaiApiKey', 'anthropicApiKeySaved', 'openaiApiKeySaved', 'apiKey']) {
+      expect(store[key]).toBeUndefined();
+    }
   });
 
-  it('stores Anthropic and OpenAI API keys separately', async () => {
-    await saveApiKey('claude', 'sk-ant-test');
-    await saveApiKey('openai', 'sk-openai-test');
-
-    expect(await loadApiKey('claude')).toBe('sk-ant-test');
-    expect(await loadApiKey('openai')).toBe('sk-openai-test');
-    expect(await hasExplicitApiKey('openai')).toBe(true);
-  });
-
-  it('clearing an API key marks it as not explicitly saved', async () => {
-    await saveApiKey('openai', '');
-    expect(await hasExplicitApiKey('openai')).toBe(false);
-  });
-
-  it('returns empty string when no API key stored', async () => {
-    const loaded = await loadApiKey('openai');
-    expect(typeof loaded).toBe('string');
+  it('clearStoredApiKeys is idempotent when nothing is stored', async () => {
+    await expect(clearStoredApiKeys()).resolves.toBeUndefined();
   });
 
   it('saves and loads pipeline folder path', async () => {

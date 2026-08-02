@@ -143,17 +143,20 @@ export function buildSeoPrompt(context: ArticleContext): string {
 
 Return only valid JSON with this exact shape:
 {
-  "search_engine_title": "keyword-first title, brand last",
-  "search_engine_description": "concrete summary of the payoff",
-  "slug": "keyword-hyphenated-slug",
+  "search_engine_title": "primary keyword first, brand last",
+  "search_engine_description": "payoff + primary keyword, no subtitle echo",
+  "slug": "primary-keyword-then-detail",
   "tags": ["Tag One", "Tag Two", "Tag Three"]
 }
 
-Rules (these follow Substack's own SEO guidance — not generic advice):
+Rules (drawn from Substack's own SEO guide + Google ranking behaviour — not generic filler):
+
+FIRST, silently choose ONE primary keyword phrase: the exact words a real person would type into Google to find a piece like this. It MUST already appear in the body — never invent a term the article doesn't use. Weave that phrase into the title, description, and slug below.
+
 - Preserve the article's actual angle and voice. Do not rewrite the title, subtitle, or body.
-- search_engine_title: 40-60 characters. This is shown to a stranger in a Google result with no context, so it may and often should differ from the inbox/post title. Lead with the keyword phrase; put any brand name last.
-- search_engine_description: 140-160 characters. Substack already defaults the meta description to the subtitle, so DO NOT restate the subtitle. State the concrete payoff a reader gets instead.
-- slug: 3-6 words, lowercase, hyphenated, URL-safe. Cut filler words (a, the, of, and, to); keep the keyword phrase.
+- search_engine_title: 40-60 characters (Google truncates past ~60). A stranger sees this cold in a search result with no context, so it may and often should differ from the inbox/post title. Lead with the primary keyword phrase; append a recognisable brand or author name only if it helps, and only at the end. Make it specific and unique — not a bare series name — so Google treats it as its own page. The keyword here is a genuine ranking factor.
+- search_engine_description: 140-160 characters. Substack already defaults this to the subtitle, so DO NOT echo the subtitle OR the title. Include the primary keyword phrase verbatim (Google bolds query matches, which lifts click-through), then expand with one related term and the concrete payoff the reader gets. Open or close with a hook. This drives clicks, not rank.
+- slug: 3-6 words, lowercase, hyphenated, URL-safe. Put the primary keyword phrase at the FRONT. Cut filler (a, the, of, and, to) unless one is needed to read naturally. The URL is both a ranking factor and visible in the result.
 - tags: 3-6 tags. Each tag becomes a public archive page, so consistency matters more than completeness. ${vocabulary.length > 0 ? 'PREFER tags from the existing vocabulary below; only invent a new tag when none fit.' : 'Reuse conventional, reusable topic tags rather than inventing hyper-specific ones.'}
 ${vocabulary.length > 0 ? `\nExisting tag vocabulary (reuse these exact spellings when they fit):\n${vocabulary.join(', ')}\n` : ''}
 Current file: ${context.filePath ?? 'unsaved StackEd article'}
