@@ -189,6 +189,19 @@ export class WebViewTransport implements SubstackTransport {
     return this.send('POST', '/api/v1/comment/feed', body);
   }
 
+  async listPostTags(): Promise<SubstackResponse> {
+    return this.send('GET', '/api/v1/publication/post-tag');
+  }
+
+  async createPostTag(name: string): Promise<SubstackResponse> {
+    return this.send('POST', '/api/v1/publication/post-tag', { name });
+  }
+
+  async attachTag(postId: number, tagId: string): Promise<SubstackResponse> {
+    // postId is the integer post id; tagId is the tag's UUID. No body.
+    return this.send('POST', `/api/v1/post/${postId}/tag/${tagId}`);
+  }
+
   async isLoggedIn(): Promise<boolean> {
     try {
       await this.init();

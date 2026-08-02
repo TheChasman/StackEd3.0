@@ -31,6 +31,83 @@ export interface PublishResult {
   scheduled: boolean;
   published: boolean;
   noteId: string | null;
+  /** Non-fatal problems from tag sync; the post still published. */
+  tagWarnings: string[];
+  /** The publication's tag list as fetched during sync (for vocabulary caching). */
+  publicationTags: string[];
+}
+
+interface ExistingTag {
+  id: string;
+  name: string;
+}
+
+/**
+ * Attach the scaffold's tags to a published/scheduled post.
+ *
+ * Reuses existing publication tags by case-insensitive name match, creates
+ * any that are missing, then attaches each. Fails SOFT: every problem is
+ * collected into `warnings` rather than thrown, so a tag hiccup never sinks an
+ * otherwise-successful publish.
+ *
+ * Caveat: the attach endpoint takes an integer POST id. Before publication we
+ * only hold a DRAFT id; whether the two share an id space is unverified, so
+ * this runs as the final step and reports failures instead of aborting.
+ */
+export async function syncTags(
+  postId: number,
+  scaffold: Scaffold,
+  transport: SubstackTransport,
+): Promise<{ warnings: string[]; publicationTags: string[] }> {
+  if (!isPostPayload(scaffold.payload)) return { warnings: [], publicationTags: [] };
+  const tags = scaffold.payload.tags;
+  if (tags.length === 0) return { warnings: [], publicationTags: [] };
+
+  const warnings: string[] = [];
+
+  const listResp = await transport.listPostTags();
+  if (!listResp.ok || !Array.isArray(listResp.body)) {
+    warnings.push(`Could not fetch existing tags (status ${listResp.status}); tags not synced.`);
+    return { warnings, publicationTags: [] };
+  }
+
+  const existing = (listResp.body as unknown[]).filter(
+    (t): t is ExistingTag =>
+      typeof t === 'object' && t !== null &&
+      typeof (t as ExistingTag).id === 'string' &&
+      typeof (t as ExistingTag).name === 'string',
+  );
+  const byName = new Map(existing.map(t => [t.name.toLowerCase(), t]));
+  const publicationTags = existing.map(t => t.name);
+
+  for (const tag of tags) {
+    try {
+      let match = byName.get(tag.toLowerCase());
+      if (!match) {
+        const createResp = await transport.createPostTag(tag);
+        if (!createResp.ok) {
+          warnings.push(`Could not create tag "${tag}" (status ${createResp.status}).`);
+          continue;
+        }
+        const created = createResp.body as { id?: unknown; name?: unknown };
+        if (typeof created.id !== 'string') {
+          warnings.push(`Tag "${tag}" created but no id returned.`);
+          continue;
+        }
+        match = { id: created.id, name: typeof created.name === 'string' ? created.name : tag };
+        byName.set(tag.toLowerCase(), match);
+        publicationTags.push(match.name);
+      }
+      const attachResp = await transport.attachTag(postId, match.id);
+      if (!attachResp.ok) {
+        warnings.push(`Could not attach tag "${tag}" (status ${attachResp.status}).`);
+      }
+    } catch (e) {
+      warnings.push(`Tag "${tag}" failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  return { warnings, publicationTags };
 }
 
 /**
@@ -162,6 +239,8 @@ export async function publishToSubstack(
       scheduled: false,
       published: false,
       noteId: (response.body as { id?: string })?.id ?? null,
+      tagWarnings: [],
+      publicationTags: [],
     };
   }
 
@@ -169,18 +248,22 @@ export async function publishToSubstack(
   const { draftId } = await createDraft(withImages, transport);
 
   // Step 5-6: Schedule or publish
+  let scheduled = false;
+  let published = false;
   const scheduleBody = buildScheduleRequest(withImages);
   if (scheduleBody) {
     await scheduleDraft(draftId, withImages, transport);
-    return { draftId, scheduled: true, published: false, noteId: null };
+    scheduled = true;
+  } else {
+    const publishBody = buildPublishRequest(withImages);
+    if (publishBody.send) {
+      await publishDraft(draftId, withImages, transport);
+      published = true;
+    }
   }
 
-  const publishBody = buildPublishRequest(withImages);
-  if (publishBody.send) {
-    await publishDraft(draftId, withImages, transport);
-    return { draftId, scheduled: false, published: true, noteId: null };
-  }
+  // Step 7 (final): sync tags. Fails soft — warnings, never a thrown error.
+  const { warnings, publicationTags } = await syncTags(draftId, withImages, transport);
 
-  // Draft created but not published or scheduled
-  return { draftId, scheduled: false, published: false, noteId: null };
+  return { draftId, scheduled, published, noteId: null, tagWarnings: warnings, publicationTags };
 }

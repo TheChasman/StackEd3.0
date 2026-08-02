@@ -51,18 +51,18 @@ describe('readiness', () => {
     expect(r.blocking).toContain('draft_bylines is empty');
   });
 
-  it('advises on missing SEO fields', () => {
+  it('blocks on missing SEO fields', () => {
     const s = emptyScaffold('post');
     const p = s.payload as ReturnType<typeof emptyPostPayload>;
     p.draft_title = 'Test Title';
     p.draft_body = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello' }] }] };
     p.draft_bylines = [{ id: 1, publicationUserId: 2 }];
     const r = readiness(s);
-    expect(r.blocking).toEqual([]);
+    expect(r.blocking).toContain('search_engine_title is empty');
+    expect(r.blocking).toContain('search_engine_description is empty');
+    expect(r.blocking).toContain('slug is empty');
+    expect(r.blocking).toContain('tags is empty');
     expect(r.advisory).toContain('draft_subtitle is empty');
-    expect(r.advisory).toContain('search_engine_title is empty');
-    expect(r.advisory).toContain('slug is empty');
-    expect(r.advisory).toContain('tags is empty');
   });
 
   it('passes when all blocking fields are filled', () => {

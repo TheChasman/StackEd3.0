@@ -52,6 +52,16 @@ export interface SubstackTransport {
   /** POST /api/v1/comment/feed — create a Note. */
   createNote(body: unknown): Promise<SubstackResponse>;
 
+  /** GET /api/v1/publication/post-tag — the publication's existing tags. */
+  listPostTags(): Promise<SubstackResponse>;
+
+  /** POST /api/v1/publication/post-tag — create a tag. Returns { id: UUID, name, ... }. */
+  createPostTag(name: string): Promise<SubstackResponse>;
+
+  /** POST /api/v1/post/{postId}/tag/{tagId} — attach a tag to a post.
+   *  postId is an integer; tagId is a UUID. Empty body. */
+  attachTag(postId: number, tagId: string): Promise<SubstackResponse>;
+
   /** Check whether the user is logged in (session cookie present). */
   isLoggedIn(): Promise<boolean>;
 }

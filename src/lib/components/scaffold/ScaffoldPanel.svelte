@@ -1,16 +1,65 @@
 <script lang="ts">
   import { documentStore } from '$lib/stores/document.svelte';
+  import { settingsStore } from '$lib/stores/settings.svelte';
   import { readiness } from '$lib/utils/scaffold';
   import { isPostPayload, isNotePayload, type PostPayload } from '$lib/types/scaffold';
   import { publishToSubstack } from '$lib/services/substack/publisher';
+  import { applySeoDraft, SEO_FIELD_PATHS } from '$lib/services/seo';
+  import { createAdapter } from '$lib/services/ai/adapter';
+  import { getTagVocabulary, cachePublicationTags } from '$lib/services/tagVocabulary';
+  import { pmDocToText } from '$lib/utils/pmText';
 
   let scaffold = $derived(documentStore.scaffold);
   let r = $derived(scaffold ? readiness(scaffold) : null);
+  let slugLocked = $derived(scaffold ? scaffold.locked.includes(SEO_FIELD_PATHS.slug) : false);
   let publishStatus = $state('');
   let publishing = $state(false);
+  let seoLoading = $state(false);
+  let seoError = $state('');
 
   function patch<K extends keyof PostPayload>(field: K, value: PostPayload[K]) {
     documentStore.patchPayload(field, value);
+  }
+
+  async function generateSeo() {
+    if (!scaffold || !isPostPayload(scaffold.payload)) return;
+    if (!settingsStore.hasValidKey) {
+      seoError = 'No API key set — open Settings to add one.';
+      return;
+    }
+    const p = scaffold.payload;
+    const anyFilled = Boolean(
+      p.search_engine_title.trim() || p.search_engine_description.trim() || p.slug.trim() || p.tags.length > 0,
+    );
+    if (anyFilled && !window.confirm('Regenerate all four SEO fields? Current values will be replaced (locked fields are kept).')) {
+      return;
+    }
+
+    seoError = '';
+    seoLoading = true;
+    try {
+      const vocabulary = await getTagVocabulary(documentStore.filePath, scaffold.remote.publication);
+      const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
+      const draft = await adapter.generateSeoDraft({
+        scaffold,
+        bodyText: pmDocToText(documentStore.body),
+        filePath: documentStore.filePath,
+        tagVocabulary: vocabulary,
+      });
+      documentStore.replaceScaffold(applySeoDraft(scaffold, draft, vocabulary));
+    } catch (e) {
+      seoError = e instanceof Error ? e.message : 'SEO generation failed.';
+    } finally {
+      seoLoading = false;
+    }
+  }
+
+  function toggleSlugLock() {
+    if (!scaffold) return;
+    if (slugLocked && !window.confirm(
+      "Unlock the slug? Changing a published post's slug breaks every existing link to it."
+    )) return;
+    documentStore.toggleLocked(SEO_FIELD_PATHS.slug);
   }
 
   async function handlePublish() {
@@ -32,10 +81,17 @@
         ? 'publish and email subscribers'
         : 'create a draft';
 
+    const seoReview = isPostPayload(scaffold.payload)
+      ? `SEO title: ${scaffold.payload.search_engine_title}\n` +
+        `URL slug: /p/${scaffold.payload.slug}\n` +
+        `Tags: ${scaffold.payload.tags.join(', ') || '(none)'}\n\n`
+      : '';
+
     if (!window.confirm(
       `Publish to Substack?\n\n` +
       `Publication: ${publication}.substack.com\n` +
       `Action: ${action}\n\n` +
+      seoReview +
       `This will open a Substack login window if you haven't logged in yet. ` +
       `A draft will be created on Substack. ` +
       `If scheduling is set, it will be scheduled. ` +
@@ -66,7 +122,15 @@
       if (result.draftId) {
         scaffold.remote.draftId = result.draftId;
         scaffold.remote.scheduled = result.scheduled;
+        // A live URL is now load-bearing — pin the slug so regen can't change it.
+        if (result.published && !scaffold.locked.includes(SEO_FIELD_PATHS.slug)) {
+          scaffold.locked = [...scaffold.locked, SEO_FIELD_PATHS.slug];
+        }
         documentStore.replaceScaffold(scaffold);
+      }
+
+      if (result.publicationTags.length > 0) {
+        cachePublicationTags(publication, result.publicationTags);
       }
 
       if (result.published) {
@@ -77,6 +141,10 @@
         publishStatus = `Note posted! ID: ${result.noteId}`;
       } else {
         publishStatus = `Draft created. ID: ${result.draftId}`;
+      }
+
+      if (result.tagWarnings.length > 0) {
+        publishStatus += `\nTag issues: ${result.tagWarnings.join('; ')}`;
       }
     } catch (e) {
       publishStatus = `Error: ${e instanceof Error ? e.message : String(e)}`;
@@ -172,10 +240,25 @@
 
       <!-- Payload: SEO -->
       <section>
-        <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">SEO</h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider">SEO</h3>
+          <button
+            onclick={generateSeo}
+            disabled={seoLoading}
+            class="text-xs px-2 py-1 border border-dark-600 rounded hover:bg-dark-700 disabled:opacity-50"
+          >
+            {seoLoading ? 'Generating…' : 'Generate'}
+          </button>
+        </div>
+        {#if seoError}
+          <p class="text-xs text-red-400 mb-2">{seoError}</p>
+        {/if}
         <div class="flex flex-col gap-3">
           <label class="flex flex-col gap-1">
-            <span class="text-dark-400 text-xs">SEO Title</span>
+            <span class="text-dark-400 text-xs flex justify-between">
+              <span>SEO Title</span>
+              <span class={p.search_engine_title.length >= 40 && p.search_engine_title.length <= 60 ? 'text-green-500' : 'text-amber-500'}>{p.search_engine_title.length}/40–60</span>
+            </span>
             <input
               type="text"
               value={p.search_engine_title}
@@ -184,7 +267,10 @@
             />
           </label>
           <label class="flex flex-col gap-1">
-            <span class="text-dark-400 text-xs">SEO Description</span>
+            <span class="text-dark-400 text-xs flex justify-between">
+              <span>SEO Description</span>
+              <span class={p.search_engine_description.length >= 140 && p.search_engine_description.length <= 160 ? 'text-green-500' : 'text-amber-500'}>{p.search_engine_description.length}/140–160</span>
+            </span>
             <textarea
               rows={2}
               value={p.search_engine_description}
@@ -193,13 +279,22 @@
             ></textarea>
           </label>
           <label class="flex flex-col gap-1">
-            <span class="text-dark-400 text-xs">Slug</span>
+            <span class="text-dark-400 text-xs flex justify-between">
+              <span>Slug</span>
+              <button type="button" onclick={toggleSlugLock} class="text-dark-500 hover:text-dark-300">
+                {slugLocked ? '🔒 locked — unlock' : 'lock'}
+              </button>
+            </span>
             <input
               type="text"
               value={p.slug}
+              readonly={slugLocked}
               onchange={(e) => patch('slug', e.currentTarget.value)}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500 font-mono text-xs"
+              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500 font-mono text-xs {slugLocked ? 'opacity-60 cursor-not-allowed' : ''}"
             />
+            {#if slugLocked}
+              <span class="text-dark-500 text-xs">This URL is live — changing it breaks existing links.</span>
+            {/if}
           </label>
           <label class="flex flex-col gap-1">
             <span class="text-dark-400 text-xs">Tags (comma-separated)</span>
@@ -347,10 +442,19 @@
           {publishing ? 'Working...' : 'Publish to Substack'}
         </button>
         {#if publishStatus}
-          <p class="text-xs {publishStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'}">{publishStatus}</p>
+          <p class="text-xs whitespace-pre-line {publishStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'}">{publishStatus}</p>
         {/if}
         {#if r && r.blocking.length > 0}
           <p class="text-xs text-amber-400">Fix blocking issues before publishing: {r.blocking.join(', ')}</p>
+          {#if r.blocking.some(b => b.startsWith('search_engine') || b === 'slug is empty' || b === 'tags is empty')}
+            <button
+              onclick={generateSeo}
+              disabled={seoLoading}
+              class="self-start text-xs px-2 py-1 border border-dark-600 rounded hover:bg-dark-700 disabled:opacity-50"
+            >
+              {seoLoading ? 'Generating…' : 'Generate SEO'}
+            </button>
+          {/if}
         {/if}
       </div>
     </section>

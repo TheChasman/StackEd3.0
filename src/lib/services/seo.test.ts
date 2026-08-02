@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { emptyScaffold, isPostPayload, type Scaffold } from '$lib/types/scaffold';
 import type { ArticleContext } from '$lib/services/ai/adapter';
 import {
+  applySeoDraft,
   buildSeoPrompt,
+  canonicalizeTags,
   isSeoComplete,
-  mergeSeoDraft,
   parseSeoDraftJson,
   type SeoDraft,
 } from '$lib/services/seo';
@@ -72,25 +73,56 @@ describe('parseSeoDraftJson', () => {
   });
 });
 
-describe('mergeSeoDraft', () => {
-  it('fills blanks without replacing author-edited SEO fields', () => {
+describe('canonicalizeTags', () => {
+  it('maps tags onto existing vocabulary spellings case-insensitively', () => {
+    expect(canonicalizeTags(['media theory', 'New Tag'], ['Media Theory', 'Justice']))
+      .toEqual(['Media Theory', 'New Tag']);
+  });
+
+  it('deduplicates case-insensitively, preserving first-seen order', () => {
+    expect(canonicalizeTags(['Policing', 'policing', 'Reform'])).toEqual(['Policing', 'Reform']);
+  });
+});
+
+describe('applySeoDraft', () => {
+  const draft: SeoDraft = {
+    search_engine_title: 'AI title',
+    search_engine_description: 'AI description',
+    slug: 'ai-slug',
+    tags: ['ai', 'ml'],
+  };
+
+  it('overwrites all four SEO fields, replacing author edits', () => {
     const scaffold = makePost();
     if (isPostPayload(scaffold.payload)) {
       scaffold.payload.search_engine_title = 'Manual SEO title';
     }
-    const draft: SeoDraft = {
-      search_engine_title: 'AI title',
-      search_engine_description: 'AI description',
-      slug: 'ai-slug',
-      tags: ['ai'],
-    };
-    const merged = mergeSeoDraft(scaffold, draft);
+    const next = applySeoDraft(scaffold, draft);
 
-    if (!isPostPayload(merged.payload)) throw new Error('Expected post payload');
-    expect(merged.payload.search_engine_title).toBe('Manual SEO title');
-    expect(merged.payload.search_engine_description).toBe('AI description');
-    expect(merged.payload.slug).toBe('ai-slug');
-    expect(merged.payload.tags).toEqual(['ai']);
+    if (!isPostPayload(next.payload)) throw new Error('Expected post payload');
+    expect(next.payload.search_engine_title).toBe('AI title');
+    expect(next.payload.search_engine_description).toBe('AI description');
+    expect(next.payload.slug).toBe('ai-slug');
+    expect(next.payload.tags).toEqual(['ai', 'ml']);
+  });
+
+  it('respects locked field paths', () => {
+    const scaffold = makePost();
+    if (isPostPayload(scaffold.payload)) {
+      scaffold.payload.slug = 'published-slug';
+    }
+    scaffold.locked = ['payload.slug'];
+    const next = applySeoDraft(scaffold, draft);
+
+    if (!isPostPayload(next.payload)) throw new Error('Expected post payload');
+    expect(next.payload.slug).toBe('published-slug');
+    expect(next.payload.search_engine_title).toBe('AI title');
+  });
+
+  it('canonicalises tags against the supplied vocabulary', () => {
+    const next = applySeoDraft(makePost(), { ...draft, tags: ['ai'] }, ['AI']);
+    if (!isPostPayload(next.payload)) throw new Error('Expected post payload');
+    expect(next.payload.tags).toEqual(['AI']);
   });
 });
 

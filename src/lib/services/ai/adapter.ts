@@ -17,6 +17,7 @@ export interface ArticleContext {
   scaffold: Scaffold | null;
   bodyText: string;
   filePath: string | null;
+  tagVocabulary?: string[];
 }
 
 export interface AIAdapter {

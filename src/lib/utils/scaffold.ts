@@ -36,11 +36,12 @@ export function readiness(s: Scaffold): ReadinessResult {
     if (!hasBodyContent(p.draft_body)) blocking.push('draft_body is empty');
     if (p.draft_bylines.length === 0) blocking.push('draft_bylines is empty');
 
+    if (!p.search_engine_title.trim()) blocking.push('search_engine_title is empty');
+    if (!p.search_engine_description.trim()) blocking.push('search_engine_description is empty');
+    if (!p.slug.trim()) blocking.push('slug is empty');
+    if (p.tags.length === 0) blocking.push('tags is empty');
+
     if (!p.draft_subtitle.trim()) advisory.push('draft_subtitle is empty');
-    if (!p.search_engine_title.trim()) advisory.push('search_engine_title is empty');
-    if (!p.search_engine_description.trim()) advisory.push('search_engine_description is empty');
-    if (!p.slug.trim()) advisory.push('slug is empty');
-    if (p.tags.length === 0) advisory.push('tags is empty');
   } else {
     if (!hasBodyContent(getBody(s))) blocking.push('bodyJson is empty');
   }
