@@ -132,6 +132,18 @@ fn set_recent_files_menu(_entries: Vec<RecentMenuEntry>) -> Result<(), String> {
     Ok(())
 }
 
+/// Evaluate JavaScript in a webview identified by its label.
+/// Used by the Substack WebView transport to inject API-calling scripts
+/// into the Substack auth window where the session cookie lives.
+#[tauri::command]
+fn eval_in_webview(app: tauri::AppHandle, label: String, script: String) -> Result<(), String> {
+    if let Some(webview) = app.get_webview_window(&label) {
+        webview.eval(&script).map_err(|e| e.to_string())
+    } else {
+        Err(format!("Webview '{}' not found", label))
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
@@ -214,6 +226,7 @@ pub fn run() {
             file_io::organize_pipeline_article,
             image_generation::generate_openrouter_image,
             set_recent_files_menu,
+            eval_in_webview,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

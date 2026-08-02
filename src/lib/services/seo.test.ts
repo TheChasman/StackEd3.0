@@ -1,141 +1,129 @@
 import { describe, expect, it } from 'vitest';
-import type { ArticleFrontmatter } from '$lib/types/article';
-import { FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
+import { emptyScaffold, isPostPayload, type Scaffold } from '$lib/types/scaffold';
+import type { ArticleContext } from '$lib/services/ai/adapter';
 import {
   buildSeoPrompt,
   isSeoComplete,
   mergeSeoDraft,
   parseSeoDraftJson,
-} from './seo';
+  type SeoDraft,
+} from '$lib/services/seo';
 
-const BASE: ArticleFrontmatter = {
-  IMAGE: '',
-  SPARK: 'Raw idea',
-  TITLE: 'Partial Solution',
-  SUBTITLE: 'What does impartiality look like?',
-  HOOK: 'The oath changed in 2002.',
-  LANDING: '',
-  TITLE_SELECTED: '',
-  SUBTITLE_SELECTED: '',
-  HOOK_SELECTED: '',
-  LANDING_SELECTED: '',
-  AI_GEN: false,
-  SEO_TITLE: '',
-  SEO_DESCRIPTION: '',
-  SEO_SLUG: '',
-  SEO_TAGS: [],
-  created: '2026-06-09T00:00:00.000Z',
-  updated: '2026-06-09T00:00:00.000Z',
+const makePost = (): Scaffold => emptyScaffold('post');
+
+const fillSeo = (scaffold: Scaffold): Scaffold => {
+  if (isPostPayload(scaffold.payload)) {
+    scaffold.payload.search_engine_title = 'Test SEO Title';
+    scaffold.payload.search_engine_description = 'Test description';
+    scaffold.payload.slug = 'test-slug';
+    scaffold.payload.tags = ['tag1', 'tag2'];
+  }
+  return scaffold;
 };
 
 describe('isSeoComplete', () => {
-  it('returns false when any SEO field is blank', () => {
-    expect(isSeoComplete(BASE)).toBe(false);
+  it('returns false for an empty scaffold', () => {
+    expect(isSeoComplete(makePost())).toBe(false);
+  });
+
+  it('returns false for null', () => {
+    expect(isSeoComplete(null)).toBe(false);
   });
 
   it('returns true when all SEO fields are populated', () => {
-    expect(isSeoComplete({
-      ...BASE,
-      SEO_TITLE: 'Partial Solution',
-      SEO_DESCRIPTION: 'A short description.',
-      SEO_SLUG: 'partial-solution',
-      SEO_TAGS: ['justice'],
-    })).toBe(true);
+    expect(isSeoComplete(fillSeo(makePost()))).toBe(true);
   });
 });
 
 describe('parseSeoDraftJson', () => {
   it('parses valid JSON SEO output', () => {
     expect(parseSeoDraftJson(`{
-      "SEO_TITLE": "Partial Solution",
-      "SEO_DESCRIPTION": "What impartial policing really means.",
-      "SEO_SLUG": "partial-solution",
-      "SEO_TAGS": ["policing", "justice"]
+      "search_engine_title": "Partial Solution",
+      "search_engine_description": "What effective policing really means.",
+      "slug": "partial-solution",
+      "tags": ["policing", "justice"]
     }`)).toEqual({
-      SEO_TITLE: 'Partial Solution',
-      SEO_DESCRIPTION: 'What impartial policing really means.',
-      SEO_SLUG: 'partial-solution',
-      SEO_TAGS: ['policing', 'justice'],
+      search_engine_title: 'Partial Solution',
+      search_engine_description: 'What effective policing really means.',
+      slug: 'partial-solution',
+      tags: ['policing', 'justice'],
     });
   });
 
   it('rejects incomplete JSON SEO output', () => {
-    expect(() => parseSeoDraftJson('{"SEO_TITLE":"Only title"}')).toThrow('SEO draft missing SEO_DESCRIPTION');
+    expect(() => parseSeoDraftJson('{"search_engine_title":"Only title"}'))
+      .toThrow('SEO draft missing search_engine_description');
   });
 
-  it('normalises slug and tags', () => {
+  it('slugifies the slug and cleans tags', () => {
     const draft = parseSeoDraftJson(`{
-      "SEO_TITLE": "Title",
-      "SEO_DESCRIPTION": "Description",
-      "SEO_SLUG": "Partial Solution!",
-      "SEO_TAGS": [" Policing ", "", "Justice Reform"]
+      "search_engine_title": " Title ",
+      "search_engine_description": " Description ",
+      "slug": "Partial Solution!",
+      "tags": [" Policing ", "", "Justice Reform", 42]
     }`);
 
-    expect(draft.SEO_SLUG).toBe('partial-solution');
-    expect(draft.SEO_TAGS).toEqual(['Policing', 'Justice Reform']);
+    expect(draft).toEqual({
+      search_engine_title: 'Title',
+      search_engine_description: 'Description',
+      slug: 'partial-solution',
+      tags: ['Policing', 'Justice Reform'],
+    });
   });
 });
 
 describe('mergeSeoDraft', () => {
   it('fills blanks without replacing author-edited SEO fields', () => {
-    const merged = mergeSeoDraft(
-      { ...BASE, SEO_TITLE: 'Manual SEO title' },
-      {
-        SEO_TITLE: 'AI title',
-        SEO_DESCRIPTION: 'AI description',
-        SEO_SLUG: 'ai-slug',
-        SEO_TAGS: ['ai'],
-      },
-    );
+    const scaffold = makePost();
+    if (isPostPayload(scaffold.payload)) {
+      scaffold.payload.search_engine_title = 'Manual SEO title';
+    }
+    const draft: SeoDraft = {
+      search_engine_title: 'AI title',
+      search_engine_description: 'AI description',
+      slug: 'ai-slug',
+      tags: ['ai'],
+    };
+    const merged = mergeSeoDraft(scaffold, draft);
 
-    expect(merged.SEO_TITLE).toBe('Manual SEO title');
-    expect(merged.SEO_DESCRIPTION).toBe('AI description');
-    expect(merged.SEO_SLUG).toBe('ai-slug');
-    expect(merged.SEO_TAGS).toEqual(['ai']);
+    if (!isPostPayload(merged.payload)) throw new Error('Expected post payload');
+    expect(merged.payload.search_engine_title).toBe('Manual SEO title');
+    expect(merged.payload.search_engine_description).toBe('AI description');
+    expect(merged.payload.slug).toBe('ai-slug');
+    expect(merged.payload.tags).toEqual(['ai']);
   });
 });
 
 describe('buildSeoPrompt', () => {
-  it('includes frontmatter and body context', () => {
-    const prompt = buildSeoPrompt({
-      frontmatter: BASE,
-      fieldOrder: ['TITLE'],
-      body: '# Draft\n\nBody copy.',
+  it('includes title and body context', () => {
+    const scaffold = makePost();
+    if (isPostPayload(scaffold.payload)) {
+      scaffold.payload.draft_title = 'Partial Solution';
+    }
+    const context: ArticleContext = {
+      scaffold,
+      bodyText: '# Draft\n\nBody copy.',
       filePath: '/tmp/Partial Solution.md',
-    });
+    };
+    const prompt = buildSeoPrompt(context);
 
     expect(prompt).toContain('Return only valid JSON');
     expect(prompt).toContain('Partial Solution');
     expect(prompt).toContain('Body copy.');
   });
-});
 
-describe('buildSeoPrompt with Alt history', () => {
-  it('includes Alt block evolution in the prompt', () => {
-    const fm: ArticleFrontmatter = {
-      ...BASE,
-      TITLE: 'Partial Solution',
-      TITLE_SELECTED: 'Lady Justice has Lost Her Blindfold',
-    };
-    const body = [
-      '## TITLE',
-      'Partial Solution',
-      '',
-      '## Alt TITLE',
-      '1. Lady Justice has Lost Her Blindfold [✓]',
-      '2. Remove the Blindfold',
-      '',
-      '## HOOK',
-      'The oath changed in 2002.',
-    ].join('\n');
+  it('includes workshop candidates in the prompt', () => {
+    const scaffold = makePost();
+    scaffold.workshop.candidates.title = ['Lady Justice has Lost Her Blindfold'];
+    scaffold.workshop.candidates.hook = ['The oath changed in 2002.'];
     const prompt = buildSeoPrompt({
-      frontmatter: fm,
-      fieldOrder: FRONTMATTER_FIELD_ORDER.map(String),
-      body,
+      scaffold,
+      bodyText: 'Article body.',
       filePath: '/tmp/test.md',
     });
+
     expect(prompt).toContain('Lady Justice has Lost Her Blindfold');
-    expect(prompt).toContain('Remove the Blindfold');
-    expect(prompt).toContain('Alt TITLE');
+    expect(prompt).toContain('The oath changed in 2002.');
+    expect(prompt).toContain('Alt title');
   });
 });

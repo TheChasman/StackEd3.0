@@ -2,6 +2,7 @@
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
   import { createAdapter } from '$lib/services/ai/adapter';
+  import { pmDocToText } from '$lib/utils/pmText';
   import type { SearchResult } from '$lib/services/ai/adapter';
 
   let query = $state('');
@@ -26,9 +27,8 @@
     try {
       const adapter = createAdapter(settingsStore.provider, settingsStore.apiKey);
       result = await adapter.search(query, {
-        frontmatter: documentStore.frontmatter,
-        fieldOrder: documentStore.fieldOrder,
-        body: documentStore.body,
+        scaffold: documentStore.scaffold,
+        bodyText: pmDocToText(documentStore.body),
         filePath: documentStore.filePath,
       });
     } catch (e) {

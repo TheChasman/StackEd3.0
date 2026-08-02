@@ -2,6 +2,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createAdapter } from './adapter';
 import { ClaudeAdapter } from './claude';
 import { OpenAIAdapter } from './openai';
+import type { ArticleContext } from '$lib/services/ai/adapter';
+import { emptyScaffold, isPostPayload } from '$lib/types/scaffold';
+
+function articleContext(): ArticleContext {
+  const scaffold = emptyScaffold();
+  if (isPostPayload(scaffold.payload)) {
+    scaffold.payload.draft_title = 'A contextual article';
+  }
+
+  return {
+    scaffold,
+    bodyText: 'Article body for research.',
+    filePath: '/articles/contextual.md',
+  };
+}
 
 describe('createAdapter', () => {
   it('returns a ClaudeAdapter for "claude"', () => {
@@ -33,12 +48,17 @@ describe('ClaudeAdapter', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (adapter as any)['client'].messages.create = mockCreate;
 
-    const result = await adapter.search('Paris architecture');
+    const result = await adapter.search('Paris architecture', articleContext());
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         tools: expect.arrayContaining([
           expect.objectContaining({ type: 'web_search_20260209' }),
+        ]),
+        messages: expect.arrayContaining([
+          expect.objectContaining({
+            content: expect.stringContaining('Title: A contextual article'),
+          }),
         ]),
       }),
     );
@@ -66,7 +86,7 @@ describe('OpenAIAdapter', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (adapter as any)['client'].responses.create = mockCreate;
 
-    const result = await adapter.search('Paris architecture');
+    const result = await adapter.search('Paris architecture', articleContext());
 
     expect(mockCreate).toHaveBeenCalled();
     expect(result.summary).toBe('OpenAI research summary.');

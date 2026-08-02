@@ -12,6 +12,6 @@ describe('editor layout', () => {
   });
 
   it('is mounted inside a flex column content slot so editor scrolling works', () => {
-    expect(appSource).toContain('<div class="flex flex-col flex-1 min-h-0 overflow-hidden">');
+    expect(appSource).toContain('<div class="flex-1 min-w-0 flex flex-col">');
   });
 });

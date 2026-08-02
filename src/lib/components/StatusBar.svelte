@@ -4,9 +4,8 @@
 
   let wordCount = $derived(documentStore.wordCount);
   let dirty = $derived(documentStore.dirty);
-  let fileHandle = $derived(documentStore.fileHandle);
   let filePath = $derived(documentStore.filePath);
-  let fileName = $derived(fileHandle?.name ?? filePath?.split('/').pop() ?? 'No file open');
+  let fileName = $derived(filePath?.split('/').pop() ?? 'No file open');
 
   function reloadApp(): void {
     window.location.reload();
@@ -21,7 +20,7 @@
 </script>
 
 <footer class="relative z-10 flex items-center gap-4 px-4 py-1.5 border-t border-dark-700 bg-dark-800 text-xs text-dark-300 shrink-0">
-  <span class="truncate max-w-xs" title={filePath ?? fileHandle?.name}>
+  <span class="truncate max-w-xs" title={filePath ?? ''}>
     {fileName}
     {#if dirty}<span class="text-amber-500 ml-1">●</span>{/if}
   </span>

@@ -11,7 +11,7 @@ describe('right sidebar layout', () => {
   });
 
   it('keeps loaded editor content from stealing the app tab rows', () => {
-    expect(source).toContain('<div class="flex flex-col flex-1 min-h-0 overflow-hidden">');
+    expect(source).toContain('<div class="flex-1 min-w-0 flex flex-col">');
     expect(source).toContain('class="flex overflow-x-auto min-h-10 border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0"');
   });
 

@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Editor } from '@tiptap/core';
   import StyleDropdown from './toolbar/StyleDropdown.svelte';
-  import FontDropdown from './toolbar/FontDropdown.svelte';
-  import FontSizeDropdown from './toolbar/FontSizeDropdown.svelte';
   import ButtonDropdown from './toolbar/ButtonDropdown.svelte';
   import MoreDropdown from './toolbar/MoreDropdown.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
@@ -21,6 +19,8 @@
   function toggleBold() { run(() => editor!.chain().toggleBold().run()); }
   function toggleItalic() { run(() => editor!.chain().toggleItalic().run()); }
   function toggleStrike() { run(() => editor!.chain().toggleStrike().run()); }
+  function toggleSuperscript() { run(() => (editor!.commands as any).toggleSuperscript?.()); }
+  function toggleSubscript() { run(() => (editor!.commands as any).toggleSubscript?.()); }
   function toggleCode() { run(() => editor!.chain().toggleCode().run()); }
   function toggleBlockquote() { run(() => editor!.chain().toggleBlockquote().run()); }
   function toggleBulletList() { run(() => editor!.chain().toggleBulletList().run()); }
@@ -102,10 +102,8 @@
 
   <div class="w-px h-4 bg-dark-600 mx-1"></div>
 
-  <!-- Style dropdown (Heading 1-6 / Normal text) -->
+  <!-- Style dropdown (Heading 2-4 / Normal text) -->
   <StyleDropdown {editor} />
-  <FontDropdown {editor} />
-  <FontSizeDropdown {editor} />
 
   <div class="w-px h-4 bg-dark-600 mx-1"></div>
 
@@ -118,6 +116,12 @@
   </button>
   <button onclick={toggleStrike} class="p-1.5 rounded hover:bg-dark-600 text-dark-200 {editor.isActive('strike') ? 'bg-dark-600 text-primary-500' : ''}" title="Strikethrough">
     <span class="line-through">S</span>
+  </button>
+  <button onclick={toggleSuperscript} class="p-1.5 rounded hover:bg-dark-600 text-dark-200 {editor.isActive('superscript') ? 'bg-dark-600 text-primary-500' : ''}" title="Superscript">
+    <span class="text-xs">X²</span>
+  </button>
+  <button onclick={toggleSubscript} class="p-1.5 rounded hover:bg-dark-600 text-dark-200 {editor.isActive('subscript') ? 'bg-dark-600 text-primary-500' : ''}" title="Subscript">
+    <span class="text-xs">X₂</span>
   </button>
 
   <div class="w-px h-4 bg-dark-600 mx-1"></div>

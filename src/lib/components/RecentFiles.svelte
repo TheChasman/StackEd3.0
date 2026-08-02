@@ -1,6 +1,6 @@
 <script lang="ts">
   import { pruneRecentFiles, removeRecentFile, type RecentFile } from '$lib/services/storage';
-  import { openFilePath } from '$lib/services/files';
+  import { openScaffoldPath } from '$lib/services/files';
   import { syncRecentFilesMenu } from '$lib/services/recentMenu';
   import { documentStore } from '$lib/stores/document.svelte';
 
@@ -18,8 +18,8 @@
 
   async function open(file: RecentFile) {
     try {
-      const parsed = await openFilePath(file.filePath);
-      documentStore.openInNewTab(parsed);
+      const scaffold = await openScaffoldPath(file.filePath);
+      documentStore.openInNewTab(scaffold, file.filePath);
       onclose();
     } catch {
       if (typeof file.id === 'number') {

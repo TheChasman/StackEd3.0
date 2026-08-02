@@ -1,5 +1,5 @@
-import { serializeMarkdownFile } from '$lib/utils/frontmatter';
 import type { ArticleContext } from './adapter';
+import { isPostPayload } from '$lib/types/scaffold';
 
 const MAX_BODY_CONTEXT_CHARS = 12000;
 
@@ -9,26 +9,25 @@ function truncate(value: string, maxLength: number): string {
 }
 
 export function buildResearchPrompt(query: string, context?: ArticleContext): string {
-  if (!context?.frontmatter && !context?.body) {
+  if (!context?.scaffold && !context?.bodyText) {
     return `Research the following topic and provide a concise summary with sources:\n\n${query}`;
   }
 
-  const frontmatter = context.frontmatter
-    ? serializeMarkdownFile(context.frontmatter as unknown as Record<string, unknown>, context.fieldOrder, '').trim()
-    : 'No YAML frontmatter loaded.';
+  const s = context.scaffold;
+  const title = s && isPostPayload(s.payload) ? s.payload.draft_title : '';
+  const subtitle = s && isPostPayload(s.payload) ? s.payload.draft_subtitle : '';
 
-  const body = context.body.trim()
-    ? truncate(context.body, MAX_BODY_CONTEXT_CHARS)
-    : 'No Markdown body loaded.';
+  const body = context.bodyText.trim()
+    ? truncate(context.bodyText, MAX_BODY_CONTEXT_CHARS)
+    : 'No body content loaded.';
 
   return `Research the following topic and provide a concise summary with sources. Use the current StackEd article context when relevant.
 
 Current file: ${context.filePath ?? 'unsaved StackEd article'}
+Title: ${title || '(untitled)'}
+Subtitle: ${subtitle || '(none)'}
 
-YAML frontmatter:
-${frontmatter}
-
-Markdown body:
+Body:
 ${body}
 
 Research topic:

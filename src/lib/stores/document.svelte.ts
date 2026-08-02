@@ -1,12 +1,12 @@
-import type { ArticleFrontmatter } from '$lib/types/article';
-import type { ParsedFile } from '$lib/types/article';
-import { extractTitleFromBody } from '$lib/utils/frontmatter';
+// Scaffold-based document store.
+// Replaces the old frontmatter+body (markdown) model with a single Scaffold
+// object whose body is ProseMirror JSON — the wire format Substack accepts.
+import type { Scaffold, PostPayload, NotePayload, PMDoc, PMNode } from '$lib/types/scaffold';
+import { emptyScaffold, isPostPayload, isNotePayload, getBody } from '$lib/types/scaffold';
+import { deserializeScaffold } from '$lib/utils/scaffold';
 
 interface TabState {
-  frontmatter: ArticleFrontmatter | null;
-  body: string;
-  fieldOrder: string[];
-  fileHandle: FileSystemFileHandle | null;
+  scaffold: Scaffold | null;
   filePath: string | null;
   dirty: boolean;
 }
@@ -18,20 +18,17 @@ export interface TabMeta {
 }
 
 function emptyTab(): TabState {
-  return {
-    frontmatter: null,
-    body: '',
-    fieldOrder: [],
-    fileHandle: null,
-    filePath: null,
-    dirty: false,
-  };
+  return { scaffold: null, filePath: null, dirty: false };
 }
 
 function tabTitle(tab: TabState): string {
-  const bodyTitle = extractTitleFromBody(tab.body);
-  if (bodyTitle) return bodyTitle;
-  if (tab.filePath) return tab.filePath.split('/').pop()?.replace(/\.md$/i, '') ?? 'Untitled';
+  if (tab.scaffold) {
+    if (isPostPayload(tab.scaffold.payload)) {
+      return tab.scaffold.payload.draft_title || 'Untitled';
+    }
+    return 'Note';
+  }
+  if (tab.filePath) return tab.filePath.split('/').pop()?.replace(/\.stacked\.json$/i, '') ?? 'Untitled';
   return 'Untitled';
 }
 
@@ -40,13 +37,8 @@ class DocumentStore {
   private _activeIndex = $state(0);
   private _loadVersion = $state(0);
 
-  get activeIndex(): number {
-    return this._activeIndex;
-  }
-
-  get tabCount(): number {
-    return this._tabs.length;
-  }
+  get activeIndex(): number { return this._activeIndex; }
+  get tabCount(): number { return this._tabs.length; }
 
   get tabMetas(): TabMeta[] {
     return this._tabs.map(tab => ({
@@ -56,25 +48,28 @@ class DocumentStore {
     }));
   }
 
-  // Active-tab proxy getters
-  get frontmatter(): ArticleFrontmatter | null {
-    return this._tabs[this._activeIndex].frontmatter;
+  // --- Active-tab accessors ---
+
+  get scaffold(): Scaffold | null {
+    return this._tabs[this._activeIndex].scaffold;
   }
 
-  get body(): string {
-    return this._tabs[this._activeIndex].body;
+  get payload(): PostPayload | NotePayload | null {
+    return this._tabs[this._activeIndex].scaffold?.payload ?? null;
   }
 
-  get titleFromBody(): string {
-    return extractTitleFromBody(this._tabs[this._activeIndex].body);
+  /** The body as ProseMirror JSON (the wire format). */
+  get body(): PMDoc {
+    const s = this._tabs[this._activeIndex].scaffold;
+    if (!s) return { type: 'doc', content: [] };
+    return getBody(s);
   }
 
-  get fieldOrder(): string[] {
-    return this._tabs[this._activeIndex].fieldOrder;
-  }
-
-  get fileHandle(): FileSystemFileHandle | null {
-    return this._tabs[this._activeIndex].fileHandle;
+  get title(): string {
+    const s = this._tabs[this._activeIndex].scaffold;
+    if (!s) return '';
+    if (isPostPayload(s.payload)) return s.payload.draft_title;
+    return '';
   }
 
   get filePath(): string | null {
@@ -90,80 +85,47 @@ class DocumentStore {
   }
 
   get wordCount(): number {
-    return this._tabs[this._activeIndex].body
-      .replace(/#{1,6}\s/g, '')
-      .replace(/<[^>]+>/g, ' ')
-      .split(/\s+/)
-      .filter(Boolean).length;
+    return countPMDocWords(this.body);
   }
 
-  get hookWarning(): boolean {
-    const hook = String(this._tabs[this._activeIndex]?.frontmatter?.HOOK ?? '');
-    if (!hook.trim()) return false;
-    return hook.trim().split(/\s+/).filter(Boolean).length > 150;
-  }
+  // --- Loading ---
 
-  get phase(): 'draft' | 'final' {
-    const path = this._tabs[this._activeIndex]?.filePath ?? '';
-    return path.endsWith('_final.md') ? 'final' : 'draft';
-  }
-
-  /** Load a file into the active tab (used for saves / initial load). */
-  load(
-    frontmatter: ArticleFrontmatter,
-    body: string,
-    fieldOrder: string[],
-    fileHandle: FileSystemFileHandle | null,
-    filePath: string | null = null,
-    dirty = false,
-  ): void {
+  /** Load a scaffold into the active tab. */
+  load(scaffold: Scaffold, filePath: string | null = null, dirty = false): void {
     const tab = this._tabs[this._activeIndex];
-    tab.frontmatter = frontmatter;
-    tab.body = body;
-    tab.fieldOrder = fieldOrder;
-    tab.fileHandle = fileHandle;
+    tab.scaffold = scaffold;
     tab.filePath = filePath;
     tab.dirty = dirty;
     this._loadVersion += 1;
   }
 
-  /** Open a blank tab (Cmd+T). Always creates a new one. */
-  newTab(): void {
-    this._tabs.push(emptyTab());
-    this._activeIndex = this._tabs.length - 1;
+  /** Load from a JSON string (from disk). */
+  loadJson(json: string, filePath: string | null = null): void {
+    const scaffold = deserializeScaffold(json);
+    this.load(scaffold, filePath, false);
   }
 
-  /** Open a parsed file in a new tab.  Reuses the active tab if it is blank and untouched. */
-  openInNewTab(parsed: ParsedFile): void {
+  /** Open a scaffold in a new tab. Reuses active tab if blank. */
+  openInNewTab(scaffold: Scaffold, filePath: string | null = null): void {
     const current = this._tabs[this._activeIndex];
     const reuseEmpty =
       this._tabs.length === 1 &&
-      current.frontmatter === null &&
-      current.body === '' &&
+      current.scaffold === null &&
       !current.dirty;
 
     if (reuseEmpty) {
-      this.load(
-        parsed.frontmatter,
-        parsed.body,
-        parsed.fieldOrder,
-        parsed.fileHandle ?? null,
-        parsed.filePath ?? null,
-        parsed.dirty ?? false,
-      );
+      this.load(scaffold, filePath, false);
       return;
     }
 
-    this._tabs.push({
-      frontmatter: parsed.frontmatter,
-      body: parsed.body,
-      fieldOrder: parsed.fieldOrder,
-      fileHandle: parsed.fileHandle ?? null,
-      filePath: parsed.filePath ?? null,
-      dirty: parsed.dirty ?? false,
-    });
+    this._tabs.push({ scaffold, filePath, dirty: false });
     this._activeIndex = this._tabs.length - 1;
     this._loadVersion += 1;
+  }
+
+  newTab(): void {
+    this._tabs.push(emptyTab());
+    this._activeIndex = this._tabs.length - 1;
   }
 
   switchTab(index: number): void {
@@ -184,25 +146,55 @@ class DocumentStore {
     }
   }
 
-  setBody(body: string): void {
-    this._tabs[this._activeIndex].body = body;
-    this._tabs[this._activeIndex].dirty = true;
-  }
+  // --- Mutations ---
 
-  patchField(field: keyof ArticleFrontmatter, value: unknown): void {
+  /** Replace the body PMDoc. */
+  setBody(body: PMDoc): void {
     const tab = this._tabs[this._activeIndex];
-    if (!tab.frontmatter) return;
-    tab.frontmatter = { ...tab.frontmatter, [field]: value };
+    if (!tab.scaffold) return;
+    if (isPostPayload(tab.scaffold.payload)) {
+      tab.scaffold.payload.draft_body = body;
+    } else if (isNotePayload(tab.scaffold.payload)) {
+      tab.scaffold.payload.bodyJson = body;
+    }
+    tab.scaffold.updated = new Date().toISOString();
     tab.dirty = true;
   }
 
-  setAltSelection(section: 'TITLE' | 'SUBTITLE' | 'HOOK' | 'LANDING', text: string): void {
-    const key = `${section}_SELECTED` as keyof ArticleFrontmatter;
-    this.patchField(key, text);
+  /** Patch a payload field by key. */
+  patchPayload<K extends keyof PostPayload>(field: K, value: PostPayload[K]): void {
+    const tab = this._tabs[this._activeIndex];
+    if (!tab.scaffold || !isPostPayload(tab.scaffold.payload)) return;
+    tab.scaffold.payload[field] = value;
+    tab.scaffold.updated = new Date().toISOString();
+    tab.dirty = true;
   }
 
-  replaceFrontmatter(frontmatter: ArticleFrontmatter): void {
-    this._tabs[this._activeIndex].frontmatter = frontmatter;
+  /** Patch a workshop field by key. */
+  patchWorkshop<K extends keyof Scaffold['workshop']>(field: K, value: Scaffold['workshop'][K]): void {
+    const tab = this._tabs[this._activeIndex];
+    if (!tab.scaffold) return;
+    tab.scaffold.workshop[field] = value;
+    tab.scaffold.updated = new Date().toISOString();
+    tab.dirty = true;
+  }
+
+  /** Toggle a field path in the locked array. */
+  toggleLocked(path: string): void {
+    const tab = this._tabs[this._activeIndex];
+    if (!tab.scaffold) return;
+    const locked = tab.scaffold.locked;
+    if (locked.includes(path)) {
+      tab.scaffold.locked = locked.filter(p => p !== path);
+    } else {
+      tab.scaffold.locked = [...locked, path];
+    }
+    tab.dirty = true;
+  }
+
+  /** Replace the entire scaffold (e.g. after AI merge). */
+  replaceScaffold(scaffold: Scaffold): void {
+    this._tabs[this._activeIndex].scaffold = scaffold;
     this._tabs[this._activeIndex].dirty = true;
   }
 
@@ -214,6 +206,31 @@ class DocumentStore {
     this._tabs = [emptyTab()];
     this._activeIndex = 0;
   }
+
+  /** Create a fresh scaffold in the active tab (for "New" button). */
+  newScaffold(kind: 'post' | 'note' = 'post'): Scaffold {
+    const scaffold = emptyScaffold(kind);
+    this.load(scaffold, null, true);
+    return scaffold;
+  }
+}
+
+function countPMDocWords(doc: PMDoc): number {
+  let count = 0;
+  for (const node of doc.content) {
+    count += countNodeWords(node);
+  }
+  return count;
+}
+
+function countNodeWords(node: PMNode): number {
+  if (node.text) {
+    return node.text.split(/\s+/).filter(Boolean).length;
+  }
+  if (node.content) {
+    return node.content.reduce((sum, child) => sum + countNodeWords(child), 0);
+  }
+  return 0;
 }
 
 export const documentStore = new DocumentStore();

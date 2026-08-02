@@ -5,7 +5,7 @@
   let { editor }: { editor: Editor } = $props();
 
   function activeLabel(): string {
-    for (const level of [1, 2, 3, 4, 5, 6] as const) {
+    for (const level of [2, 3, 4] as const) {
       if (editor.isActive('heading', { level })) return `Heading ${level}`;
     }
     return 'Normal text';
@@ -15,7 +15,7 @@
     if (level === null) {
       editor.chain().focus().setParagraph().run();
     } else {
-      editor.chain().focus().toggleHeading({ level: level as 1|2|3|4|5|6 }).run();
+      editor.chain().focus().toggleHeading({ level: level as 2|3|4 }).run();
     }
     close();
   }
@@ -30,7 +30,7 @@
     >
       Normal text
     </button>
-    {#each [1, 2, 3, 4, 5, 6] as level}
+    {#each [2, 3, 4] as level}
       <button
         type="button"
         onclick={() => apply(level, close)}

@@ -1,91 +1,32 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
   import { Editor } from '@tiptap/core';
-  import StarterKit from '@tiptap/starter-kit';
-  import { TextStyle, FontFamily, FontSize } from '@tiptap/extension-text-style';
-  import { marked } from 'marked';
-  import TurndownService from 'turndown';
-  import { Paywall } from './extensions/Paywall';
-  import { SubscribeButton } from './extensions/SubscribeButton';
-  import { ShareButton } from './extensions/ShareButton';
-  import { Poll } from './extensions/Poll';
-  import { Poetry } from './extensions/Poetry';
-  import { Latex } from './extensions/LaTeX';
-  import { Footnote } from './extensions/Footnote';
-  import { CaptionedImage } from './extensions/CaptionedImage';
-  import { Image2 } from './extensions/Image2';
-  import { Caption } from './extensions/Caption';
-  import { FinancialChart } from './extensions/FinancialChart';
-  import { PredictionMarket } from './extensions/PredictionMarket';
-  import { Recipe } from './extensions/Recipe';
-  import { ProtectedTitle } from './extensions/ProtectedTitle';
+  import { substackExtensions } from '$lib/editor/schema';
   import { clearHeroImageFlags, insertHeroImageAtTop, replaceHeroImage } from './extensions/heroImage';
   import { documentStore } from '$lib/stores/document.svelte';
+  import type { PMDoc } from '$lib/types/scaffold';
   import Toolbar from './Toolbar.svelte';
 
   let element: HTMLDivElement;
   let editor = $state<Editor | null>(null);
 
-  const turndown = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
-  // Keep Substack custom elements as raw HTML in the Markdown body
-  turndown.keep((node) => {
-    const el = node as HTMLElement;
-    return (
-      (el.nodeName === 'SPAN' && Boolean(el.getAttribute('style'))) ||
-      el.dataset?.type === 'paywall' ||
-      el.dataset?.type === 'subscribe-button' ||
-      el.dataset?.type === 'share-button' ||
-      el.dataset?.type === 'poll' ||
-      el.dataset?.type === 'latex' ||
-      el.dataset?.type === 'footnote' ||
-      el.dataset?.type === 'financial-chart' ||
-      el.dataset?.type === 'prediction-market' ||
-      el.dataset?.type === 'recipe' ||
-      el.dataset?.type === 'captioned-image' ||
-      el.dataset?.type === 'image2' ||
-      el.dataset?.type === 'caption' ||
-      el.className === 'poetry-block'
-    );
-  });
-
-  function getMarkdown(): string {
-    if (!editor) return '';
-    const html = editor.getHTML();
-    return turndown.turndown(html);
+  function getDoc(): PMDoc {
+    if (!editor) return { type: 'doc', content: [] };
+    return editor.getJSON() as PMDoc;
   }
 
-  function setMarkdown(md: string): void {
+  function setDoc(doc: PMDoc): void {
     if (!editor) return;
-    const html = marked.parse(md) as string;
-    editor.commands.setContent(html, { emitUpdate: false });
+    editor.commands.setContent(doc, { emitUpdate: false });
   }
 
   onMount(() => {
     editor = new Editor({
       element,
-      extensions: [
-        TextStyle,
-        FontFamily,
-        FontSize,
-        StarterKit,
-        CaptionedImage,
-        Image2,
-        Caption,
-        Paywall,
-        SubscribeButton,
-        ShareButton,
-        Poll,
-        Poetry,
-        Latex,
-        Footnote,
-        FinancialChart,
-        PredictionMarket,
-        Recipe,
-        ProtectedTitle,
-      ],
+      extensions: substackExtensions,
       content: '',
       onUpdate: () => {
-        documentStore.setBody(getMarkdown());
+        documentStore.setBody(getDoc());
       },
       onTransaction: () => {
         // Trigger Svelte reactivity on selection changes
@@ -94,13 +35,9 @@
     });
 
     // Load initial body from store
-    // Note: setMarkdown() uses emitUpdate: false, so if ProtectedTitle's
-    // ProseMirror plugin normalizes line 1 into an H1 here, that normalized
-    // markdown is never written back to documentStore.body (onUpdate doesn't
-    // fire). A legacy file opened and saved without an edit will keep its
-    // original line 1 on disk, even though the editor renders it as an H1.
-    if (documentStore.body) {
-      setMarkdown(documentStore.body);
+    const body = untrack(() => documentStore.body);
+    if (body.content.length > 0) {
+      setDoc(body);
     }
   });
 
@@ -109,9 +46,7 @@
     documentStore.loadVersion;
     const body = untrack(() => documentStore.body);
     if (editor) {
-      // Same emitUpdate: false caveat as onMount above: ProtectedTitle's
-      // load-time H1 normalization doesn't dirty documentStore.body.
-      setMarkdown(body);
+      setDoc(body);
     }
   });
 

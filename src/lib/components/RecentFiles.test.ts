@@ -6,7 +6,7 @@ const source = readFileSync(join(process.cwd(), 'src/lib/components/RecentFiles.
 
 describe('RecentFiles', () => {
   it('opens recent files through the tab-aware document path', () => {
-    expect(source).toContain('documentStore.openInNewTab(parsed);');
+    expect(source).toContain('documentStore.openInNewTab(scaffold, file.filePath);');
     expect(source).not.toContain('documentStore.load(parsed.frontmatter');
   });
 });

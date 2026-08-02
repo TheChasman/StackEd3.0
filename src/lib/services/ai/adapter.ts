@@ -1,4 +1,4 @@
-import type { ArticleFrontmatter } from '$lib/types/article';
+import type { Scaffold } from '$lib/types/scaffold';
 import type { SeoDraft } from '$lib/services/seo';
 
 export interface Citation {
@@ -14,9 +14,8 @@ export interface SearchResult {
 }
 
 export interface ArticleContext {
-  frontmatter: ArticleFrontmatter | null;
-  fieldOrder: string[];
-  body: string;
+  scaffold: Scaffold | null;
+  bodyText: string;
   filePath: string | null;
 }
 
