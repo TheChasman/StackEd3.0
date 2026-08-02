@@ -157,7 +157,7 @@ async function migrateFromMdFile(mdPath: string): Promise<Scaffold> {
 
 export async function saveScaffoldPath(filePath: string, scaffold: Scaffold): Promise<string> {
   const json = serializeScaffold(scaffold);
-  await invoke('write_file', { path: filePath, content: json });
+  await invoke('write_file', { path: filePath, contents: json });
 
   // Generate and write MD mirror
   try {
@@ -208,7 +208,7 @@ export async function createNewScaffold(): Promise<{ scaffold: Scaffold; filePat
 }
 
 export async function writeFilePath(filePath: string, content: string): Promise<void> {
-  await invoke('write_file', { path: filePath, content });
+  await invoke('write_file', { path: filePath, contents: content });
 }
 
 export async function deleteFile(filePath: string): Promise<void> {
