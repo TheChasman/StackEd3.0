@@ -111,8 +111,8 @@ export function applySeoDraft(scaffold: Scaffold, draft: SeoDraft, tagVocabulary
     ...scaffold,
     payload: {
       ...p,
-      search_engine_title: locked.has(SEO_FIELD_PATHS.search_engine_title) ? p.search_engine_title : draft.search_engine_title,
-      search_engine_description: locked.has(SEO_FIELD_PATHS.search_engine_description) ? p.search_engine_description : draft.search_engine_description,
+      search_engine_title: locked.has(SEO_FIELD_PATHS.search_engine_title) ? p.search_engine_title : draft.search_engine_title.slice(0, 60),
+      search_engine_description: locked.has(SEO_FIELD_PATHS.search_engine_description) ? p.search_engine_description : draft.search_engine_description.slice(0, 160),
       slug: locked.has(SEO_FIELD_PATHS.slug) ? p.slug : draft.slug,
       tags: locked.has(SEO_FIELD_PATHS.tags) ? p.tags : canonicalizeTags(draft.tags, tagVocabulary),
     },

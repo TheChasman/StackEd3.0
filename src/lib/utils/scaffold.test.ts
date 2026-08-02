@@ -48,7 +48,7 @@ describe('readiness', () => {
     const r = readiness(s);
     expect(r.blocking).toContain('draft_title is empty');
     expect(r.blocking).toContain('draft_body is empty');
-    expect(r.blocking).toContain('draft_bylines is empty');
+    expect(r.advisory).toContain('draft_bylines is empty (auto-assigned on publish)');
   });
 
   it('blocks on missing SEO fields', () => {

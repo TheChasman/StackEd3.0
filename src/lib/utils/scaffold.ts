@@ -34,7 +34,7 @@ export function readiness(s: Scaffold): ReadinessResult {
     const p = s.payload as PostPayload;
     if (!p.draft_title.trim()) blocking.push('draft_title is empty');
     if (!hasBodyContent(p.draft_body)) blocking.push('draft_body is empty');
-    if (p.draft_bylines.length === 0) blocking.push('draft_bylines is empty');
+    if (p.draft_bylines.length === 0) advisory.push('draft_bylines is empty (auto-assigned on publish)');
 
     if (!p.search_engine_title.trim()) blocking.push('search_engine_title is empty');
     if (!p.search_engine_description.trim()) blocking.push('search_engine_description is empty');
