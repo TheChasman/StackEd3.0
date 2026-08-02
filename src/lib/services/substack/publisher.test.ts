@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyScaffold, isPostPayload, type Scaffold } from '$lib/types/scaffold';
+import { emptyScaffold, isPostPayload, type Scaffold, type Byline } from '$lib/types/scaffold';
 import type { SubstackTransport, SubstackResponse, ImageUploadResult } from './transport';
 import { syncTags } from './publisher';
 
@@ -45,6 +45,7 @@ class StubTransport implements SubstackTransport {
   async unscheduleDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
   async createNote(): Promise<SubstackResponse> { throw new Error('unused'); }
   async isLoggedIn(): Promise<boolean> { return true; }
+  async getUserInfo(): Promise<Byline> { throw new Error('unused'); }
 }
 
 describe('syncTags', () => {

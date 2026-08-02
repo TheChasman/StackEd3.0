@@ -9,6 +9,8 @@
 // - No read/scrape endpoints beyond the user's own drafts
 // - Fail loudly on 403/429/captcha
 
+import type { Byline } from '$lib/types/scaffold';
+
 export interface SubstackResponse {
   ok: boolean;
   status: number;
@@ -64,6 +66,9 @@ export interface SubstackTransport {
 
   /** Check whether the user is logged in (session cookie present). */
   isLoggedIn(): Promise<boolean>;
+
+  /** GET /api/v1/user/profile/self — fetch the current user's byline info. */
+  getUserInfo(): Promise<Byline>;
 }
 
 /**

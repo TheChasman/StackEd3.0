@@ -15,6 +15,7 @@ import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { invoke } from '@tauri-apps/api/core';
 import { emit, listen } from '@tauri-apps/api/event';
 import type { SubstackTransport, SubstackResponse, ImageUploadResult } from './transport';
+import type { Byline } from '$lib/types/scaffold';
 
 const WINDOW_LABEL = 'substack-auth';
 const REQUEST_EVENT = 'substack:request';
@@ -33,6 +34,8 @@ interface PendingRequest {
  */
 const INJECTED_SCRIPT = `
 (function() {
+  if (window.__substackInjected) return;
+  window.__substackInjected = true;
   const { listen, emit } = window.__TAURI__.event;
   listen('${REQUEST_EVENT}', async (event) => {
     const { id, method, url, body } = event.payload;
@@ -70,6 +73,9 @@ export class WebViewTransport implements SubstackTransport {
   private unlisten: (() => void) | null = null;
   private initialized = false;
 
+  /** Tracks which publication the shared window is currently on. */
+  static currentPublication: string | null = null;
+
   constructor(publication: string) {
     this.publication = publication;
   }
@@ -98,6 +104,16 @@ export class WebViewTransport implements SubstackTransport {
     const existing = await WebviewWindow.getByLabel(WINDOW_LABEL);
     if (existing) {
       this.window = existing;
+      // Navigate to the correct publication if the window is on a different one
+      if (WebViewTransport.currentPublication !== this.publication) {
+        await invoke('eval_in_webview', {
+          label: WINDOW_LABEL,
+          script: `window.location.href = 'https://${this.publication}.substack.com'`,
+        });
+        // Wait for the new page to load
+        await new Promise((r) => setTimeout(r, 1500));
+        WebViewTransport.currentPublication = this.publication;
+      }
     } else {
       const url = `https://${this.publication}.substack.com`;
       this.window = new WebviewWindow(WINDOW_LABEL, {
@@ -116,6 +132,7 @@ export class WebViewTransport implements SubstackTransport {
           }
         }, 100);
       });
+      WebViewTransport.currentPublication = this.publication;
     }
 
     // Inject the listener script once the page is ready
@@ -211,6 +228,30 @@ export class WebViewTransport implements SubstackTransport {
     } catch {
       return false;
     }
+  }
+
+  async getUserInfo(): Promise<Byline> {
+    const response = await this.send('GET', '/api/v1/user/profile/self');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user info: ${response.status}`);
+    }
+    const profile = response.body as {
+      id?: number;
+      name?: string;
+      publication_users?: Array<{ id: number; user_id?: number }>;
+    };
+    if (typeof profile.id !== 'number') {
+      throw new Error('User profile response missing id');
+    }
+    const pubUser = profile.publication_users?.find(pu => typeof pu.id === 'number');
+    if (!pubUser) {
+      throw new Error('User profile response missing publication user info');
+    }
+    return {
+      id: profile.id,
+      publicationUserId: pubUser.id,
+      name: profile.name,
+    };
   }
 
   /** Clean up: close the window and stop listening. */

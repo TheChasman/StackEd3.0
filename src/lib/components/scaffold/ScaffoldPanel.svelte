@@ -11,6 +11,7 @@
   let scaffold = $derived(documentStore.scaffold);
   let r = $derived(scaffold ? readiness(scaffold) : null);
   let slugLocked = $derived(scaffold ? scaffold.locked.includes(SEO_FIELD_PATHS.slug) : false);
+  let errorMap = $derived(new Map(r?.blocking.map(b => [b.split(' ')[0], b]) ?? []));
   let publishStatus = $state('');
   let publishing = $state(false);
   let seoLoading = $state(false);
@@ -156,19 +157,13 @@
 {:else}
   <div class="flex flex-col gap-4 p-4 overflow-y-auto h-full text-sm">
 
-    <!-- Readiness indicator -->
-    {#if r}
-      <div class="rounded border p-2 text-xs {r.blocking.length === 0 ? 'border-green-700 bg-green-900/20' : 'border-amber-700 bg-amber-900/20'}">
-        {#if r.blocking.length === 0}
-          <span class="text-green-400">Ready to publish</span>
-          {#if r.advisory.length > 0}
-            <span class="text-dark-400"> ({r.advisory.length} advisory)</span>
-          {/if}
-        {:else}
-          <span class="text-amber-400">Blocking: {r.blocking.join(', ')}</span>
-        {/if}
-      </div>
-    {/if}
+    {#snippet errorTip(field: string)}
+      {#if errorMap.has(field)}
+        <div class="absolute left-0 top-full mt-1 z-50 bg-dark-900 border border-red-500 text-red-300 text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
+          {errorMap.get(field)}
+        </div>
+      {/if}
+    {/snippet}
 
     {#if isPostPayload(scaffold.payload)}
       {@const p = scaffold.payload}
@@ -176,14 +171,15 @@
       <section>
         <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Post</h3>
         <div class="flex flex-col gap-3">
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 relative group">
             <span class="text-dark-400 text-xs">Title</span>
             <textarea
               rows={2}
               value={p.draft_title}
               onchange={(e) => patch('draft_title', e.currentTarget.value)}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 resize-none focus:border-primary-500"
+              class="bg-dark-800 border rounded p-2 text-dark-100 resize-none focus:border-primary-500 {errorMap.has('draft_title') ? 'border-red-500' : 'border-dark-600'}"
             ></textarea>
+            {@render errorTip('draft_title')}
           </label>
           <label class="flex flex-col gap-1">
             <span class="text-dark-400 text-xs">Subtitle</span>
@@ -232,6 +228,18 @@
               <option value="none">None</option>
             </select>
           </label>
+          <label class="flex flex-col gap-1 relative group">
+            <span class="text-dark-400 text-xs">Author</span>
+            <input
+              type="text"
+              value={p.draft_bylines.length > 0
+                ? (p.draft_bylines[0].name ?? `User #${p.draft_bylines[0].id}`)
+                : 'Not set — assigned on publish'}
+              readonly
+              class="bg-dark-800 border rounded p-2 text-dark-100 {errorMap.has('draft_bylines') ? 'border-red-500' : 'border-dark-600'} {p.draft_bylines.length === 0 ? 'text-dark-500 italic' : ''}"
+            />
+            {@render errorTip('draft_bylines')}
+          </label>
         </div>
       </section>
 
@@ -251,7 +259,7 @@
           <p class="text-xs text-red-400 mb-2">{seoError}</p>
         {/if}
         <div class="flex flex-col gap-3">
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 relative group">
             <span class="text-dark-400 text-xs flex justify-between">
               <span>SEO Title</span>
               <span class={p.search_engine_title.length >= 40 && p.search_engine_title.length <= 60 ? 'text-green-500' : 'text-amber-500'}>{p.search_engine_title.length}/40–60</span>
@@ -260,10 +268,11 @@
               type="text"
               value={p.search_engine_title}
               onchange={(e) => patch('search_engine_title', e.currentTarget.value)}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500"
+              class="bg-dark-800 border rounded p-2 text-dark-100 focus:border-primary-500 {errorMap.has('search_engine_title') ? 'border-red-500' : 'border-dark-600'}"
             />
+            {@render errorTip('search_engine_title')}
           </label>
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 relative group">
             <span class="text-dark-400 text-xs flex justify-between">
               <span>SEO Description</span>
               <span class={p.search_engine_description.length >= 140 && p.search_engine_description.length <= 160 ? 'text-green-500' : 'text-amber-500'}>{p.search_engine_description.length}/140–160</span>
@@ -272,10 +281,11 @@
               rows={2}
               value={p.search_engine_description}
               onchange={(e) => patch('search_engine_description', e.currentTarget.value)}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 resize-none focus:border-primary-500"
+              class="bg-dark-800 border rounded p-2 text-dark-100 resize-none focus:border-primary-500 {errorMap.has('search_engine_description') ? 'border-red-500' : 'border-dark-600'}"
             ></textarea>
+            {@render errorTip('search_engine_description')}
           </label>
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 relative group">
             <span class="text-dark-400 text-xs flex justify-between">
               <span>Slug</span>
               <button type="button" onclick={toggleSlugLock} class="text-dark-500 hover:text-dark-300">
@@ -287,20 +297,22 @@
               value={p.slug}
               readonly={slugLocked}
               onchange={(e) => patch('slug', e.currentTarget.value)}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500 font-mono text-xs {slugLocked ? 'opacity-60 cursor-not-allowed' : ''}"
+              class="bg-dark-800 border rounded p-2 text-dark-100 focus:border-primary-500 font-mono text-xs {slugLocked ? 'opacity-60 cursor-not-allowed' : ''} {errorMap.has('slug') ? 'border-red-500' : 'border-dark-600'}"
             />
             {#if slugLocked}
               <span class="text-dark-500 text-xs">This URL is live — changing it breaks existing links.</span>
             {/if}
+            {@render errorTip('slug')}
           </label>
-          <label class="flex flex-col gap-1">
+          <label class="flex flex-col gap-1 relative group">
             <span class="text-dark-400 text-xs">Tags (comma-separated)</span>
             <input
               type="text"
               value={p.tags.join(', ')}
               onchange={(e) => patch('tags', e.currentTarget.value.split(',').map(t => t.trim()).filter(Boolean))}
-              class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500"
+              class="bg-dark-800 border rounded p-2 text-dark-100 focus:border-primary-500 {errorMap.has('tags') ? 'border-red-500' : 'border-dark-600'}"
             />
+            {@render errorTip('tags')}
           </label>
         </div>
       </section>

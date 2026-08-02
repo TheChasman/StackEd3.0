@@ -66,7 +66,7 @@ export function buildCreateDraftRequest(scaffold: Scaffold): CreateDraftRequest 
     draft_subtitle: p.draft_subtitle,
     draft_body: JSON.stringify(p.draft_body), // CRITICAL: string, not object
     type: p.type,
-    draft_bylines: p.draft_bylines,
+    draft_bylines: p.draft_bylines.map(b => ({ id: b.id, publicationUserId: b.publicationUserId })),
     draft_section_id: p.draft_section_id,
     audience: p.audience,
     write_comment_permissions: p.write_comment_permissions,

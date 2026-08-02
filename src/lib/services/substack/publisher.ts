@@ -229,6 +229,11 @@ export async function publishToSubstack(
   transport: SubstackTransport,
   readImageAsDataUrl: (src: string) => Promise<string>,
 ): Promise<PublishResult> {
+  // Step 0: Auto-assign the current user as byline if none set
+  if (isPostPayload(scaffold.payload) && scaffold.payload.draft_bylines.length === 0) {
+    scaffold.payload.draft_bylines = [await transport.getUserInfo()];
+  }
+
   // Step 1-3: Upload foreign images
   const withImages = await uploadImages(scaffold, transport, readImageAsDataUrl);
 

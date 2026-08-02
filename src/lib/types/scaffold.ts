@@ -38,6 +38,7 @@ export type NoteReplyRole = 'everyone' | 'free_subscriber' | 'paid_subscriber' |
 export interface Byline {
   id: number;
   publicationUserId: number;
+  name?: string;
 }
 
 export interface PostPayload {
