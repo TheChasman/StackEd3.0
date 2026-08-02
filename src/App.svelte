@@ -40,8 +40,15 @@
   }
 
   async function loadFilePath(filePath: string) {
-    const scaffold = await openScaffoldPath(filePath);
-    documentStore.openInNewTab(scaffold, filePath);
+    try {
+      const scaffold = await openScaffoldPath(filePath);
+      documentStore.openInNewTab(scaffold, filePath);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (!msg.includes('No file selected')) {
+        alert(`Could not open file:\n${filePath}\n\n${msg}`);
+      }
+    }
   }
 
   onMount(() => {
@@ -151,9 +158,9 @@
   async function handleOpen() {
     try {
       const scaffold = await openScaffold();
-      documentStore.openInNewTab(scaffold);
-    } catch {
-      // User cancelled picker
+      if (scaffold) documentStore.openInNewTab(scaffold);
+    } catch (e) {
+      alert('Open failed: ' + (e instanceof Error ? e.message : e));
     }
   }
 

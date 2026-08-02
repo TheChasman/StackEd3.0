@@ -90,18 +90,17 @@ export async function openFolder(): Promise<string | null> {
   return Array.isArray(selected) ? (selected[0] ?? null) : selected;
 }
 
-export async function openScaffold(): Promise<Scaffold> {
+export async function openScaffold(): Promise<Scaffold | null> {
   const selected = await openDialog({
-    title: 'Open Scaffold File',
+    title: 'Open File',
     multiple: false,
     defaultPath: getDefaultOpenPath(),
     filters: [
-      { name: 'StackEd Scaffold', extensions: ['stacked.json'] },
-      { name: 'Markdown (migrate)', extensions: ['md'] },
+      { name: 'StackEd files', extensions: ['stacked.json', 'md'] },
     ],
   });
   const filePath = Array.isArray(selected) ? selected[0] : selected;
-  if (!filePath) throw new Error('No file selected');
+  if (!filePath) return null;
   return openScaffoldPath(filePath);
 }
 
