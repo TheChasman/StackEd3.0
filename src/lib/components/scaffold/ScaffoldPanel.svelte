@@ -2,9 +2,10 @@
   import { invoke } from '@tauri-apps/api/core';
   import { documentStore } from '$lib/stores/document.svelte';
   import { readiness } from '$lib/utils/scaffold';
-  import { isPostPayload, isNotePayload, type PostPayload } from '$lib/types/scaffold';
+  import { isPostPayload, isNotePayload, type PostPayload, type PMDoc, type PMNode } from '$lib/types/scaffold';
   import { publishToSubstack } from '$lib/services/substack/publisher';
   import { RecordingTransport } from '$lib/services/substack/recordingTransport';
+  import { BUILT_IN_BODY_PRESETS, type BodyPreset, buildBodyFromPreset } from '$lib/utils/bodyPresets';
   import TransportRecorderPanel from '$lib/components/dev/TransportRecorderPanel.svelte';
   import { getBuffer } from '$lib/stores/transportRecorder.svelte';
   import { applySeoDraft, SEO_FIELD_PATHS, buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
@@ -25,6 +26,8 @@
   let rttTitle = $state('Round-trip test');
   let rttSubtitle = $state('');
   let rttSlug = $state(`rtt-${crypto.randomUUID().slice(0, 6)}`);
+  let bodyRttVisible = $state(false);
+  let bodyPreset = $state<BodyPreset>('multi-section');
 
   function patch<K extends keyof PostPayload>(field: K, value: PostPayload[K]) {
     documentStore.patchPayload(field, value);
@@ -59,6 +62,41 @@
     } finally {
       seoLoading = false;
     }
+  }
+
+  function diffBodies(sent: PMDoc, fetched: PMDoc): { matched: number; differing: Array<{ path: string; a: unknown; b: unknown }> } {
+    const differing: Array<{ path: string; a: unknown; b: unknown }> = [];
+    let matched = 0;
+
+    function walk(a: PMNode | undefined, b: PMNode | undefined, path: string): void {
+      if (a === undefined && b === undefined) return;
+      if (a === undefined || b === undefined) {
+        differing.push({ path, a, b });
+        return;
+      }
+      const sameShape = a.type === b.type
+        && JSON.stringify(a.attrs ?? null) === JSON.stringify(b.attrs ?? null);
+      const sameContent = JSON.stringify(a.content ?? null) === JSON.stringify(b.content ?? null);
+      if (sameShape && sameContent) {
+        matched++;
+        return;
+      }
+      if ((a.type === 'text' && b.type === 'text') || (a.type === 'paragraph' && b.type === 'paragraph')) {
+        if ((a.content ?? []).length === 1 && (b.content ?? []).length === 1 && (a.content?.[0]?.text ?? '') !== (b.content?.[0]?.text ?? '')) {
+          differing.push({ path, a: a.content?.[0]?.text, b: b.content?.[0]?.text });
+          return;
+        }
+      }
+      const aChildren = a.content ?? [];
+      const bChildren = b.content ?? [];
+      const len = Math.max(aChildren.length, bChildren.length);
+      for (let i = 0; i < len; i++) {
+        walk(aChildren[i], bChildren[i], `${path}.${i}`);
+      }
+    }
+
+    walk(sent as PMNode, fetched as PMNode, 'draft_body');
+    return { matched, differing };
   }
 
   async function runMinimalRoundTrip() {
@@ -105,6 +143,78 @@
       const base = `Error: ${e instanceof Error ? e.message : String(e)}`;
       const hint = getBuffer().length > 0 ? '\nOpen the recorder (🔬) for the failed request.' : '';
       publishStatus = base + hint;
+    } finally {
+      publishing = false;
+    }
+  }
+
+  async function runBodyRoundTrip() {
+    if (!scaffold) return;
+    const publication = scaffold.remote.publication.trim();
+    if (!publication) {
+      alert('Enter your Substack publication subdomain first (e.g. "myblog" for myblog.substack.com).');
+      return;
+    }
+    if (!window.confirm('Send body round-trip to Substack? Includes title, subtitle, slug, draft_body.')) return;
+
+    publishing = true;
+    publishStatus = 'Opening Substack...';
+
+    try {
+      const { WebViewTransport } = await import('$lib/services/substack/webviewTransport');
+      const transport = new RecordingTransport(new WebViewTransport(publication));
+
+      const { invoke } = await import('@tauri-apps/api/core');
+      const readImageAsDataUrl = async (src: string): Promise<string> => {
+        if (src.startsWith('data:')) return src;
+        const { resolveArtworkImagePath } = await import('$lib/utils/artworkReferences');
+        const path = resolveArtworkImagePath(documentStore.filePath, src);
+        if (!path) throw new Error(`Cannot resolve image: ${src}`);
+        return invoke<string>('read_image_data_url', { path });
+      };
+
+      const { emptyScaffold } = await import('$lib/types/scaffold');
+      const fresh = emptyScaffold('post');
+      if (!isPostPayload(fresh.payload)) throw new Error('expected post payload');
+      fresh.payload.draft_title = rttTitle;
+      fresh.payload.draft_subtitle = rttSubtitle;
+      fresh.payload.slug = rttSlug;
+      fresh.payload.draft_body = buildBodyFromPreset(bodyPreset);
+      fresh.payload.send = false;
+
+      publishStatus = 'Uploading images and creating draft...';
+      const result = await publishToSubstack(fresh, transport, readImageAsDataUrl);
+
+      if (!result.draftId) {
+        publishStatus = 'Error: no draftId returned';
+        return;
+      }
+
+      publishStatus = 'Draft created. Fetching back...';
+      const fetched = await transport.getDraft(result.draftId);
+
+      if (!fetched.ok) {
+        publishStatus = `Body round-trip: draft created (ID: ${result.draftId}), but fetch-back failed — status ${fetched.status}.\nOpen the recorder (🔬) to inspect the round-trip.`;
+        return;
+      }
+
+      const fetchedBody = (fetched.body as { draft_body?: PMDoc }).draft_body;
+      if (!fetchedBody) {
+        publishStatus = `Body round-trip: draft created (ID: ${result.draftId}), but fetch-back body did not include draft_body.\nOpen the recorder (🔬) to inspect.`;
+        return;
+      }
+
+      const diff = diffBodies(fresh.payload.draft_body, fetchedBody);
+      const differingLines = diff.differing.slice(0, 5).map(d =>
+        `${d.path}: ${JSON.stringify(d.a)} vs ${JSON.stringify(d.b)}`
+      ).join('; ');
+      const moreCount = diff.differing.length > 5 ? ` (+${diff.differing.length - 5} more)` : '';
+      const verdict = diff.differing.length === 0
+        ? `matched (all ${diff.matched} nodes equal)`
+        : `${diff.matched} matched, ${diff.differing.length} differs — ${differingLines}${moreCount}`;
+      publishStatus = `Body round-trip: ${verdict}. Draft ID: ${result.draftId}\nConfirm by opening ${publication}.substack.com/publish`;
+    } catch (e) {
+      publishStatus = `Error: ${e instanceof Error ? e.message : String(e)}`;
     } finally {
       publishing = false;
     }
@@ -507,6 +617,32 @@
           disabled={publishing}
           onclick={runMinimalRoundTrip}
         >Round-trip to Substack drafts</button>
+      </div>
+    {/if}
+
+    <button
+      class="self-start text-xs text-dark-500 hover:text-dark-300"
+      onclick={() => { bodyRttVisible = !bodyRttVisible; }}
+    >{bodyRttVisible ? 'Hide' : 'Show'} body round-trip (Phase 2)</button>
+    {#if bodyRttVisible}
+      <div class="border border-dark-700 rounded p-3 flex flex-col gap-2">
+        <div class="text-xs font-semibold uppercase tracking-wide text-dark-400">Body round-trip (Phase 2 · step 1)</div>
+        <label class="flex flex-col gap-1 text-xs">
+          Body preset
+          <select class="bg-dark-900 border border-dark-700 rounded px-2 py-1" bind:value={bodyPreset}>
+            {#each BUILT_IN_BODY_PRESETS as preset}
+              <option value={preset}>{preset}</option>
+            {/each}
+          </select>
+        </label>
+        {#if bodyPreset === 'full-mirror'}
+          <div class="text-xs text-dark-500">// TODO: Phase 3 — replace with comprehensive legal-node mirror.</div>
+        {/if}
+        <button
+          class="self-start px-3 py-1 rounded bg-blue-700 text-white text-sm disabled:opacity-50"
+          disabled={publishing}
+          onclick={runBodyRoundTrip}
+        >Run Body Round-Trip</button>
       </div>
     {/if}
 
