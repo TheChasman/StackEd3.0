@@ -1,9 +1,16 @@
 import type { SubstackTransport, SubstackResponse, ImageUploadResult } from './transport';
 import type { Byline } from '$lib/types/scaffold';
-import { recordEntry } from '$lib/stores/transportRecorder.svelte';
+import { recordEntry, updateEntry } from '$lib/stores/transportRecorder.svelte';
 
 let entryCounter = 0;
 function newEntryId(): string { return `e_${++entryCounter}`; }
+
+/** A return value is treated as a SubstackResponse when it carries the `ok`/`status` pair. */
+function isSubstackResponse(value: unknown): value is SubstackResponse {
+  return typeof value === 'object' && value !== null
+    && typeof (value as SubstackResponse).ok === 'boolean'
+    && typeof (value as SubstackResponse).status === 'number';
+}
 
 export class RecordingTransport implements SubstackTransport {
   constructor(private readonly inner: SubstackTransport) {}
@@ -15,14 +22,18 @@ export class RecordingTransport implements SubstackTransport {
       recordEntry({ id, startedAt, method, path, bodyIn, status: 'pending', bodyOut: null, error: null, endedAt: null });
     }
     try {
-      const bodyOut = await call();
+      const result = await call();
       if (import.meta.env.DEV) {
-        recordEntry({ id, startedAt, method, path, bodyIn, status: 200, bodyOut, error: null, endedAt: Date.now() });
+        if (isSubstackResponse(result)) {
+          updateEntry(id, { status: result.status, bodyOut: result.body, endedAt: Date.now() });
+        } else {
+          updateEntry(id, { status: 200, bodyOut: result, endedAt: Date.now() });
+        }
       }
-      return bodyOut;
+      return result;
     } catch (e) {
       if (import.meta.env.DEV) {
-        recordEntry({ id, startedAt, method, path, bodyIn, status: 0, bodyOut: null, error: String(e), endedAt: Date.now() });
+        updateEntry(id, { status: 0, bodyOut: null, error: String(e), endedAt: Date.now() });
       }
       throw e;
     }

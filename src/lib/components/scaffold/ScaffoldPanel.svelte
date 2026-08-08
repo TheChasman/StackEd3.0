@@ -6,6 +6,7 @@
   import { publishToSubstack } from '$lib/services/substack/publisher';
   import { RecordingTransport } from '$lib/services/substack/recordingTransport';
   import TransportRecorderPanel from '$lib/components/dev/TransportRecorderPanel.svelte';
+  import { getBuffer } from '$lib/stores/transportRecorder.svelte';
   import { applySeoDraft, SEO_FIELD_PATHS, buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
   import { getTagVocabulary, cachePublicationTags } from '$lib/services/tagVocabulary';
   import { pmDocToText } from '$lib/utils/pmText';
@@ -101,7 +102,9 @@
         ? `Draft created. ID: ${result.draftId}\nConfirm by opening ${publication}.substack.com/publish`
         : `Error: no draftId returned`;
     } catch (e) {
-      publishStatus = `Error: ${e instanceof Error ? e.message : String(e)}`;
+      const base = `Error: ${e instanceof Error ? e.message : String(e)}`;
+      const hint = getBuffer().length > 0 ? '\nOpen the recorder (🔬) for the failed request.' : '';
+      publishStatus = base + hint;
     } finally {
       publishing = false;
     }
@@ -478,10 +481,12 @@
     </section>
 
     <!-- Round-trip control (dev) -->
-    <button
-      class="self-start text-xs text-dark-500 hover:text-dark-300"
-      onclick={() => { rttVisible = !rttVisible; }}
-    >{rttVisible ? 'Hide' : 'Show'} round-trip control</button>
+    {#if import.meta.env.DEV}
+      <button
+        class="self-start text-xs text-dark-500 hover:text-dark-300"
+        onclick={() => { rttVisible = !rttVisible; }}
+      >{rttVisible ? 'Hide' : 'Show'} round-trip control</button>
+    {/if}
     {#if rttVisible}
       <div class="border border-dark-700 rounded p-3 flex flex-col gap-2">
         <div class="text-xs font-semibold uppercase tracking-wide text-dark-400">Round-trip (dev)</div>

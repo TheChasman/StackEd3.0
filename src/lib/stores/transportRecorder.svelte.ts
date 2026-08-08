@@ -15,12 +15,21 @@ const buffer: RecorderEntry[] = [];
 const subscribers = new Set<(entries: RecorderEntry[]) => void>();
 
 function notify(): void {
-  for (const cb of subscribers) cb(buffer);
+  const snapshot = [...buffer];
+  for (const cb of subscribers) cb(snapshot);
 }
 
 export function recordEntry(entry: RecorderEntry): void {
   buffer.push(entry);
   while (buffer.length > RING_CAPACITY) buffer.shift();
+  notify();
+}
+
+/** Finds a pending entry by id and patches its fields in place, then notifies. */
+export function updateEntry(id: string, patch: Partial<Omit<RecorderEntry, 'id'>>): void {
+  const entry = buffer.find(e => e.id === id);
+  if (!entry) return;
+  Object.assign(entry, patch);
   notify();
 }
 
@@ -30,12 +39,12 @@ export function clearBuffer(): void {
 }
 
 export function getBuffer(): RecorderEntry[] {
-  return buffer;
+  return [...buffer];
 }
 
 export function subscribe(cb: (entries: RecorderEntry[]) => void): () => void {
   subscribers.add(cb);
-  cb(buffer);
+  cb([...buffer]);
   return () => { subscribers.delete(cb); };
 }
 
