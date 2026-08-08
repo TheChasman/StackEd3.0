@@ -32,7 +32,7 @@
           <span class="text-dark-500">{new Date(e.startedAt).toLocaleTimeString()}</span>
           <span class="font-semibold">{e.method}</span>
           <span>{e.path}</span>
-          <span class="ml-auto">{e.status}</span>
+          <span class="ml-auto px-1.5 py-0.5 rounded bg-dark-800">{e.status}</span>
           <span class="text-dark-500">{e.endedAt ? `${e.endedAt - e.startedAt}ms` : '…'}</span>
         </summary>
         <div class="mt-1 grid grid-cols-2 gap-2">
