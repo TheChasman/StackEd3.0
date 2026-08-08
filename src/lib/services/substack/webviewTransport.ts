@@ -201,6 +201,10 @@ export class WebViewTransport implements SubstackTransport {
     return this.send('DELETE', `/api/v1/drafts/${draftId}/scheduled_release`);
   }
 
+  async getDraft(draftId: number): Promise<SubstackResponse> {
+    return this.send('GET', `/api/v1/drafts/${draftId}`);
+  }
+
   async createNote(body: unknown): Promise<SubstackResponse> {
     // Notes go to the account host (substack.com), not the publication host
     return this.send('POST', '/api/v1/comment/feed', body);

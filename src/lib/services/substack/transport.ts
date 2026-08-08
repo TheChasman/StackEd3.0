@@ -51,6 +51,9 @@ export interface SubstackTransport {
   /** DELETE /api/v1/drafts/{id}/scheduled_release — cancel schedule. */
   unscheduleDraft(draftId: number): Promise<SubstackResponse>;
 
+  /** GET /api/v1/drafts/{id} — fetch an existing draft back from Substack. */
+  getDraft(draftId: number): Promise<SubstackResponse>;
+
   /** POST /api/v1/comment/feed — create a Note. */
   createNote(body: unknown): Promise<SubstackResponse>;
 

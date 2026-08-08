@@ -14,6 +14,7 @@ class StubTransport implements Partial<SubstackTransport> {
   createPostTag: Mock = vi.fn();
   attachTag: Mock = vi.fn();
   uploadImage: Mock = vi.fn();
+  getDraft: Mock = vi.fn();
   isLoggedIn: Mock = vi.fn().mockResolvedValue(true);
   getUserInfo: Mock = vi.fn();
 }
@@ -124,5 +125,27 @@ describe('RecordingTransport', () => {
     const snap = getBuffer();
     snap.push({ id: 'tampered', startedAt: 0, method: 'X', path: '/', bodyIn: null, status: 0, bodyOut: null, error: null, endedAt: null });
     expect(getBuffer()).toHaveLength(1);
+  });
+
+  it('delegates getDraft with the id-interpolated path and forwards the id', async () => {
+    const stub = new StubTransport() as unknown as SubstackTransport;
+    const response: SubstackResponse = { ok: true, status: 200, body: { id: 42, draft_title: 'X' } };
+    stub.getDraft = vi.fn().mockResolvedValue(response);
+    const recorder = new RecordingTransport(stub);
+    const result = await recorder.getDraft(42);
+    expect(result).toEqual(response);
+    expect(stub.getDraft).toHaveBeenCalledTimes(1);
+    expect(stub.getDraft).toHaveBeenCalledWith(42);
+  });
+
+  it('records non-throwing SubstackResponse status on a getDraft that returns 404', async () => {
+    const stub = new StubTransport() as unknown as SubstackTransport;
+    const response: SubstackResponse = { ok: false, status: 404, body: { error: 'not found' } };
+    stub.getDraft = vi.fn().mockResolvedValue(response);
+    const recorder = new RecordingTransport(stub);
+    const result = await recorder.getDraft(404);
+    expect(result).toEqual(response);
+    expect(getBuffer()).toHaveLength(1);
+    expect(getBuffer()[0].status).toBe(404);
   });
 });

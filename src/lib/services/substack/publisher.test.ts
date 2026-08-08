@@ -43,6 +43,7 @@ class StubTransport implements SubstackTransport {
   async publishDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
   async scheduleDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
   async unscheduleDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
+  async getDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
   async createNote(): Promise<SubstackResponse> { throw new Error('unused'); }
   async isLoggedIn(): Promise<boolean> { return true; }
   async getUserInfo(): Promise<Byline> { throw new Error('unused'); }

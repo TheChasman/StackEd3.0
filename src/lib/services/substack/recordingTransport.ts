@@ -54,6 +54,9 @@ export class RecordingTransport implements SubstackTransport {
   unscheduleDraft(id: number): Promise<SubstackResponse> {
     return this.wrap('DELETE', `/api/v1/drafts/${id}/scheduled_release`, undefined, () => this.inner.unscheduleDraft(id));
   }
+  getDraft(draftId: number): Promise<SubstackResponse> {
+    return this.wrap('GET', `/api/v1/drafts/${draftId}`, undefined, () => this.inner.getDraft(draftId));
+  }
   createNote(body: unknown): Promise<SubstackResponse> {
     return this.wrap('POST', '/api/v1/comment/feed', body as { bodyJson: unknown }, () => this.inner.createNote(body));
   }
