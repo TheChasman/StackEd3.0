@@ -10,23 +10,37 @@ export interface RecorderEntry {
   endedAt: number | null;
 }
 
+const RING_CAPACITY = 200;
+const buffer: RecorderEntry[] = [];
+const subscribers = new Set<(entries: RecorderEntry[]) => void>();
+
+function notify(): void {
+  for (const cb of subscribers) cb(buffer);
+}
+
 export function recordEntry(entry: RecorderEntry): void {
-  void entry;
+  buffer.push(entry);
+  while (buffer.length > RING_CAPACITY) buffer.shift();
+  notify();
 }
 
 export function clearBuffer(): void {
-  // no-op
+  buffer.length = 0;
+  notify();
 }
 
 export function getBuffer(): RecorderEntry[] {
-  return [];
+  return buffer;
 }
 
 export function subscribe(cb: (entries: RecorderEntry[]) => void): () => void {
-  void cb;
-  return () => {};
+  subscribers.add(cb);
+  cb(buffer);
+  return () => { subscribers.delete(cb); };
 }
 
 export function useRecorder(): { entries: RecorderEntry[] } {
-  return { entries: [] };
+  // Svelte 5 runes-style accessor; consumers can re-bind via subscribe() if they
+  // need an unsubscribe handle.
+  return { entries: buffer };
 }
