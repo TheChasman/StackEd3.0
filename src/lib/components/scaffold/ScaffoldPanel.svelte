@@ -77,16 +77,26 @@
       const sameShape = a.type === b.type
         && JSON.stringify(a.attrs ?? null) === JSON.stringify(b.attrs ?? null);
       const sameContent = JSON.stringify(a.content ?? null) === JSON.stringify(b.content ?? null);
-      if (sameShape && sameContent) {
+      const sameText = (a.text ?? '') === (b.text ?? '');
+      if (sameShape && sameContent && sameText) {
         matched++;
         return;
       }
-      if ((a.type === 'text' && b.type === 'text') || (a.type === 'paragraph' && b.type === 'paragraph')) {
-        if ((a.content ?? []).length === 1 && (b.content ?? []).length === 1 && (a.content?.[0]?.text ?? '') !== (b.content?.[0]?.text ?? '')) {
-          differing.push({ path, a: a.content?.[0]?.text, b: b.content?.[0]?.text });
-          return;
-        }
+      // Text-level diff: surface the .text leaf with the parent's path
+      if (a.type === 'text' && b.type === 'text' && a.text !== b.text) {
+        differing.push({ path: `${path}.text`, a: a.text ?? '', b: b.text ?? '' });
+        return;
       }
+      if (a.type === 'paragraph' && b.type === 'paragraph'
+          && (a.content ?? []).length === 1
+          && (b.content ?? []).length === 1
+          && a.content?.[0]?.type === 'text'
+          && b.content?.[0]?.type === 'text'
+          && (a.content[0].text ?? '') !== (b.content[0].text ?? '')) {
+        differing.push({ path: `${path}.text`, a: a.content[0].text ?? '', b: b.content[0].text ?? '' });
+        return;
+      }
+      // Walk children
       const aChildren = a.content ?? [];
       const bChildren = b.content ?? [];
       const len = Math.max(aChildren.length, bChildren.length);
