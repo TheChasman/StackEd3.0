@@ -68,6 +68,11 @@
     const differing: Array<{ path: string; a: unknown; b: unknown }> = [];
     let matched = 0;
 
+    function countNodes(n: PMNode): number {
+      const children = n.content ?? [];
+      return 1 + children.reduce((sum, c) => sum + countNodes(c), 0);
+    }
+
     function walk(a: PMNode | undefined, b: PMNode | undefined, path: string): void {
       if (a === undefined && b === undefined) return;
       if (a === undefined || b === undefined) {
@@ -79,7 +84,7 @@
       const sameContent = JSON.stringify(a.content ?? null) === JSON.stringify(b.content ?? null);
       const sameText = (a.text ?? '') === (b.text ?? '');
       if (sameShape && sameContent && sameText) {
-        matched++;
+        matched += countNodes(a);
         return;
       }
       // Text-level diff: surface the .text leaf with the parent's path
@@ -94,6 +99,11 @@
           && b.content?.[0]?.type === 'text'
           && (a.content[0].text ?? '') !== (b.content[0].text ?? '')) {
         differing.push({ path: `${path}.text`, a: a.content[0].text ?? '', b: b.content[0].text ?? '' });
+        return;
+      }
+      // Type-only diff: same text content, different node type (e.g. paragraph → heading)
+      if (!sameShape && sameContent && sameText) {
+        differing.push({ path, a: a.type, b: b.type });
         return;
       }
       // Walk children
@@ -224,7 +234,9 @@
         : `${diff.matched} matched, ${diff.differing.length} differs — ${differingLines}${moreCount}`;
       publishStatus = `Body round-trip: ${verdict}. Draft ID: ${result.draftId}\nConfirm by opening ${publication}.substack.com/publish`;
     } catch (e) {
-      publishStatus = `Error: ${e instanceof Error ? e.message : String(e)}`;
+      const msg = e instanceof Error ? e.message : String(e);
+      const hint = getBuffer().length > 0 ? '\nOpen the recorder (🔬) for the failed request.' : '';
+      publishStatus = `Error: ${msg}${hint}`;
     } finally {
       publishing = false;
     }
