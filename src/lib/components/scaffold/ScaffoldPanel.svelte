@@ -4,6 +4,8 @@
   import { readiness } from '$lib/utils/scaffold';
   import { isPostPayload, isNotePayload, type PostPayload } from '$lib/types/scaffold';
   import { publishToSubstack } from '$lib/services/substack/publisher';
+  import { RecordingTransport } from '$lib/services/substack/recordingTransport';
+  import TransportRecorderPanel from '$lib/components/dev/TransportRecorderPanel.svelte';
   import { applySeoDraft, SEO_FIELD_PATHS, buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
   import { getTagVocabulary, cachePublicationTags } from '$lib/services/tagVocabulary';
   import { pmDocToText } from '$lib/utils/pmText';
@@ -16,6 +18,12 @@
   let publishing = $state(false);
   let seoLoading = $state(false);
   let seoError = $state('');
+
+  let rttVisible = $state(false);
+  let showRecorder = $state(false);
+  let rttTitle = $state('Round-trip test');
+  let rttSubtitle = $state('');
+  let rttSlug = $state(`rtt-${crypto.randomUUID().slice(0, 6)}`);
 
   function patch<K extends keyof PostPayload>(field: K, value: PostPayload[K]) {
     documentStore.patchPayload(field, value);
@@ -49,6 +57,53 @@
       seoError = typeof e === 'string' ? e : e instanceof Error ? e.message : 'SEO generation failed.';
     } finally {
       seoLoading = false;
+    }
+  }
+
+  async function runMinimalRoundTrip() {
+    if (!scaffold) return;
+    const publication = scaffold.remote.publication.trim();
+    if (!publication) {
+      alert('Enter your Substack publication subdomain first (e.g. "myblog" for myblog.substack.com).');
+      return;
+    }
+    if (!window.confirm('Send minimal post to Substack drafts? Sends only title, subtitle, slug.')) return;
+
+    publishing = true;
+    publishStatus = 'Opening Substack...';
+
+    try {
+      const { WebViewTransport } = await import('$lib/services/substack/webviewTransport');
+      const transport = new RecordingTransport(new WebViewTransport(publication));
+
+      const { invoke } = await import('@tauri-apps/api/core');
+      const readImageAsDataUrl = async (src: string): Promise<string> => {
+        if (src.startsWith('data:')) return src;
+        const { resolveArtworkImagePath } = await import('$lib/utils/artworkReferences');
+        const path = resolveArtworkImagePath(documentStore.filePath, src);
+        if (!path) throw new Error(`Cannot resolve image: ${src}`);
+        return invoke<string>('read_image_data_url', { path });
+      };
+
+      const { emptyScaffold } = await import('$lib/types/scaffold');
+      const fresh = emptyScaffold('post');
+      if (isPostPayload(fresh.payload)) {
+        fresh.payload.draft_title = rttTitle;
+        fresh.payload.draft_subtitle = rttSubtitle;
+        fresh.payload.slug = rttSlug;
+        fresh.payload.send = false;
+      }
+
+      publishStatus = 'Uploading images and creating draft...';
+      const result = await publishToSubstack(fresh, transport, readImageAsDataUrl);
+
+      publishStatus = result.draftId
+        ? `Draft created. ID: ${result.draftId}\nConfirm by opening ${publication}.substack.com/publish`
+        : `Error: no draftId returned`;
+    } catch (e) {
+      publishStatus = `Error: ${e instanceof Error ? e.message : String(e)}`;
+    } finally {
+      publishing = false;
     }
   }
 
@@ -422,6 +477,34 @@
       </div>
     </section>
 
+    <!-- Round-trip control (dev) -->
+    <button
+      class="self-start text-xs text-dark-500 hover:text-dark-300"
+      onclick={() => { rttVisible = !rttVisible; }}
+    >{rttVisible ? 'Hide' : 'Show'} round-trip control</button>
+    {#if rttVisible}
+      <div class="border border-dark-700 rounded p-3 flex flex-col gap-2">
+        <div class="text-xs font-semibold uppercase tracking-wide text-dark-400">Round-trip (dev)</div>
+        <label class="flex flex-col gap-1 text-xs">
+          Title
+          <input class="bg-dark-900 border border-dark-700 rounded px-2 py-1" bind:value={rttTitle} />
+        </label>
+        <label class="flex flex-col gap-1 text-xs">
+          Subtitle
+          <input class="bg-dark-900 border border-dark-700 rounded px-2 py-1" bind:value={rttSubtitle} />
+        </label>
+        <label class="flex flex-col gap-1 text-xs">
+          Slug
+          <input class="bg-dark-900 border border-dark-700 rounded px-2 py-1 font-mono" bind:value={rttSlug} />
+        </label>
+        <button
+          class="self-start px-3 py-1 rounded bg-blue-700 text-white text-sm disabled:opacity-50"
+          disabled={publishing}
+          onclick={runMinimalRoundTrip}
+        >Round-trip to Substack drafts</button>
+      </div>
+    {/if}
+
     <!-- Substack publishing -->
     <section>
       <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Substack</h3>
@@ -482,6 +565,24 @@
         {/if}
       </div>
     </section>
+
+    {#if import.meta.env.DEV}
+      <div class="sticky bottom-2 self-end">
+        <button
+          class="text-xs px-2 py-1 rounded bg-dark-800 border border-dark-700 text-dark-300 hover:text-dark-100"
+          onclick={() => { showRecorder = !showRecorder; }}
+        >🔬 {showRecorder ? 'Hide' : 'Show'} recorder</button>
+      </div>
+      {#if showRecorder}
+        <div class="fixed inset-4 z-50 border border-dark-700 rounded bg-dark-900 shadow-lg overflow-hidden">
+          <TransportRecorderPanel />
+          <button
+            class="absolute top-2 right-2 text-dark-400 hover:text-dark-100"
+            onclick={() => { showRecorder = false; }}
+          >×</button>
+        </div>
+      {/if}
+    {/if}
 
   </div>
 {/if}
