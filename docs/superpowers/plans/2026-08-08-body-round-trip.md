@@ -452,15 +452,12 @@ Insert this helper in the script block. It can sit anywhere above `runMinimalRou
 
       const { emptyScaffold } = await import('$lib/types/scaffold');
       const fresh = emptyScaffold('post');
+      if (!isPostPayload(fresh.payload)) throw new Error('expected post payload');
       fresh.payload.draft_title = rttTitle;
       fresh.payload.draft_subtitle = rttSubtitle;
       fresh.payload.slug = rttSlug;
       fresh.payload.draft_body = buildBodyFromPreset(bodyPreset);
       fresh.payload.send = false;
-      if (isPostPayload(fresh.payload)) {
-        // type narrow — payload is currently PostPayload; the guard mirrors Phase 1.
-        fresh.payload.send = false;
-      }
 
       publishStatus = 'Uploading images and creating draft...';
       const result = await publishToSubstack(fresh, transport, readImageAsDataUrl);
