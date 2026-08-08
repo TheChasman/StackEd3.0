@@ -127,7 +127,7 @@ describe('RecordingTransport', () => {
     expect(getBuffer()).toHaveLength(1);
   });
 
-  it('delegates getDraft with the id-interpolated path and forwards the id', async () => {
+  it('delegates getDraft with id-interpolated path, forwards id, and records in the buffer', async () => {
     const stub = new StubTransport() as unknown as SubstackTransport;
     const response: SubstackResponse = { ok: true, status: 200, body: { id: 42, draft_title: 'X' } };
     stub.getDraft = vi.fn().mockResolvedValue(response);
@@ -136,6 +136,9 @@ describe('RecordingTransport', () => {
     expect(result).toEqual(response);
     expect(stub.getDraft).toHaveBeenCalledTimes(1);
     expect(stub.getDraft).toHaveBeenCalledWith(42);
+    expect(getBuffer()).toHaveLength(1);
+    expect(getBuffer()[0]).toMatchObject({ method: 'GET', path: '/api/v1/drafts/42' });
+    expect(getBuffer()[0].bodyIn).toBeUndefined();
   });
 
   it('records non-throwing SubstackResponse status on a getDraft that returns 404', async () => {
