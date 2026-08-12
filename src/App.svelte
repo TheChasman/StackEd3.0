@@ -17,6 +17,7 @@
   import ThemeBrowser from '$lib/components/ThemeBrowser.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
+  import { substackConnectionsStore } from '$lib/stores/substackConnections.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import { createNewScaffold, openScaffold, openScaffoldPath, saveScaffoldPath, saveScaffoldAs, titleFromFilePath, writeFilePath } from '$lib/services/files';
   import { buildLabel } from '$lib/utils/buildInfo';
@@ -121,6 +122,7 @@
 
     void (async () => {
       await settingsStore.loadFromStorage();
+      await substackConnectionsStore.load().catch(console.error);
       const initialPath = await invoke<string | null>('initial_file_path').catch(() => null);
       if (initialPath) {
         await loadFilePath(initialPath);

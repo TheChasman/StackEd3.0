@@ -11,8 +11,28 @@
   import { applySeoDraft, SEO_FIELD_PATHS, buildSeoPrompt, parseSeoDraftJson } from '$lib/services/seo';
   import { getTagVocabulary, cachePublicationTags } from '$lib/services/tagVocabulary';
   import { pmDocToText } from '$lib/utils/pmText';
+  import { substackConnectionsStore, normaliseSubdomain } from '$lib/stores/substackConnections.svelte';
 
   let scaffold = $derived(documentStore.scaffold);
+  // The dropdown's value must match an option (which uses the normalised
+  // subdomain). Resolve the document's raw publication to a known connection
+  // case-insensitively WITHOUT rewriting the file — the doc only changes when
+  // the user actively picks from the dropdown.
+  let selectedSubdomain = $derived(
+    scaffold?.remote.publication
+      ? (substackConnectionsStore.findBySubdomain(scaffold.remote.publication)?.subdomain ?? '')
+      : '',
+  );
+
+  // Legacy-file migration + deleted-connection recovery: if the active post
+  // names a publication that isn't in the registry, silently (re)add it.
+  $effect(() => {
+    const pub = scaffold?.remote.publication;
+    if (pub && !substackConnectionsStore.findBySubdomain(pub)) {
+      void substackConnectionsStore.ensureConnectionForSubdomain(pub);
+    }
+  });
+
   let r = $derived(scaffold ? readiness(scaffold) : null);
   let slugLocked = $derived(scaffold ? scaffold.locked.includes(SEO_FIELD_PATHS.slug) : false);
   let errorMap = $derived(new Map(r?.blocking.map(b => [b.split(' ')[0], b]) ?? []));
@@ -673,20 +693,25 @@
       <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Substack</h3>
       <div class="flex flex-col gap-3">
         <label class="flex flex-col gap-1">
-          <span class="text-dark-400 text-xs">Publication subdomain</span>
-          <div class="flex items-center gap-1">
-            <input
-              type="text"
-              value={scaffold.remote.publication}
-              onchange={(e) => {
-                scaffold!.remote.publication = e.currentTarget.value.trim();
-                documentStore.replaceScaffold(scaffold!);
-              }}
-              placeholder="myblog"
-              class="flex-1 bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500 text-sm"
-            />
-            <span class="text-dark-500 text-xs whitespace-nowrap">.substack.com</span>
-          </div>
+          <span class="text-dark-400 text-xs">Publication</span>
+          <select
+            value={selectedSubdomain}
+            onchange={(e) => {
+              scaffold!.remote.publication = normaliseSubdomain(e.currentTarget.value);
+              documentStore.replaceScaffold(scaffold!);
+            }}
+            class="bg-dark-800 border border-dark-600 rounded p-2 text-dark-100 focus:border-primary-500 text-sm"
+          >
+            <option value="">— Select a connection —</option>
+            {#each substackConnectionsStore.connections as conn (conn.id)}
+              <option value={conn.subdomain}>
+                {conn.nickname}{conn.nickname !== conn.subdomain ? ` (${conn.subdomain}.substack.com)` : ''}
+              </option>
+            {/each}
+          </select>
+          {#if substackConnectionsStore.connections.length === 0}
+            <span class="text-dark-500 text-xs">Add a connection in Settings to publish.</span>
+          {/if}
         </label>
         <button
           onclick={handlePublish}

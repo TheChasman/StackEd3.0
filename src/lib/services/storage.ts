@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { invoke } from '@tauri-apps/api/core';
+import type { SubstackConnection } from '$lib/types/connection';
 
 interface StackEdDB extends DBSchema {
   settings: { key: string; value: unknown };
@@ -45,6 +46,17 @@ export async function savePipelineFolderPath(path: string): Promise<void> {
 export async function loadPipelineFolderPath(): Promise<string | null> {
   const db = await DB_PROMISE;
   return ((await db.get('settings', 'pipelineFolderPath')) as string | undefined) ?? null;
+}
+
+export async function saveSubstackConnections(connections: SubstackConnection[]): Promise<void> {
+  const db = await DB_PROMISE;
+  await db.put('settings', connections, 'substackConnections');
+}
+
+export async function loadSubstackConnections(): Promise<SubstackConnection[]> {
+  const db = await DB_PROMISE;
+  const stored = (await db.get('settings', 'substackConnections')) as SubstackConnection[] | undefined;
+  return Array.isArray(stored) ? stored : [];
 }
 
 export interface RecentFile {
