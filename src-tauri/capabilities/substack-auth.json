@@ -5,6 +5,11 @@
   "windows": [
     "substack-auth"
   ],
+  "remote": {
+    "urls": [
+      "https://*.substack.com"
+    ]
+  },
   "permissions": [
     "core:event:default"
   ]
