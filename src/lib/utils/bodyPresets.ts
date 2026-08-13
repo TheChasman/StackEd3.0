@@ -1,10 +1,7 @@
 import type { PMDoc, PMNode } from '$lib/types/scaffold';
 
 export type BodyPreset =
-  | 'minimal-paragraph'
-  | 'paragraph-heading'
-  | 'multi-section'
-  | 'full-mirror';
+  'minimal-paragraph' | 'paragraph-heading' | 'multi-section' | 'full-mirror';
 
 export const BUILT_IN_BODY_PRESETS: ReadonlyArray<BodyPreset> = [
   'minimal-paragraph',
@@ -42,7 +39,10 @@ export function buildBodyFromPreset(preset: BodyPreset): PMDoc {
     case 'minimal-paragraph':
       return { type: 'doc', content: [paragraph('Body round-trip test.')] };
     case 'paragraph-heading':
-      return { type: 'doc', content: [paragraph('Body round-trip test — paragraph 1.'), heading('Section heading', 2)] };
+      return {
+        type: 'doc',
+        content: [paragraph('Body round-trip test — paragraph 1.'), heading('Section heading', 2)],
+      };
     case 'multi-section':
       return multiSectionBody();
     case 'full-mirror':

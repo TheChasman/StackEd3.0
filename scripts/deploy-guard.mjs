@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url';
 const scriptPath = fileURLToPath(import.meta.url);
 
 function gitOutput(args, execFileSyncImpl = execFileSync) {
-  return execFileSyncImpl('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  return execFileSyncImpl('git', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
 }
 
 function optionalGitOutput(args, execFileSyncImpl = execFileSync) {
@@ -29,7 +32,9 @@ export function getDeployBlockers({ status, upstream, aheadBehind }) {
   const ahead = Number.parseInt(aheadRaw || '0', 10);
   const behind = Number.parseInt(behindRaw || '0', 10);
   if (ahead > 0) {
-    blockers.push(`Branch is ahead of upstream by ${ahead} commit(s). Push before deploy so the build label points at a remote commit.`);
+    blockers.push(
+      `Branch is ahead of upstream by ${ahead} commit(s). Push before deploy so the build label points at a remote commit.`,
+    );
   }
   if (behind > 0) {
     blockers.push(`Branch is behind upstream by ${behind} commit(s). Pull/rebase before deploy.`);
@@ -45,7 +50,10 @@ export function assertDeployable(state) {
 }
 
 export function readGitDeployState(execFileSyncImpl = execFileSync) {
-  const upstream = optionalGitOutput(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], execFileSyncImpl);
+  const upstream = optionalGitOutput(
+    ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'],
+    execFileSyncImpl,
+  );
   return {
     status: gitOutput(['status', '--porcelain'], execFileSyncImpl),
     upstream,

@@ -36,19 +36,22 @@ describe('installMacosApp', () => {
       log: () => {},
     });
 
-    await expect(readFile(join(destinationApp, 'Contents', 'Resources', 'marker.txt'), 'utf8'))
-      .resolves.toBe('fresh build');
+    await expect(
+      readFile(join(destinationApp, 'Contents', 'Resources', 'marker.txt'), 'utf8'),
+    ).resolves.toBe('fresh build');
   });
 
   test('fails before copying when the built app is missing', async () => {
     const root = await createTempDir();
 
-    await expect(installMacosApp({
-      sourceApp: join(root, 'missing', 'StackEd.app'),
-      destinationApp: join(root, 'Applications', 'StackEd.app'),
-      isAppRunning: () => false,
-      log: () => {},
-    })).rejects.toThrow('Built app not found');
+    await expect(
+      installMacosApp({
+        sourceApp: join(root, 'missing', 'StackEd.app'),
+        destinationApp: join(root, 'Applications', 'StackEd.app'),
+        isAppRunning: () => false,
+        log: () => {},
+      }),
+    ).rejects.toThrow('Built app not found');
   });
 
   test('refuses to replace the app while StackEd is running', async () => {
@@ -57,12 +60,14 @@ describe('installMacosApp', () => {
     const destinationApp = join(root, 'Applications', 'StackEd.app');
     await createAppBundle(sourceApp, 'fresh build');
 
-    await expect(installMacosApp({
-      sourceApp,
-      destinationApp,
-      isAppRunning: () => true,
-      log: () => {},
-    })).rejects.toThrow('Quit StackEd before installing');
+    await expect(
+      installMacosApp({
+        sourceApp,
+        destinationApp,
+        isAppRunning: () => true,
+        log: () => {},
+      }),
+    ).rejects.toThrow('Quit StackEd before installing');
   });
 
   test('continues install once StackEd has exited', async () => {
@@ -73,7 +78,7 @@ describe('installMacosApp', () => {
     await createAppBundle(destinationApp, 'stale build');
 
     const states = [true, false];
-    const isAppRunning = () => (states.shift() ?? false);
+    const isAppRunning = () => states.shift() ?? false;
 
     await installMacosApp({
       sourceApp,
@@ -83,7 +88,8 @@ describe('installMacosApp', () => {
     });
 
     expect(states.length).toBe(0);
-    await expect(readFile(join(destinationApp, 'Contents', 'Resources', 'marker.txt'), 'utf8'))
-      .resolves.toBe('fresh build');
+    await expect(
+      readFile(join(destinationApp, 'Contents', 'Resources', 'marker.txt'), 'utf8'),
+    ).resolves.toBe('fresh build');
   });
 });

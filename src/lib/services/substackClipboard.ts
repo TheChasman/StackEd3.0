@@ -29,7 +29,8 @@ function creditTitleFromDataAttrs(source: HTMLImageElement): string {
   try {
     const parsed = JSON.parse(raw) as { credit?: unknown; title?: unknown };
     if (typeof parsed.title === 'string' && parsed.title.trim()) return parsed.title.trim();
-    if (typeof parsed.credit === 'string' && parsed.credit.trim()) return `Credit: ${parsed.credit.trim()}`;
+    if (typeof parsed.credit === 'string' && parsed.credit.trim())
+      return `Credit: ${parsed.credit.trim()}`;
   } catch {
     return '';
   }
@@ -53,7 +54,9 @@ export async function createSubstackClipboardHtml({
   readImageDataUrl,
 }: CreateSubstackClipboardHtmlParams): Promise<string> {
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const figures = Array.from(doc.querySelectorAll('figure[data-type="captioned-image"], figure.captioned-image-container'));
+  const figures = Array.from(
+    doc.querySelectorAll('figure[data-type="captioned-image"], figure.captioned-image-container'),
+  );
 
   for (const figure of figures) {
     const source = figure.querySelector('img') as HTMLImageElement | null;
@@ -88,7 +91,10 @@ export async function createSubstackClipboardHtml({
   return doc.body.innerHTML.trim();
 }
 
-export async function copyEditorHtmlForSubstack(html: string, articlePath: string | null): Promise<void> {
+export async function copyEditorHtmlForSubstack(
+  html: string,
+  articlePath: string | null,
+): Promise<void> {
   const clipboardHtml = await createSubstackClipboardHtml({
     html,
     articlePath,

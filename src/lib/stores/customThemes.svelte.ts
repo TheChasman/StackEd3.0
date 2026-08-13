@@ -25,10 +25,14 @@ class CustomThemesStore {
 
   private normalizeTheme(theme: CustomTheme): { theme: CustomTheme; changed: boolean } {
     const colors = this.normalizeColors(theme.colors);
-    const catalogueId = theme.catalogueId
-      ?? (theme.catalogueFlavor ? mapLegacyFlavorToSchemeId(theme.catalogueFlavor) : null)
-      ?? undefined;
-    const changed = !isBase16Colors(theme.colors) || catalogueId !== theme.catalogueId || Boolean(theme.catalogueFlavor);
+    const catalogueId =
+      theme.catalogueId ??
+      (theme.catalogueFlavor ? mapLegacyFlavorToSchemeId(theme.catalogueFlavor) : null) ??
+      undefined;
+    const changed =
+      !isBase16Colors(theme.colors) ||
+      catalogueId !== theme.catalogueId ||
+      Boolean(theme.catalogueFlavor);
     return {
       theme: {
         ...theme,
@@ -55,7 +59,7 @@ class CustomThemesStore {
 
       this.customThemes = normalizedThemes;
       const savedId = localStorage.getItem('activeCustomThemeId');
-      if (savedId && this.customThemes.some(t => t.id === savedId)) {
+      if (savedId && this.customThemes.some((t) => t.id === savedId)) {
         this.activeCustomId = savedId;
         const activeTheme = this.customThemes.find((theme) => theme.id === savedId);
         if (activeTheme) {
@@ -68,7 +72,11 @@ class CustomThemesStore {
     this.isLoaded = true;
   }
 
-  async createTheme(name: string, colors: Base16Colors | Record<string, string>, description?: string): Promise<CustomTheme> {
+  async createTheme(
+    name: string,
+    colors: Base16Colors | Record<string, string>,
+    description?: string,
+  ): Promise<CustomTheme> {
     const theme: CustomTheme = {
       id: themeStorage.generateId(),
       name,
@@ -84,7 +92,7 @@ class CustomThemesStore {
   }
 
   async updateTheme(id: string, updates: Partial<CustomTheme>): Promise<void> {
-    const theme = this.customThemes.find(t => t.id === id);
+    const theme = this.customThemes.find((t) => t.id === id);
     if (!theme) throw new Error(`Theme ${id} not found`);
 
     const updatedColors = updates.colors
@@ -108,7 +116,7 @@ class CustomThemesStore {
 
   async deleteTheme(id: string): Promise<void> {
     await themeStorage.deleteTheme(id);
-    this.customThemes = this.customThemes.filter(t => t.id !== id);
+    this.customThemes = this.customThemes.filter((t) => t.id !== id);
     if (this.activeCustomId === id) {
       this.activeCustomId = null;
       localStorage.removeItem('activeCustomThemeId');
@@ -116,14 +124,14 @@ class CustomThemesStore {
   }
 
   async cloneTheme(id: string, newName: string): Promise<CustomTheme> {
-    const theme = this.customThemes.find(t => t.id === id);
+    const theme = this.customThemes.find((t) => t.id === id);
     if (!theme) throw new Error(`Theme ${id} not found`);
 
     return this.createTheme(newName, { ...theme.colors }, `Clone of ${theme.name}`);
   }
 
   async applyCustomTheme(id: string): Promise<void> {
-    const theme = this.customThemes.find(t => t.id === id);
+    const theme = this.customThemes.find((t) => t.id === id);
     if (!theme) throw new Error(`Theme ${id} not found`);
 
     this.activeCustomId = id;
@@ -134,7 +142,7 @@ class CustomThemesStore {
   }
 
   async toggleFavorite(id: string): Promise<void> {
-    const theme = this.customThemes.find(t => t.id === id);
+    const theme = this.customThemes.find((t) => t.id === id);
     if (theme) {
       await this.updateTheme(id, { isFavorite: !theme.isFavorite });
     }
@@ -150,7 +158,7 @@ class CustomThemesStore {
   }
 
   getThemeByCatalogueId(schemeId: string): CustomTheme | undefined {
-    return this.customThemes.find(theme => theme.catalogueId === schemeId);
+    return this.customThemes.find((theme) => theme.catalogueId === schemeId);
   }
 
   cloneFromCatalogueScheme(schemeId: string): Promise<CustomTheme> {
@@ -164,14 +172,13 @@ class CustomThemesStore {
   }
 
   getFavorites(): CustomTheme[] {
-    return this.customThemes.filter(t => t.isFavorite);
+    return this.customThemes.filter((t) => t.isFavorite);
   }
 
   search(query: string): CustomTheme[] {
     const q = query.toLowerCase();
-    return this.customThemes.filter(t =>
-      t.name.toLowerCase().includes(q) ||
-      t.description?.toLowerCase().includes(q)
+    return this.customThemes.filter(
+      (t) => t.name.toLowerCase().includes(q) || t.description?.toLowerCase().includes(q),
     );
   }
 }

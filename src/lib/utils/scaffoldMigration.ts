@@ -7,7 +7,6 @@ import type { ArticleFrontmatter } from '$lib/types/article';
 import type { Scaffold, PostPayload, PMDoc } from '$lib/types/scaffold';
 import { emptyScaffold } from '$lib/types/scaffold';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Extensions = any[];
 
 export function migrateFromArticle(
@@ -52,7 +51,12 @@ function extractAltCandidates(body: string): {
   hook: string[];
   landing: string[];
 } {
-  const result = { title: [] as string[], subtitle: [] as string[], hook: [] as string[], landing: [] as string[] };
+  const result = {
+    title: [] as string[],
+    subtitle: [] as string[],
+    hook: [] as string[],
+    landing: [] as string[],
+  };
   const sections = ['TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 
   for (const section of sections) {
@@ -67,9 +71,9 @@ function extractAltCandidates(body: string): {
 
     const items = chunk
       .split('\n')
-      .map(line => line.match(/^\d+\.\s+(.*?)(\s*\[✓\])?\s*$/))
+      .map((line) => line.match(/^\d+\.\s+(.*?)(\s*\[✓\])?\s*$/))
       .filter((m): m is RegExpMatchArray => m !== null && m[1].trim().length > 0)
-      .map(m => m[1].trim());
+      .map((m) => m[1].trim());
 
     const key = section.toLowerCase() as 'title' | 'subtitle' | 'hook' | 'landing';
     result[key] = items;

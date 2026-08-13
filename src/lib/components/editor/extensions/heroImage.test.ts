@@ -19,11 +19,15 @@ describe('replaceHeroImage', () => {
   it('replaces an existing hero image at the top of the article', () => {
     const editor = createEditor();
     editor.commands.setContent('<p>Intro paragraph.</p>');
-    editor.chain().focus().insertCaptionedImage({
-      src: 'https://example.com/old_100x100.png',
-      alt: 'Old hero',
-      topImage: true,
-    }).run();
+    editor
+      .chain()
+      .focus()
+      .insertCaptionedImage({
+        src: 'https://example.com/old_100x100.png',
+        alt: 'Old hero',
+        topImage: true,
+      })
+      .run();
 
     const replaced = replaceHeroImage(editor, {
       src: 'https://example.com/new_640x480.png',
@@ -60,11 +64,15 @@ describe('replaceHeroImage', () => {
 
   it('returns false when no existing hero is present', () => {
     const editor = createEditor();
-    editor.chain().focus().insertCaptionedImage({
-      src: 'https://example.com/inline.png',
-      alt: 'Inline',
-      topImage: false,
-    }).run();
+    editor
+      .chain()
+      .focus()
+      .insertCaptionedImage({
+        src: 'https://example.com/inline.png',
+        alt: 'Inline',
+        topImage: false,
+      })
+      .run();
 
     const replaced = replaceHeroImage(editor, {
       src: 'https://example.com/new_640x480.png',
@@ -77,11 +85,15 @@ describe('replaceHeroImage', () => {
 
   it('clears existing hero flags before a new hero is inserted', () => {
     const editor = createEditor();
-    editor.chain().focus().insertCaptionedImage({
-      src: 'https://example.com/old_100x100.png',
-      alt: 'Old hero',
-      topImage: true,
-    }).run();
+    editor
+      .chain()
+      .focus()
+      .insertCaptionedImage({
+        src: 'https://example.com/old_100x100.png',
+        alt: 'Old hero',
+        topImage: true,
+      })
+      .run();
 
     clearHeroImageFlags(editor);
 

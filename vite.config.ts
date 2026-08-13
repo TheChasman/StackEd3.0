@@ -6,20 +6,27 @@ import { fileURLToPath, URL } from 'node:url';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
+const packageJson = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+) as {
   version: string;
 };
 
 function commandOutput(command: string): string {
   try {
-    return execSync(command, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+    return execSync(command, { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
   } catch {
     return '';
   }
 }
 
 const buildCommit = commandOutput('git rev-parse --short HEAD');
-const buildTimestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+const buildTimestamp = new Date()
+  .toISOString()
+  .replace(/[-:TZ.]/g, '')
+  .slice(0, 14);
 
 export default defineConfig({
   define: {

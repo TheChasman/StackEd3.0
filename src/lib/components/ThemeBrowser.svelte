@@ -14,7 +14,16 @@
   let editingThemeId = $state<string | null>(null);
   let selectedThemeId = $state<string | null>(null);
   const baseRamp = ['base00', 'base01', 'base02', 'base03', 'base04', 'base05', 'base06', 'base07'];
-  const accentRamp = ['base08', 'base09', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E', 'base0F'];
+  const accentRamp = [
+    'base08',
+    'base09',
+    'base0A',
+    'base0B',
+    'base0C',
+    'base0D',
+    'base0E',
+    'base0F',
+  ];
 
   const catalogueSchemes = catalogueSync.getCatalogueSchemes();
   const builtinSchemes = themeStore
@@ -39,7 +48,7 @@
   }
 
   async function cloneTheme(id: string) {
-    const theme = customThemesStore.customThemes.find(t => t.id === id);
+    const theme = customThemesStore.customThemes.find((t) => t.id === id);
     if (theme) {
       const newName = prompt('New theme name:', `${theme.name} (Copy)`);
       if (newName) {
@@ -72,11 +81,12 @@
 
   const filtered = $derived(
     activeTab === 'custom'
-      ? customThemesStore.customThemes.filter(t =>
-          t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      ? customThemesStore.customThemes.filter(
+          (t) =>
+            t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            t.description?.toLowerCase().includes(searchQuery.toLowerCase()),
         )
-      : customThemesStore.customThemes
+      : customThemesStore.customThemes,
   );
 </script>
 
@@ -106,11 +116,7 @@
 
     <!-- Tabs -->
     <div class="flex gap-0 px-6 pt-5 border-b border-dark-700 shrink-0">
-      {#each [
-        { id: 'builtin', label: 'Built-in Schemes' },
-        { id: 'custom', label: 'My Themes' },
-        { id: 'catalogue', label: 'Dark Catalogue' },
-      ] as tab}
+      {#each [{ id: 'builtin', label: 'Built-in Schemes' }, { id: 'custom', label: 'My Themes' }, { id: 'catalogue', label: 'Dark Catalogue' }] as tab}
         <button
           onclick={() => (activeTab = tab.id as any)}
           class="px-5 py-3 text-base font-medium border-b-2 transition-colors {activeTab === tab.id
@@ -125,10 +131,7 @@
     <!-- Content -->
     <div class="flex-1 overflow-y-auto">
       {#if editingThemeId}
-        <ThemeEditor
-          themeId={editingThemeId}
-          onclose={() => (editingThemeId = null)}
-        />
+        <ThemeEditor themeId={editingThemeId} onclose={() => (editingThemeId = null)} />
       {:else if activeTab === 'builtin'}
         <div class="p-6 grid grid-cols-2 gap-5">
           {#each builtinSchemes as scheme (scheme.id)}
@@ -160,7 +163,9 @@
 
           {#if filtered.length === 0}
             <div class="text-center py-12 text-dark-400">
-              {searchQuery ? 'No themes match your search' : 'No custom themes yet. Import from the dark catalogue or clone a built-in theme.'}
+              {searchQuery
+                ? 'No themes match your search'
+                : 'No custom themes yet. Import from the dark catalogue or clone a built-in theme.'}
             </div>
           {:else}
             <div class="space-y-2">
@@ -228,8 +233,12 @@
         </div>
       {:else if activeTab === 'catalogue'}
         <div class="p-6 space-y-6">
-          <div class="flex items-center justify-between gap-3 rounded-lg border border-dark-600 bg-dark-700/60 p-4">
-            <p class="text-sm text-dark-300">Curated Base16-compatible dark themes. Add all in one click, then edit in My Themes.</p>
+          <div
+            class="flex items-center justify-between gap-3 rounded-lg border border-dark-600 bg-dark-700/60 p-4"
+          >
+            <p class="text-sm text-dark-300">
+              Curated Base16-compatible dark themes. Add all in one click, then edit in My Themes.
+            </p>
             <button
               onclick={importAllDarkFromCatalogue}
               class="px-4 py-2 bg-green-900/30 hover:bg-green-900/50 text-green-400 rounded text-sm font-medium transition-colors"
@@ -239,7 +248,9 @@
           </div>
           {#each catalogueSchemes as scheme (scheme.id)}
             {@const paletteColors = getPaletteAsRecord(scheme.id)}
-            <div class="p-5 rounded-lg border border-dark-600 hover:border-green-500 transition-all">
+            <div
+              class="p-5 rounded-lg border border-dark-600 hover:border-green-500 transition-all"
+            >
               <div class="flex items-center justify-between mb-5">
                 <div class="flex items-center gap-4">
                   <span class="text-5xl">{scheme.emoji}</span>
@@ -250,7 +261,9 @@
                 </div>
                 <button
                   onclick={() => importFromCatalogue(scheme.id)}
-                  class="px-5 py-3 rounded text-base font-medium transition-colors {isImportedFromCatalogue(scheme.id)
+                  class="px-5 py-3 rounded text-base font-medium transition-colors {isImportedFromCatalogue(
+                    scheme.id,
+                  )
                     ? 'bg-dark-600 text-dark-200 hover:bg-dark-500'
                     : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'}"
                 >

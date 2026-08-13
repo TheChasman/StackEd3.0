@@ -29,7 +29,7 @@ function cleanTags(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value
     .filter((item): item is string => typeof item === 'string')
-    .map(item => item.trim())
+    .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 8);
 }
@@ -51,12 +51,19 @@ export function parseSeoDraftJson(raw: string): SeoDraft {
   if (jsonStart < 0 || jsonEnd < jsonStart) throw new Error('SEO draft was not valid JSON.');
 
   const parsed = JSON.parse(raw.slice(jsonStart, jsonEnd + 1)) as Partial<SeoDraft>;
-  for (const field of ['search_engine_title', 'search_engine_description', 'slug', 'tags'] as const) {
+  for (const field of [
+    'search_engine_title',
+    'search_engine_description',
+    'slug',
+    'tags',
+  ] as const) {
     if (!(field in parsed)) throw new Error(`SEO draft missing ${field}.`);
   }
 
-  if (typeof parsed.search_engine_title !== 'string') throw new Error('search_engine_title must be text.');
-  if (typeof parsed.search_engine_description !== 'string') throw new Error('search_engine_description must be text.');
+  if (typeof parsed.search_engine_title !== 'string')
+    throw new Error('search_engine_title must be text.');
+  if (typeof parsed.search_engine_description !== 'string')
+    throw new Error('search_engine_description must be text.');
   if (typeof parsed.slug !== 'string') throw new Error('slug must be text.');
 
   const tags = cleanTags(parsed.tags);
@@ -85,7 +92,7 @@ export const SEO_FIELD_PATHS = {
  * Deduplicates case-insensitively, preserving first-seen order.
  */
 export function canonicalizeTags(tags: string[], vocabulary: string[] = []): string[] {
-  const vocabByLower = new Map(vocabulary.map(v => [v.toLowerCase(), v]));
+  const vocabByLower = new Map(vocabulary.map((v) => [v.toLowerCase(), v]));
   const seen = new Set<string>();
   const result: string[] = [];
   for (const tag of tags) {
@@ -103,7 +110,11 @@ export function canonicalizeTags(tags: string[], vocabulary: string[] = []): str
  * whose path is pinned in scaffold.locked. Tags are canonicalised against the
  * supplied publication vocabulary before being applied.
  */
-export function applySeoDraft(scaffold: Scaffold, draft: SeoDraft, tagVocabulary: string[] = []): Scaffold {
+export function applySeoDraft(
+  scaffold: Scaffold,
+  draft: SeoDraft,
+  tagVocabulary: string[] = [],
+): Scaffold {
   if (!isPostPayload(scaffold.payload)) return scaffold;
   const p = scaffold.payload;
   const locked = new Set(scaffold.locked);
@@ -111,8 +122,12 @@ export function applySeoDraft(scaffold: Scaffold, draft: SeoDraft, tagVocabulary
     ...scaffold,
     payload: {
       ...p,
-      search_engine_title: locked.has(SEO_FIELD_PATHS.search_engine_title) ? p.search_engine_title : draft.search_engine_title.slice(0, 60),
-      search_engine_description: locked.has(SEO_FIELD_PATHS.search_engine_description) ? p.search_engine_description : draft.search_engine_description.slice(0, 160),
+      search_engine_title: locked.has(SEO_FIELD_PATHS.search_engine_title)
+        ? p.search_engine_title
+        : draft.search_engine_title.slice(0, 60),
+      search_engine_description: locked.has(SEO_FIELD_PATHS.search_engine_description)
+        ? p.search_engine_description
+        : draft.search_engine_description.slice(0, 160),
       slug: locked.has(SEO_FIELD_PATHS.slug) ? p.slug : draft.slug,
       tags: locked.has(SEO_FIELD_PATHS.tags) ? p.tags : canonicalizeTags(draft.tags, tagVocabulary),
     },

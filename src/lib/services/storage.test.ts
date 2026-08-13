@@ -7,9 +7,13 @@ let nextId = 1;
 // Mock idb before importing the module under test
 vi.mock('idb', () => {
   const mockDB = {
-    put: vi.fn(async (_store: string, val: unknown, key: string) => { store[key] = val; }),
+    put: vi.fn(async (_store: string, val: unknown, key: string) => {
+      store[key] = val;
+    }),
     get: vi.fn(async (_store: string, key: string) => store[key] ?? undefined),
-    delete: vi.fn(async (_store: string, key: string) => { delete store[key]; }),
+    delete: vi.fn(async (_store: string, key: string) => {
+      delete store[key];
+    }),
     getAll: vi.fn(async (_store: string) => [...recents]),
     transaction: vi.fn(() => ({
       store: {
@@ -18,7 +22,7 @@ vi.mock('idb', () => {
           recents.push({ ...item, id: nextId++ });
         }),
         delete: vi.fn(async (id: number) => {
-          const idx = recents.findIndex(r => r.id === id);
+          const idx = recents.findIndex((r) => r.id === id);
           if (idx >= 0) recents.splice(idx, 1);
         }),
       },
@@ -57,7 +61,13 @@ describe('storage service', () => {
 
     await clearStoredApiKeys();
 
-    for (const key of ['anthropicApiKey', 'openaiApiKey', 'anthropicApiKeySaved', 'openaiApiKeySaved', 'apiKey']) {
+    for (const key of [
+      'anthropicApiKey',
+      'openaiApiKey',
+      'anthropicApiKeySaved',
+      'openaiApiKeySaved',
+      'apiKey',
+    ]) {
       expect(store[key]).toBeUndefined();
     }
   });
@@ -80,14 +90,14 @@ describe('storage service', () => {
   it('addRecentFile stores a recent entry', async () => {
     await addRecentFile('/tmp/test.md', 'Test Article');
     const recents = await getRecentFiles();
-    expect(recents.some(r => r.title === 'Test Article')).toBe(true);
+    expect(recents.some((r) => r.title === 'Test Article')).toBe(true);
   });
 
   it('addRecentFile updates an existing path instead of duplicating it', async () => {
     await addRecentFile('/tmp/duplicate.md', 'Old Title');
     await addRecentFile('/tmp/duplicate.md', 'New Title');
     const recents = await getRecentFiles();
-    const matches = recents.filter(r => r.filePath === '/tmp/duplicate.md');
+    const matches = recents.filter((r) => r.filePath === '/tmp/duplicate.md');
     expect(matches).toHaveLength(1);
     expect(matches[0].title).toBe('New Title');
   });

@@ -6,11 +6,11 @@ export interface ArticleFrontmatter {
   SUBTITLE: string;
   HOOK: string;
   LANDING: string;
-  TITLE_SELECTED: string;      // [✓]-chosen Alt TITLE text, or ''
-  SUBTITLE_SELECTED: string;   // [✓]-chosen Alt SUBTITLE text, or ''
-  HOOK_SELECTED: string;       // [✓]-chosen Alt HOOK text, or ''
-  LANDING_SELECTED: string;    // [✓]-chosen Alt LANDING text, or ''
-  AI_GEN: boolean;             // true = generative mode, false = rescan mode
+  TITLE_SELECTED: string; // [✓]-chosen Alt TITLE text, or ''
+  SUBTITLE_SELECTED: string; // [✓]-chosen Alt SUBTITLE text, or ''
+  HOOK_SELECTED: string; // [✓]-chosen Alt HOOK text, or ''
+  LANDING_SELECTED: string; // [✓]-chosen Alt LANDING text, or ''
+  AI_GEN: boolean; // true = generative mode, false = rescan mode
   SEO_TITLE: string;
   SEO_DESCRIPTION: string;
   SEO_SLUG: string;
@@ -75,7 +75,6 @@ export interface PermissionsManifest {
   description: string;
   fields: Record<string, FieldPermission>;
 }
-
 
 // Parsed StackEd article file (before loading into the store)
 export interface ParsedFile {

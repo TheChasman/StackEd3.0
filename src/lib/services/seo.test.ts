@@ -38,12 +38,14 @@ describe('isSeoComplete', () => {
 
 describe('parseSeoDraftJson', () => {
   it('parses valid JSON SEO output', () => {
-    expect(parseSeoDraftJson(`{
+    expect(
+      parseSeoDraftJson(`{
       "search_engine_title": "Partial Solution",
       "search_engine_description": "What effective policing really means.",
       "slug": "partial-solution",
       "tags": ["policing", "justice"]
-    }`)).toEqual({
+    }`),
+    ).toEqual({
       search_engine_title: 'Partial Solution',
       search_engine_description: 'What effective policing really means.',
       slug: 'partial-solution',
@@ -52,8 +54,9 @@ describe('parseSeoDraftJson', () => {
   });
 
   it('rejects incomplete JSON SEO output', () => {
-    expect(() => parseSeoDraftJson('{"search_engine_title":"Only title"}'))
-      .toThrow('SEO draft missing search_engine_description');
+    expect(() => parseSeoDraftJson('{"search_engine_title":"Only title"}')).toThrow(
+      'SEO draft missing search_engine_description',
+    );
   });
 
   it('slugifies the slug and cleans tags', () => {
@@ -75,8 +78,10 @@ describe('parseSeoDraftJson', () => {
 
 describe('canonicalizeTags', () => {
   it('maps tags onto existing vocabulary spellings case-insensitively', () => {
-    expect(canonicalizeTags(['media theory', 'New Tag'], ['Media Theory', 'Justice']))
-      .toEqual(['Media Theory', 'New Tag']);
+    expect(canonicalizeTags(['media theory', 'New Tag'], ['Media Theory', 'Justice'])).toEqual([
+      'Media Theory',
+      'New Tag',
+    ]);
   });
 
   it('deduplicates case-insensitively, preserving first-seen order', () => {

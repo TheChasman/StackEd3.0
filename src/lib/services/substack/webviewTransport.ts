@@ -170,11 +170,7 @@ export class WebViewTransport implements SubstackTransport {
   }
 
   async uploadImage(dataUrl: string): Promise<ImageUploadResult> {
-    const response = await this.send(
-      'POST',
-      `/api/v1/image`,
-      { image: dataUrl },
-    );
+    const response = await this.send('POST', `/api/v1/image`, { image: dataUrl });
     if (!response.ok) {
       throw new Error(`Image upload failed: ${response.status}`);
     }
@@ -247,7 +243,7 @@ export class WebViewTransport implements SubstackTransport {
     if (typeof profile.id !== 'number') {
       throw new Error('User profile response missing id');
     }
-    const pubUser = profile.publication_users?.find(pu => typeof pu.id === 'number');
+    const pubUser = profile.publication_users?.find((pu) => typeof pu.id === 'number');
     if (!pubUser) {
       throw new Error('User profile response missing publication user info');
     }

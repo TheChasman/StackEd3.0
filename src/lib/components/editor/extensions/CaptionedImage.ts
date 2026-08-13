@@ -4,7 +4,10 @@ import { Image2 } from './Image2';
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     captionedImage: {
-      insertCaptionedImage: (imageAttrs: Record<string, unknown>, captionText?: string) => ReturnType;
+      insertCaptionedImage: (
+        imageAttrs: Record<string, unknown>,
+        captionText?: string,
+      ) => ReturnType;
     };
   }
 }

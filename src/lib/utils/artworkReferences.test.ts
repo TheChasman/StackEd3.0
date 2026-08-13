@@ -9,7 +9,9 @@ import {
 describe('artworkReferences', () => {
   it('builds compact _artwork links from file names and absolute paths', () => {
     expect(relativeArtworkSrc('hero image.png')).toBe('_artwork/hero%20image.png');
-    expect(relativeArtworkSrcFromPath('/vault/Article/_artwork/hero image.png')).toBe('_artwork/hero%20image.png');
+    expect(relativeArtworkSrcFromPath('/vault/Article/_artwork/hero image.png')).toBe(
+      '_artwork/hero%20image.png',
+    );
   });
 
   it('recognizes compact artwork links', () => {
@@ -27,6 +29,8 @@ describe('artworkReferences', () => {
       '/vault/Article/_artwork/hero.png',
     );
     expect(resolveArtworkImagePath(null, '_artwork/hero.png')).toBeNull();
-    expect(resolveArtworkImagePath('/vault/Article/Article.md', 'https://example.com/hero.png')).toBeNull();
+    expect(
+      resolveArtworkImagePath('/vault/Article/Article.md', 'https://example.com/hero.png'),
+    ).toBeNull();
   });
 });

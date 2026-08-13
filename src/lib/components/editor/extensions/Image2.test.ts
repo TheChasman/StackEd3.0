@@ -24,7 +24,9 @@ describe('Image2 extension', () => {
   });
 
   it('keeps src and alt attributes in renderHTML output', () => {
-    const renderHTML = (Image2 as any).config.renderHTML as (args: { HTMLAttributes: Record<string, unknown> }) => [string, Record<string, unknown>];
+    const renderHTML = (Image2 as any).config.renderHTML as (args: {
+      HTMLAttributes: Record<string, unknown>;
+    }) => [string, Record<string, unknown>];
     const output = renderHTML({
       HTMLAttributes: {
         src: 'data:image/png;base64,aGVybw==',
@@ -38,7 +40,10 @@ describe('Image2 extension', () => {
   });
 
   it('reads topImage from data-attrs when parsing saved HTML', () => {
-    const addAttributes = (Image2 as any).config.addAttributes() as Record<string, { parseHTML?: (el: HTMLElement) => unknown }>;
+    const addAttributes = (Image2 as any).config.addAttributes() as Record<
+      string,
+      { parseHTML?: (el: HTMLElement) => unknown }
+    >;
     const parseTopImage = addAttributes.topImage.parseHTML as (el: HTMLElement) => unknown;
 
     const el = document.createElement('img');
@@ -64,7 +69,9 @@ describe('Image2 extension', () => {
     });
 
     const img = nodeView.dom.querySelector('img') as HTMLImageElement;
-    const button = nodeView.dom.querySelector('button[aria-label="Show as thumbnail"]') as HTMLButtonElement;
+    const button = nodeView.dom.querySelector(
+      'button[aria-label="Show as thumbnail"]',
+    ) as HTMLButtonElement;
 
     expect(button).toBeTruthy();
     expect(img.width).toBe(1200);
@@ -87,7 +94,9 @@ describe('Image2 extension', () => {
   });
 
   it('persists thumbnail state in rendered data attrs', () => {
-    const renderHTML = (Image2 as any).config.renderHTML as (args: { HTMLAttributes: Record<string, unknown> }) => [string, Record<string, unknown>];
+    const renderHTML = (Image2 as any).config.renderHTML as (args: {
+      HTMLAttributes: Record<string, unknown>;
+    }) => [string, Record<string, unknown>];
     const output = renderHTML({
       HTMLAttributes: {
         src: 'https://example.com/large.png',
@@ -100,7 +109,10 @@ describe('Image2 extension', () => {
   });
 
   it('reads thumbnail state from saved data attrs', () => {
-    const addAttributes = (Image2 as any).config.addAttributes() as Record<string, { parseHTML?: (el: HTMLElement) => unknown }>;
+    const addAttributes = (Image2 as any).config.addAttributes() as Record<
+      string,
+      { parseHTML?: (el: HTMLElement) => unknown }
+    >;
     const parseThumbnail = addAttributes.thumbnail.parseHTML as (el: HTMLElement) => unknown;
 
     const el = document.createElement('img');
@@ -135,11 +147,17 @@ describe('Image2 extension', () => {
       getPos: () => 7,
     });
 
-    const button = nodeView.dom.querySelector('button[aria-label="Show as thumbnail"]') as HTMLButtonElement;
+    const button = nodeView.dom.querySelector(
+      'button[aria-label="Show as thumbnail"]',
+    ) as HTMLButtonElement;
 
     button.click();
 
-    expect(setNodeMarkup).toHaveBeenCalledWith(7, undefined, expect.objectContaining({ thumbnail: true }));
+    expect(setNodeMarkup).toHaveBeenCalledWith(
+      7,
+      undefined,
+      expect.objectContaining({ thumbnail: true }),
+    );
     expect(dispatch).toHaveBeenCalledWith('thumbnail transaction');
   });
 
@@ -153,15 +171,21 @@ describe('Image2 extension', () => {
       onUpdate,
     });
 
-    editor.chain().focus().insertCaptionedImage({
-      src: 'https://example.com/inline_1200x800.png',
-      alt: 'Inline image',
-      width: 1200,
-      height: 800,
-    }).run();
+    editor
+      .chain()
+      .focus()
+      .insertCaptionedImage({
+        src: 'https://example.com/inline_1200x800.png',
+        alt: 'Inline image',
+        width: 1200,
+        height: 800,
+      })
+      .run();
     onUpdate.mockClear();
 
-    const button = element.querySelector('button[aria-label="Show as thumbnail"]') as HTMLButtonElement;
+    const button = element.querySelector(
+      'button[aria-label="Show as thumbnail"]',
+    ) as HTMLButtonElement;
     button.click();
 
     expect(onUpdate).toHaveBeenCalled();
@@ -193,7 +217,9 @@ describe('Image2 extension', () => {
 
     expect(img.getAttribute('src')).toBe('data:image/png;base64,aGVybw==');
 
-    const renderHTML = (Image2 as any).config.renderHTML as (args: { HTMLAttributes: Record<string, unknown> }) => [string, Record<string, unknown>];
+    const renderHTML = (Image2 as any).config.renderHTML as (args: {
+      HTMLAttributes: Record<string, unknown>;
+    }) => [string, Record<string, unknown>];
     const output = renderHTML({
       HTMLAttributes: {
         src: '_artwork/hero%20image.png',

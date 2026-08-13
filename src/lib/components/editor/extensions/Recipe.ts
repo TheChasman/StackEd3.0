@@ -67,7 +67,7 @@ export const Recipe = Node.create({
           style:
             'border:1px solid #e5e5e5;border-radius:8px;padding:16px;margin:16px 0;background:#fffaf3;font-family:system-ui,-apple-system,sans-serif;color:#1a1a1a;',
         },
-        HTMLAttributes
+        HTMLAttributes,
       ),
       ['h3', { style: 'margin:0 0 8px 0;font-size:20px;' }, HTMLAttributes.title || 'Recipe'],
       [
@@ -131,11 +131,7 @@ export const Recipe = Node.create({
             const pos = typeof getPos === 'function' ? getPos() : undefined;
             if (typeof pos !== 'number') return;
             const field = el.getAttribute('data-edit') as
-              | 'title'
-              | 'servings'
-              | 'time'
-              | 'ingredients'
-              | 'steps';
+              'title' | 'servings' | 'time' | 'ingredients' | 'steps';
             const isList = field === 'ingredients' || field === 'steps';
             const current = isList ? (n.attrs[field] as string[]).join('\n') : n.attrs[field];
             const next = prompt(`${field}${isList ? ' (one per line)' : ''}:`, current);

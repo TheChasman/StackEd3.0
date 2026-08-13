@@ -27,7 +27,9 @@ describe('substackClipboard', () => {
 
     expect(readImageDataUrl).toHaveBeenCalledWith('/vault/Article/_artwork/hero image.png');
     expect(output).toContain('<p>Before</p>');
-    expect(output).toContain('<img src="data:image/png;base64,aGVybw==" alt="Hero image" width="1200" height="800">');
+    expect(output).toContain(
+      '<img src="data:image/png;base64,aGVybw==" alt="Hero image" width="1200" height="800">',
+    );
     expect(output).toContain('<p>After</p>');
     expect(output).not.toContain('data-type="image2"');
     expect(output).not.toContain('data-attrs');

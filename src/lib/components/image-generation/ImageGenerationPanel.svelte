@@ -30,9 +30,11 @@
   async function ensureArticlePath(): Promise<string | null> {
     if (documentStore.filePath) return documentStore.filePath;
     return new Promise((resolve) => {
-      window.dispatchEvent(new CustomEvent('stacked:ensure-article-path', {
-        detail: { resolve },
-      }));
+      window.dispatchEvent(
+        new CustomEvent('stacked:ensure-article-path', {
+          detail: { resolve },
+        }),
+      );
     });
   }
 
@@ -50,7 +52,9 @@
     savedSrc = '';
     subtitleText = '';
     creditText = '';
-    const unlisten = await listen<string>('image-gen:status', (e) => { status = e.payload; });
+    const unlisten = await listen<string>('image-gen:status', (e) => {
+      status = e.payload;
+    });
     try {
       const generated = await generateImage({ prompt: trimmed, model });
       const saved = await saveGeneratedImageToArtwork({
@@ -81,15 +85,17 @@
     }
     window.dispatchEvent(new CustomEvent('stacked:open-editor'));
     await tick();
-    window.dispatchEvent(new CustomEvent('stacked:insert-image', {
-      detail: {
-        src: savedSrc,
-        alt: altText.trim() || defaultAltText(prompt),
-        subtitle: subtitleText,
-        credit: creditText,
-        hero: false,
-      },
-    }));
+    window.dispatchEvent(
+      new CustomEvent('stacked:insert-image', {
+        detail: {
+          src: savedSrc,
+          alt: altText.trim() || defaultAltText(prompt),
+          subtitle: subtitleText,
+          credit: creditText,
+          hero: false,
+        },
+      }),
+    );
   }
 </script>
 

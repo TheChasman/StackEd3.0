@@ -66,7 +66,10 @@ export function buildCreateDraftRequest(scaffold: Scaffold): CreateDraftRequest 
     draft_subtitle: p.draft_subtitle,
     draft_body: JSON.stringify(p.draft_body), // CRITICAL: string, not object
     type: p.type,
-    draft_bylines: p.draft_bylines.map(b => ({ id: b.id, publicationUserId: b.publicationUserId })),
+    draft_bylines: p.draft_bylines.map((b) => ({
+      id: b.id,
+      publicationUserId: b.publicationUserId,
+    })),
     draft_section_id: p.draft_section_id,
     audience: p.audience,
     write_comment_permissions: p.write_comment_permissions,
@@ -163,7 +166,11 @@ function isSubstackCdnUrl(url: string): boolean {
   );
 }
 
-function walkNodes(nodes: PMNode[], basePath: number[], fn: (node: PMNode, path: number[]) => void): void {
+function walkNodes(
+  nodes: PMNode[],
+  basePath: number[],
+  fn: (node: PMNode, path: number[]) => void,
+): void {
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
     const path = [...basePath, i];
@@ -178,12 +185,16 @@ function walkNodes(nodes: PMNode[], basePath: number[], fn: (node: PMNode, path:
  * Rewrite an image2 node's src/width/height/bytes after upload.
  * Returns a new PMDoc with the updated node.
  */
-export function rewriteImageAttrs(doc: PMDoc, path: number[], uploadResult: {
-  url: string;
-  bytes: number;
-  imageWidth: number;
-  imageHeight: number;
-}): PMDoc {
+export function rewriteImageAttrs(
+  doc: PMDoc,
+  path: number[],
+  uploadResult: {
+    url: string;
+    bytes: number;
+    imageWidth: number;
+    imageHeight: number;
+  },
+): PMDoc {
   const newContent = [...doc.content];
   let target = newContent;
   for (let i = 0; i < path.length - 1; i++) {

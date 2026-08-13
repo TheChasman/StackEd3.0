@@ -74,7 +74,8 @@
       run: () => {
         const url = prompt('YouTube URL or video ID:');
         if (!url) return;
-        const videoId = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/)?.[1] ?? url.trim();
+        const videoId =
+          url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/)?.[1] ?? url.trim();
         if (videoId.length === 11) (editor.commands as any).insertYouTube?.(videoId);
         else alert('Could not extract an 11-character video ID from that URL.');
       },

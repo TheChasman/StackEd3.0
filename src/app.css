@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-dark-50: #f8f9fa;
@@ -23,12 +23,15 @@
   --color-primary-800: #92400e;
   --color-primary-900: #78350f;
 
-  --font-sans: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans:
+    'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
   --font-mono: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Source Code Pro', Menlo, monospace;
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply h-full overflow-hidden bg-dark-900 text-dark-50;
   }
   #app {
@@ -36,7 +39,7 @@
   }
 }
 
-@import "katex/dist/katex.min.css";
+@import 'katex/dist/katex.min.css';
 
 .ProseMirror {
   @apply outline-none min-h-full px-8 py-6;

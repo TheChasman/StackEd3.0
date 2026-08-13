@@ -27,7 +27,10 @@
         filePath: documentStore.filePath,
       });
       // Key is resolved from SpockLock inside the Rust command; it never enters the WebView.
-      const { summary, citations } = await invoke<{ summary: string; citations: string[] }>('research_web', { prompt });
+      const { summary, citations } = await invoke<{ summary: string; citations: string[] }>(
+        'research_web',
+        { prompt },
+      );
       result = {
         query,
         summary,
@@ -76,7 +79,9 @@
       <p class="text-sm text-dark-400 animate-pulse">Researching…</p>
     {:else if result}
       <div class="flex flex-col gap-3">
-        <div class="text-sm text-dark-100 whitespace-pre-wrap leading-relaxed">{result.summary}</div>
+        <div class="text-sm text-dark-100 whitespace-pre-wrap leading-relaxed">
+          {result.summary}
+        </div>
 
         {#if result.citations.length > 0}
           <div>
@@ -84,7 +89,12 @@
             <ul class="flex flex-col gap-1">
               {#each result.citations as cite (cite.url)}
                 <li class="text-xs">
-                  <a href={cite.url} target="_blank" rel="noopener" class="text-primary-400 hover:underline truncate block">{cite.title}</a>
+                  <a
+                    href={cite.url}
+                    target="_blank"
+                    rel="noopener"
+                    class="text-primary-400 hover:underline truncate block">{cite.title}</a
+                  >
                   {#if cite.snippet}<p class="text-dark-300 line-clamp-2">{cite.snippet}</p>{/if}
                 </li>
               {/each}

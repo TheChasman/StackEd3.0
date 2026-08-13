@@ -2,21 +2,13 @@
 // Migration lives in scaffoldMigration.ts (deletable after all files are converted).
 import { generateHTML } from '@tiptap/html';
 import TurndownService from 'turndown';
-import type {
-  Scaffold,
-  PostPayload,
-  PMDoc,
-  PMNode,
-} from '$lib/types/scaffold';
-import {
-  isPostPayload,
-  getBody,
-} from '$lib/types/scaffold';
+import type { Scaffold, PostPayload, PMDoc, PMNode } from '$lib/types/scaffold';
+import { isPostPayload, getBody } from '$lib/types/scaffold';
 
 // TipTap extensions are passed as a loosely-typed array to avoid generic
 // incompatibility between Node and Extension types. The schema module
 // provides the actual type-safe extension list.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Extensions = any[];
 
 // --- Readiness ---
@@ -34,7 +26,8 @@ export function readiness(s: Scaffold): ReadinessResult {
     const p = s.payload as PostPayload;
     if (!p.draft_title.trim()) blocking.push('draft_title is empty');
     if (!hasBodyContent(p.draft_body)) blocking.push('draft_body is empty');
-    if (p.draft_bylines.length === 0) advisory.push('draft_bylines is empty (auto-assigned on publish)');
+    if (p.draft_bylines.length === 0)
+      advisory.push('draft_bylines is empty (auto-assigned on publish)');
 
     if (!p.search_engine_title.trim()) blocking.push('search_engine_title is empty');
     if (!p.search_engine_description.trim()) blocking.push('search_engine_description is empty');

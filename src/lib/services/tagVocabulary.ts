@@ -92,7 +92,5 @@ export async function getTagVocabulary(
   for (const tag of await siblingTags(filePath)) add(tag);
   for (const tag of cachedPublicationTags(publication)) add(tag);
 
-  return [...counts.values()]
-    .sort((a, b) => b.count - a.count)
-    .map(entry => entry.canonical);
+  return [...counts.values()].sort((a, b) => b.count - a.count).map((entry) => entry.canonical);
 }

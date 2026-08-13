@@ -123,13 +123,27 @@ describe('RecordingTransport', () => {
     const recorder = new RecordingTransport(stub as unknown as SubstackTransport);
     await recorder.createDraft({});
     const snap = getBuffer();
-    snap.push({ id: 'tampered', startedAt: 0, method: 'X', path: '/', bodyIn: null, status: 0, bodyOut: null, error: null, endedAt: null });
+    snap.push({
+      id: 'tampered',
+      startedAt: 0,
+      method: 'X',
+      path: '/',
+      bodyIn: null,
+      status: 0,
+      bodyOut: null,
+      error: null,
+      endedAt: null,
+    });
     expect(getBuffer()).toHaveLength(1);
   });
 
   it('delegates getDraft with id-interpolated path, forwards id, and records in the buffer', async () => {
     const stub = new StubTransport() as unknown as SubstackTransport;
-    const response: SubstackResponse = { ok: true, status: 200, body: { id: 42, draft_title: 'X' } };
+    const response: SubstackResponse = {
+      ok: true,
+      status: 200,
+      body: { id: 42, draft_title: 'X' },
+    };
     stub.getDraft = vi.fn().mockResolvedValue(response);
     const recorder = new RecordingTransport(stub);
     const result = await recorder.getDraft(42);

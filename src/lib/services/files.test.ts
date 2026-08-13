@@ -21,7 +21,9 @@ describe('files service', () => {
     });
 
     it('handles Windows path separators', () => {
-      expect(titleFromFilePath(String.raw`C:\articles\Test Article.STACKED.JSON`)).toBe('Test Article');
+      expect(titleFromFilePath(String.raw`C:\articles\Test Article.STACKED.JSON`)).toBe(
+        'Test Article',
+      );
     });
 
     it('preserves names without a recognized extension', () => {

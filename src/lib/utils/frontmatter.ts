@@ -11,14 +11,17 @@ export interface ParsedMarkdown {
 }
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
-const EVERNOTE_TASKS_ARTIFACT_RE = /(?:^|\n)\s*Content not supported\s*\n+\s*This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.\s*(?=\n|$)/g;
-const EVERNOTE_TASKS_HTML_ARTIFACT_RE = /<div\b[^>]*--en-task-group:true;[\s\S]*?This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.[\s\S]*?<\/div>\s*<\/div>/g;
-const EVERNOTE_ENML_WRAPPER_RE = /^\s*<!DOCTYPE en-note SYSTEM "http:\/\/xml\.evernote\.com\/pub\/enml2\.dtd">\s*<en-note>([\s\S]*)<\/en-note>\s*$/;
+const EVERNOTE_TASKS_ARTIFACT_RE =
+  /(?:^|\n)\s*Content not supported\s*\n+\s*This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.\s*(?=\n|$)/g;
+const EVERNOTE_TASKS_HTML_ARTIFACT_RE =
+  /<div\b[^>]*--en-task-group:true;[\s\S]*?This block is a placeholder for Tasks, which has been officially released on the newest version of Evernote and is no longer supported on this version\. Deleting or moving this block may cause unexpected behavior in newer versions of Evernote\.[\s\S]*?<\/div>\s*<\/div>/g;
+const EVERNOTE_ENML_WRAPPER_RE =
+  /^\s*<!DOCTYPE en-note SYSTEM "http:\/\/xml\.evernote\.com\/pub\/enml2\.dtd">\s*<en-note>([\s\S]*)<\/en-note>\s*$/;
 const ARTICLE_SECTIONS = ['SPARK', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 const INLINE_LABEL_BOUNDARIES = ['SPARK', 'TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
 
 const ALT_SECTIONS = ['TITLE', 'SUBTITLE', 'HOOK', 'LANDING'] as const;
-type AltSection = typeof ALT_SECTIONS[number];
+type AltSection = (typeof ALT_SECTIONS)[number];
 type SelectedKey = `${AltSection}_SELECTED`;
 
 const SELECTED_ITEM_RE = /^\d+\.\s+(.*?)\s*\[✓\]\s*$/m;
@@ -88,8 +91,9 @@ function extractInlineLabel(body: string, sectionName: string): string {
   const remainingText = body.substring(startIndex);
   const nextLabel = remainingText.match(nextLabelPattern);
   const blankLine = remainingText.match(/\r?\n\s*\r?\n/);
-  const endIndexes = [nextLabel?.index, blankLine?.index]
-    .filter((index): index is number => index !== undefined);
+  const endIndexes = [nextLabel?.index, blankLine?.index].filter(
+    (index): index is number => index !== undefined,
+  );
   const endIndex = endIndexes.length > 0 ? Math.min(...endIndexes) : remainingText.length;
 
   return remainingText.substring(0, endIndex).trim();
@@ -139,8 +143,8 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
     // Capture top-level key order from the raw YAML string
     fieldOrder = yamlStr
       .split('\n')
-      .filter(line => /^[a-zA-Z_][a-zA-Z_0-9]*\s*:/.test(line))
-      .map(line => line.split(':')[0].trim());
+      .filter((line) => /^[a-zA-Z_][a-zA-Z_0-9]*\s*:/.test(line))
+      .map((line) => line.split(':')[0].trim());
   }
 
   const cleaned = removeEtlArtifacts(body);
@@ -164,7 +168,7 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
     }
   }
 
-  const hookText = typeof frontmatter.HOOK === 'string' ? frontmatter.HOOK as string : '';
+  const hookText = typeof frontmatter.HOOK === 'string' ? (frontmatter.HOOK as string) : '';
   const hookWarning = hookText.trim() ? wordCount(hookText) > 150 : false;
 
   return {
@@ -180,18 +184,23 @@ export function parseMarkdownFile(content: string): ParsedMarkdown {
 function serializeLine(key: string, value: unknown): string {
   if (Array.isArray(value)) {
     if (value.length === 0) return `${key}: []`;
-    const items = value.map(item =>
-      typeof item === 'string'
-        ? `  - ${yaml.dump(item, { lineWidth: -1, quotingType: '"', forceQuotes: true }).trimEnd()}`
-        : `  - ${yaml.dump(item, { lineWidth: -1 }).trimEnd()}`
-    ).join('\n');
+    const items = value
+      .map((item) =>
+        typeof item === 'string'
+          ? `  - ${yaml.dump(item, { lineWidth: -1, quotingType: '"', forceQuotes: true }).trimEnd()}`
+          : `  - ${yaml.dump(item, { lineWidth: -1 }).trimEnd()}`,
+      )
+      .join('\n');
     return `${key}:\n${items}`;
   }
   if (typeof value === 'boolean') return `${key}: ${value}`;
   if (value === null || value === undefined || value === '') return `${key}: ""`;
   // For multiline strings, use literal block scalar
   if (typeof value === 'string' && (value.includes('\n') || value.length > 80)) {
-    return `${key}: |\n${value.split('\n').map(line => `  ${line}`).join('\n')}`;
+    return `${key}: |\n${value
+      .split('\n')
+      .map((line) => `  ${line}`)
+      .join('\n')}`;
   }
   // Use js-yaml to produce a correct inline scalar
   return `${key}: ${yaml.dump(value, { lineWidth: -1 }).trimEnd()}`;
@@ -236,10 +245,7 @@ export function serializeArticleFile(
  * Does not touch SEO_*, IMAGE, or AI_GEN fields.
  * Updates `updated` timestamp.
  */
-export function runBodyParser(
-  frontmatter: ArticleFrontmatter,
-  body: string,
-): ArticleFrontmatter {
+export function runBodyParser(frontmatter: ArticleFrontmatter, body: string): ArticleFrontmatter {
   const now = new Date().toISOString();
   const updated = { ...frontmatter, updated: now };
 

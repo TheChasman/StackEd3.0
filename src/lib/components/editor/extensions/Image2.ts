@@ -218,7 +218,8 @@ export const Image2 = Node.create({
 
       const toggle = document.createElement('button');
       toggle.type = 'button';
-      toggle.className = 'absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs font-medium text-white hover:bg-black/85 focus:outline-none focus:ring-2 focus:ring-primary-400';
+      toggle.className =
+        'absolute top-2 left-2 rounded bg-black/70 px-2 py-0.5 text-xs font-medium text-white hover:bg-black/85 focus:outline-none focus:ring-2 focus:ring-primary-400';
       toggle.textContent = thumbnail ? 'Full' : 'Thumb';
       toggle.setAttribute('aria-label', thumbnail ? 'Show full size' : 'Show as thumbnail');
       toggle.addEventListener('click', (event) => {
@@ -246,7 +247,8 @@ export const Image2 = Node.create({
       // Hero badge
       if (node.attrs.topImage) {
         const badge = document.createElement('span');
-        badge.className = 'absolute top-2 right-2 px-2 py-0.5 text-xs rounded bg-amber-500/90 text-black font-medium';
+        badge.className =
+          'absolute top-2 right-2 px-2 py-0.5 text-xs rounded bg-amber-500/90 text-black font-medium';
         badge.textContent = 'HERO';
         dom.appendChild(badge);
       }
@@ -261,7 +263,9 @@ export const Image2 = Node.create({
           if (imgEl) {
             setEditorImageSrc(imgEl, updatedNode.attrs.src || '');
             imgEl.alt = updatedNode.attrs.alt || '';
-            imgEl.title = updatedNode.attrs.title || (updatedNode.attrs.credit ? `Credit: ${updatedNode.attrs.credit}` : '');
+            imgEl.title =
+              updatedNode.attrs.title ||
+              (updatedNode.attrs.credit ? `Credit: ${updatedNode.attrs.credit}` : '');
             applyThumbnailDisplay(imgEl, thumbnail);
           }
           toggle.textContent = thumbnail ? 'Full' : 'Thumb';

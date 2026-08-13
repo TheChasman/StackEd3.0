@@ -4,11 +4,18 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 vi.mock('idb', () => {
   const store: Record<string, unknown> = {};
   const mockDB = {
-    put: vi.fn(async (_store: string, val: unknown, key: string) => { store[key] = val; }),
+    put: vi.fn(async (_store: string, val: unknown, key: string) => {
+      store[key] = val;
+    }),
     get: vi.fn(async (_store: string, key: string) => store[key] ?? undefined),
-    delete: vi.fn(async (_store: string, key: string) => { delete store[key]; }),
+    delete: vi.fn(async (_store: string, key: string) => {
+      delete store[key];
+    }),
     getAll: vi.fn(async () => []),
-    transaction: vi.fn(() => ({ store: { getAll: vi.fn(async () => []), add: vi.fn(), delete: vi.fn() }, done: Promise.resolve() })),
+    transaction: vi.fn(() => ({
+      store: { getAll: vi.fn(async () => []), add: vi.fn(), delete: vi.fn() },
+      done: Promise.resolve(),
+    })),
   };
   return { openDB: vi.fn(async () => mockDB) };
 });

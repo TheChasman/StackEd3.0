@@ -76,7 +76,14 @@ export async function applyPatchVersionBump({
 function stageVersionFiles() {
   execFileSync(
     'git',
-    ['add', 'package.json', 'package-lock.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock'],
+    [
+      'add',
+      'package.json',
+      'package-lock.json',
+      'src-tauri/tauri.conf.json',
+      'src-tauri/Cargo.toml',
+      'src-tauri/Cargo.lock',
+    ],
     { stdio: 'inherit' },
   );
 }

@@ -10,7 +10,11 @@ function postWithTags(tags: string[]): Scaffold {
 }
 
 const ok = (body: unknown): SubstackResponse => ({ ok: true, status: 200, body });
-const fail = (status: number, body: unknown = {}): SubstackResponse => ({ ok: false, status, body });
+const fail = (status: number, body: unknown = {}): SubstackResponse => ({
+  ok: false,
+  status,
+  body,
+});
 
 /** A transport stub that records calls and returns scripted responses. */
 class StubTransport implements SubstackTransport {
@@ -37,16 +41,36 @@ class StubTransport implements SubstackTransport {
   }
 
   // Unused by syncTags.
-  async uploadImage(): Promise<ImageUploadResult> { throw new Error('unused'); }
-  async createDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async updateDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async publishDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async scheduleDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async unscheduleDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async getDraft(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async createNote(): Promise<SubstackResponse> { throw new Error('unused'); }
-  async isLoggedIn(): Promise<boolean> { return true; }
-  async getUserInfo(): Promise<Byline> { throw new Error('unused'); }
+  async uploadImage(): Promise<ImageUploadResult> {
+    throw new Error('unused');
+  }
+  async createDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async updateDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async publishDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async scheduleDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async unscheduleDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async getDraft(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async createNote(): Promise<SubstackResponse> {
+    throw new Error('unused');
+  }
+  async isLoggedIn(): Promise<boolean> {
+    return true;
+  }
+  async getUserInfo(): Promise<Byline> {
+    throw new Error('unused');
+  }
 }
 
 describe('syncTags', () => {
@@ -70,7 +94,9 @@ describe('syncTags', () => {
   });
 
   it('warns but does not throw when attach fails', async () => {
-    const transport = new StubTransport([{ id: 'uuid-1', name: 'Policing' }], { attachFails: true });
+    const transport = new StubTransport([{ id: 'uuid-1', name: 'Policing' }], {
+      attachFails: true,
+    });
     const result = await syncTags(42, postWithTags(['Policing']), transport);
 
     expect(result.warnings).toHaveLength(1);

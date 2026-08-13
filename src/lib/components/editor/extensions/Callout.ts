@@ -1,10 +1,10 @@
-import { Node, mergeAttributes } from '@tiptap/core'
+import { Node, mergeAttributes } from '@tiptap/core';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     callout: {
-      insertCallout: () => ReturnType
-    }
+      insertCallout: () => ReturnType;
+    };
   }
 }
 
@@ -15,10 +15,7 @@ export const Callout = Node.create({
   defining: true,
 
   parseHTML() {
-    return [
-      { tag: 'div[data-type="callout"]' },
-      { tag: 'div.callout' },
-    ]
+    return [{ tag: 'div[data-type="callout"]' }, { tag: 'div.callout' }];
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -29,27 +26,29 @@ export const Callout = Node.create({
         class: 'callout',
       }),
       0,
-    ]
+    ];
   },
 
   addNodeView() {
     return () => {
-      const dom = document.createElement('div')
-      dom.className = 'callout my-4 p-4 rounded-lg bg-dark-700 border border-dark-600'
-      dom.setAttribute('data-type', 'callout')
-      dom.contentEditable = 'true'
-      return { dom }
-    }
+      const dom = document.createElement('div');
+      dom.className = 'callout my-4 p-4 rounded-lg bg-dark-700 border border-dark-600';
+      dom.setAttribute('data-type', 'callout');
+      dom.contentEditable = 'true';
+      return { dom };
+    };
   },
 
   addCommands() {
     return {
-      insertCallout: () => ({ commands }) => {
-        return commands.insertContent({
-          type: this.name,
-          content: [{ type: 'paragraph' }],
-        })
-      },
-    }
+      insertCallout:
+        () =>
+        ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            content: [{ type: 'paragraph' }],
+          });
+        },
+    };
   },
-})
+});

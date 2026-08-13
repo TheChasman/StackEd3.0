@@ -1,4 +1,9 @@
-import { applyBase16Theme, DEFAULT_SCHEME_ID, getDarkBase16Schemes, getStoredSchemeId } from '$lib/themes/base16';
+import {
+  applyBase16Theme,
+  DEFAULT_SCHEME_ID,
+  getDarkBase16Schemes,
+  getStoredSchemeId,
+} from '$lib/themes/base16';
 
 type AllThemes = readonly string[];
 

@@ -1,6 +1,12 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open as openDialog, save } from '@tauri-apps/plugin-dialog';
-import { serializeScaffold, deserializeScaffold, generateMarkdownMirror, scaffoldJsonPath, scaffoldMdMirrorPath } from '$lib/utils/scaffold';
+import {
+  serializeScaffold,
+  deserializeScaffold,
+  generateMarkdownMirror,
+  scaffoldJsonPath,
+  scaffoldMdMirrorPath,
+} from '$lib/utils/scaffold';
 import { migrateFromArticle } from '$lib/utils/scaffoldMigration';
 import { parseMarkdownFile } from '$lib/utils/frontmatter';
 import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/article';
@@ -13,7 +19,11 @@ const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
 const DEFAULT_OPEN_FOLDER = '/Users/chasnewport/Obsidian/O_Substack';
 
 function getLocalStorage(): Storage | null {
-  try { return globalThis.localStorage ?? null; } catch { return null; }
+  try {
+    return globalThis.localStorage ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function getFolderPath(filePath: string): string {
@@ -42,7 +52,8 @@ function getDefaultOpenPath(): string {
 }
 
 function getDefaultSavePath(scaffold: Scaffold): string {
-  const title = (scaffold.payload as any)?.draft_title?.trim()?.replace(/[/:*?"<>|\\]/g, '-') || 'article';
+  const title =
+    (scaffold.payload as any)?.draft_title?.trim()?.replace(/[/:*?"<>|\\]/g, '-') || 'article';
   const fileName = `${title}.stacked.json`;
   const folder = getLocalStorage()?.getItem(LAST_SAVED_FOLDER_KEY);
   return folder ? `${folder}/${fileName}` : fileName;
@@ -54,7 +65,9 @@ function getDefaultNewPath(): string {
 }
 
 export function titleFromFilePath(filePath: string): string {
-  return getFileName(filePath).replace(/\.stacked\.json$/i, '').replace(/\.md$/i, '');
+  return getFileName(filePath)
+    .replace(/\.stacked\.json$/i, '')
+    .replace(/\.md$/i, '');
 }
 
 async function addAndSyncRecent(filePath: string, title: string): Promise<void> {
@@ -62,14 +75,22 @@ async function addAndSyncRecent(filePath: string, title: string): Promise<void> 
   await syncRecentFilesMenu().catch(() => {});
 }
 
-function getArticlePathForNewFile(selectedPath: string): { articlePath: string; artworkPath: string; researchPath: string; title: string } {
+function getArticlePathForNewFile(selectedPath: string): {
+  articlePath: string;
+  artworkPath: string;
+  researchPath: string;
+  title: string;
+} {
   const fileName = getFileName(selectedPath);
   const title = titleFromFilePath(fileName);
   const parent = getFolderPath(selectedPath);
   const parentName = getFileName(parent);
-  const articleFolder = (parentName === title || parentName === `A_${title}`)
-    ? parent
-    : parent ? `${parent}/A_${title}` : `A_${title}`;
+  const articleFolder =
+    parentName === title || parentName === `A_${title}`
+      ? parent
+      : parent
+        ? `${parent}/A_${title}`
+        : `A_${title}`;
 
   return {
     articlePath: `${articleFolder}/${title}.stacked.json`,
@@ -95,9 +116,7 @@ export async function openScaffold(): Promise<Scaffold | null> {
     title: 'Open File',
     multiple: false,
     defaultPath: getDefaultOpenPath(),
-    filters: [
-      { name: 'StackEd files', extensions: ['stacked.json', 'md'] },
-    ],
+    filters: [{ name: 'StackEd files', extensions: ['stacked.json', 'md'] }],
   });
   const filePath = Array.isArray(selected) ? selected[0] : selected;
   if (!filePath) return null;
@@ -111,7 +130,12 @@ export async function openScaffoldPath(filePath: string): Promise<Scaffold> {
     try {
       const content = await invoke<string>('read_file', { path: jsonPath });
       const scaffold = deserializeScaffold(content);
-      await addAndSyncRecent(jsonPath, scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note');
+      await addAndSyncRecent(
+        jsonPath,
+        scaffold.payload && 'draft_title' in scaffold.payload
+          ? scaffold.payload.draft_title
+          : 'Note',
+      );
       return scaffold;
     } catch {
       // No .stacked.json found — migrate from the .md file
@@ -122,7 +146,10 @@ export async function openScaffoldPath(filePath: string): Promise<Scaffold> {
   // Read .stacked.json directly
   const content = await invoke<string>('read_file', { path: filePath });
   const scaffold = deserializeScaffold(content);
-  await addAndSyncRecent(filePath, scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note');
+  await addAndSyncRecent(
+    filePath,
+    scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note',
+  );
   return scaffold;
 }
 
@@ -151,7 +178,10 @@ async function migrateFromMdFile(mdPath: string): Promise<Scaffold> {
   const mdMirror = generateMarkdownMirror(scaffold, substackExtensions);
   await writeFilePath(scaffoldMdMirrorPath(mdPath), mdMirror);
 
-  await addAndSyncRecent(jsonPath, scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note');
+  await addAndSyncRecent(
+    jsonPath,
+    scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note',
+  );
   return scaffold;
 }
 
@@ -169,7 +199,8 @@ export async function saveScaffoldPath(filePath: string, scaffold: Scaffold): Pr
   }
 
   rememberLastSavedFolder(filePath);
-  const title = scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note';
+  const title =
+    scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note';
   await addAndSyncRecent(filePath, title);
   return filePath;
 }
@@ -185,7 +216,10 @@ export async function saveScaffoldAs(scaffold: Scaffold): Promise<string | null>
   return saveScaffoldPath(filePath, scaffold);
 }
 
-export async function createNewScaffold(): Promise<{ scaffold: Scaffold; filePath: string } | null> {
+export async function createNewScaffold(): Promise<{
+  scaffold: Scaffold;
+  filePath: string;
+} | null> {
   const selectedPath = await save({
     title: 'New StackEd Article',
     defaultPath: getDefaultNewPath(),

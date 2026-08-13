@@ -102,7 +102,7 @@ export const ShareButton = Node.create({
           class: 'share-button-wrap',
           style: 'text-align:center;margin:2em 0;',
         },
-        HTMLAttributes
+        HTMLAttributes,
       ),
       ...children,
     ];

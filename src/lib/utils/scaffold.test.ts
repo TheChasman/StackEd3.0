@@ -55,7 +55,10 @@ describe('readiness', () => {
     const s = emptyScaffold('post');
     const p = s.payload as ReturnType<typeof emptyPostPayload>;
     p.draft_title = 'Test Title';
-    p.draft_body = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello' }] }] };
+    p.draft_body = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hello' }] }],
+    };
     p.draft_bylines = [{ id: 1, publicationUserId: 2 }];
     const r = readiness(s);
     expect(r.blocking).toContain('search_engine_title is empty');
@@ -70,7 +73,10 @@ describe('readiness', () => {
     const p = s.payload as ReturnType<typeof emptyPostPayload>;
     p.draft_title = 'Complete Post';
     p.draft_subtitle = 'Subtitle';
-    p.draft_body = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body text' }] }] };
+    p.draft_body = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body text' }] }],
+    };
     p.draft_bylines = [{ id: 1, publicationUserId: 2 }];
     p.search_engine_title = 'SEO Title';
     p.search_engine_description = 'SEO desc';
@@ -84,7 +90,10 @@ describe('readiness', () => {
   it('blocks on empty note', () => {
     const s = emptyScaffold('note');
     if (isNotePayload(s.payload)) {
-      s.payload.bodyJson = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note text' }] }] };
+      s.payload.bodyJson = {
+        type: 'doc',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note text' }] }],
+      };
     }
     // Reset to empty for the test
     if (isNotePayload(s.payload)) {
@@ -97,7 +106,10 @@ describe('readiness', () => {
   it('passes when note has body content', () => {
     const s = emptyScaffold('note');
     if (isNotePayload(s.payload)) {
-      s.payload.bodyJson = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note text' }] }] };
+      s.payload.bodyJson = {
+        type: 'doc',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note text' }] }],
+      };
     }
     const r = readiness(s);
     expect(r.blocking).toEqual([]);
@@ -119,7 +131,10 @@ describe('serialize/deserialize round-trip', () => {
     const s = emptyScaffold('post');
     const p = s.payload as ReturnType<typeof emptyPostPayload>;
     p.draft_title = 'Round Trip';
-    p.draft_body = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }] };
+    p.draft_body = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Body' }] }],
+    };
     p.draft_bylines = [{ id: 10, publicationUserId: 20 }];
     p.tags = ['a', 'b'];
 
@@ -136,7 +151,10 @@ describe('serialize/deserialize round-trip', () => {
   it('preserves a note scaffold through JSON round-trip', () => {
     const s = emptyScaffold('note');
     if (isNotePayload(s.payload)) {
-      s.payload.bodyJson = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note' }] }] };
+      s.payload.bodyJson = {
+        type: 'doc',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Note' }] }],
+      };
     }
 
     const json = serializeScaffold(s);
@@ -177,7 +195,10 @@ describe('getBody / withBody', () => {
 
   it('gets and sets body for notes', () => {
     const s = emptyScaffold('note');
-    const doc: PMDoc = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] };
+    const doc: PMDoc = {
+      type: 'doc',
+      content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }],
+    };
     const updated = withBody(s, doc);
     expect(getBody(updated)).toEqual(doc);
   });

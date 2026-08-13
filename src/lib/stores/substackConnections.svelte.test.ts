@@ -63,7 +63,10 @@ describe('addConnection', () => {
   });
 
   it('uses a provided nickname', async () => {
-    const res = await substackConnectionsStore.addConnection({ subdomain: 'myblog', nickname: 'Main' });
+    const res = await substackConnectionsStore.addConnection({
+      subdomain: 'myblog',
+      nickname: 'Main',
+    });
     expect(res.ok && res.connection.nickname).toBe('Main');
   });
 
@@ -126,7 +129,10 @@ describe('ensureConnectionForSubdomain', () => {
   });
 
   it('returns the existing match across case differences without duplicating', async () => {
-    const added = await substackConnectionsStore.addConnection({ subdomain: 'myblog', nickname: 'Main' });
+    const added = await substackConnectionsStore.addConnection({
+      subdomain: 'myblog',
+      nickname: 'Main',
+    });
     const ensured = await substackConnectionsStore.ensureConnectionForSubdomain('MyBlog');
     expect(ensured?.id).toBe(added.ok ? added.connection.id : undefined);
     expect(ensured?.nickname).toBe('Main');

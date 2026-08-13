@@ -32,9 +32,7 @@ function createHeroImageNode(editor: Editor, payload: HeroImagePayload) {
     ...(payload.subtitle
       ? [
           editor.schema.node('caption', undefined, [
-            editor.schema.node('paragraph', undefined, [
-              editor.schema.text(payload.subtitle),
-            ]),
+            editor.schema.node('paragraph', undefined, [editor.schema.text(payload.subtitle)]),
           ]),
         ]
       : []),

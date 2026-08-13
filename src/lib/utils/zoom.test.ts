@@ -42,7 +42,7 @@ describe('setupZoomShortcuts', () => {
     globalThis.localStorage.setItem('stacked:zoom', '1.5');
 
     setupZoomShortcuts();
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(setZoomMock).toHaveBeenCalledWith(1.5);
   });
@@ -56,13 +56,15 @@ describe('setupZoomShortcuts', () => {
   it('zooms in for the standard macOS Command+= shortcut', async () => {
     setupZoomShortcuts();
 
-    document.dispatchEvent(new KeyboardEvent('keydown', {
-      key: '=',
-      metaKey: true,
-      bubbles: true,
-      cancelable: true,
-    }));
-    await new Promise(resolve => setTimeout(resolve, 0));
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: '=',
+        metaKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(setZoomMock).toHaveBeenCalledWith(1.1);
   });

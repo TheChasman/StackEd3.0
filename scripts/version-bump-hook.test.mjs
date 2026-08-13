@@ -2,7 +2,12 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, test } from 'vitest';
-import { bumpPatchVersionString, bumpCargoTomlVersion, bumpCargoLockVersion, applyPatchVersionBump } from './version-bump-hook.mjs';
+import {
+  bumpPatchVersionString,
+  bumpCargoTomlVersion,
+  bumpCargoLockVersion,
+  applyPatchVersionBump,
+} from './version-bump-hook.mjs';
 
 const tempDirs = [];
 
@@ -66,41 +71,68 @@ dependencies = []
     const cargoPath = join(root, 'src-tauri', 'Cargo.toml');
     const cargoLockPath = join(root, 'src-tauri', 'Cargo.lock');
     await mkdir(join(root, 'src-tauri'), { recursive: true });
-    await writeFile(packagePath, JSON.stringify({
-      name: 'stacked',
-      version: '0.1.1',
-      scripts: {},
-    }, null, 2));
-    await writeFile(packageLockPath, JSON.stringify({
-      name: 'stacked',
-      version: '0.1.1',
-      lockfileVersion: 3,
-      packages: {
-        '': {
+    await writeFile(
+      packagePath,
+      JSON.stringify(
+        {
           name: 'stacked',
           version: '0.1.1',
+          scripts: {},
         },
-      },
-    }, null, 2));
-    await writeFile(tauriPath, JSON.stringify({
-      productName: 'StackEd',
-      version: '0.1.1',
-    }, null, 2));
-    await writeFile(cargoPath, `[package]
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      packageLockPath,
+      JSON.stringify(
+        {
+          name: 'stacked',
+          version: '0.1.1',
+          lockfileVersion: 3,
+          packages: {
+            '': {
+              name: 'stacked',
+              version: '0.1.1',
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      tauriPath,
+      JSON.stringify(
+        {
+          productName: 'StackEd',
+          version: '0.1.1',
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      cargoPath,
+      `[package]
 name = "stacked"
 version = "0.1.1"
 edition = "2021"
 
 [dependencies]
 tauri = { version = "2.11.2" }
-`);
-    await writeFile(cargoLockPath, `version = 3
+`,
+    );
+    await writeFile(
+      cargoLockPath,
+      `version = 3
 
 [[package]]
 name = "stacked"
 version = "0.1.1"
 dependencies = []
-`);
+`,
+    );
 
     const nextVersion = await applyPatchVersionBump({
       packagePath,

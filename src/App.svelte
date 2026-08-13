@@ -4,7 +4,15 @@
   import { listen } from '@tauri-apps/api/event';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { message } from '@tauri-apps/plugin-dialog';
-  import { Clock3, FilePlus2, FolderOpen, PanelRight, Save, SaveAll, Settings } from 'lucide-svelte';
+  import {
+    Clock3,
+    FilePlus2,
+    FolderOpen,
+    PanelRight,
+    Save,
+    SaveAll,
+    Settings,
+  } from 'lucide-svelte';
   import Editor from '$lib/components/editor/Editor.svelte';
   import ScaffoldPanel from '$lib/components/scaffold/ScaffoldPanel.svelte';
   import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
@@ -19,7 +27,15 @@
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { substackConnectionsStore } from '$lib/stores/substackConnections.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
-  import { createNewScaffold, openScaffold, openScaffoldPath, saveScaffoldPath, saveScaffoldAs, titleFromFilePath, writeFilePath } from '$lib/services/files';
+  import {
+    createNewScaffold,
+    openScaffold,
+    openScaffoldPath,
+    saveScaffoldPath,
+    saveScaffoldAs,
+    titleFromFilePath,
+    writeFilePath,
+  } from '$lib/services/files';
   import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import { syncRecentFilesMenu } from '$lib/services/recentMenu';
@@ -68,13 +84,19 @@
     }).then((unlisten) => {
       unlistenOpenFile = unlisten;
     });
-    void listen('stacked:menu-new', () => { void handleNew(); }).then((unlisten) => {
+    void listen('stacked:menu-new', () => {
+      void handleNew();
+    }).then((unlisten) => {
       unlistenMenuNew = unlisten;
     });
-    void listen('stacked:menu-new-tab', () => { documentStore.newTab(); }).then((unlisten) => {
+    void listen('stacked:menu-new-tab', () => {
+      documentStore.newTab();
+    }).then((unlisten) => {
       unlistenMenuNewTab = unlisten;
     });
-    void listen('stacked:menu-open', () => { void handleOpen(); }).then((unlisten) => {
+    void listen('stacked:menu-open', () => {
+      void handleOpen();
+    }).then((unlisten) => {
       unlistenMenuOpen = unlisten;
     });
     void listen<string>('stacked:menu-open-recent', (event) => {
@@ -82,43 +104,49 @@
     }).then((unlisten) => {
       unlistenMenuOpenRecent = unlisten;
     });
-    void listen('stacked:menu-save', () => { void handleSave(); }).then((unlisten) => {
+    void listen('stacked:menu-save', () => {
+      void handleSave();
+    }).then((unlisten) => {
       unlistenMenuSave = unlisten;
     });
-    void listen('stacked:menu-save-as', () => { void handleSaveAs(); }).then((unlisten) => {
+    void listen('stacked:menu-save-as', () => {
+      void handleSaveAs();
+    }).then((unlisten) => {
       unlistenMenuSaveAs = unlisten;
     });
-    void appWindow.onCloseRequested(async (event) => {
-      if (closeAllowed) return;
-      const dirtyIndex = documentStore.tabMetas.findIndex((tab) => tab.dirty);
-      if (dirtyIndex === -1) return;
+    void appWindow
+      .onCloseRequested(async (event) => {
+        if (closeAllowed) return;
+        const dirtyIndex = documentStore.tabMetas.findIndex((tab) => tab.dirty);
+        if (dirtyIndex === -1) return;
 
-      event.preventDefault();
-      const dirtyTitle = documentStore.tabMetas[dirtyIndex]?.title ?? 'Untitled';
-      const choice = await message(`Save changes to "${dirtyTitle}" before quitting?`, {
-        title: 'Unsaved Changes',
-        kind: 'warning',
-        buttons: { yes: 'Save', no: "Don't Save", cancel: 'Cancel' },
-      });
+        event.preventDefault();
+        const dirtyTitle = documentStore.tabMetas[dirtyIndex]?.title ?? 'Untitled';
+        const choice = await message(`Save changes to "${dirtyTitle}" before quitting?`, {
+          title: 'Unsaved Changes',
+          kind: 'warning',
+          buttons: { yes: 'Save', no: "Don't Save", cancel: 'Cancel' },
+        });
 
-      if (choice === 'Cancel') return;
-      if (choice === "Don't Save") {
-        closeAllowed = true;
-        await appWindow.destroy();
-        return;
-      }
-
-      if (choice === 'Save') {
-        documentStore.switchTab(dirtyIndex);
-        await handleSave();
-        if (!documentStore.tabMetas.some((tab) => tab.dirty)) {
+        if (choice === 'Cancel') return;
+        if (choice === "Don't Save") {
           closeAllowed = true;
           await appWindow.destroy();
+          return;
         }
-      }
-    }).then((unlisten) => {
-      unlistenCloseRequested = unlisten;
-    });
+
+        if (choice === 'Save') {
+          documentStore.switchTab(dirtyIndex);
+          await handleSave();
+          if (!documentStore.tabMetas.some((tab) => tab.dirty)) {
+            closeAllowed = true;
+            await appWindow.destroy();
+          }
+        }
+      })
+      .then((unlisten) => {
+        unlistenCloseRequested = unlisten;
+      });
 
     void (async () => {
       await settingsStore.loadFromStorage();
@@ -128,8 +156,10 @@
         await loadFilePath(initialPath);
       }
       const savedToolTab = localStorage.getItem('activeToolTab');
-      activeToolTab = (['scaffold', 'research', 'artwork', 'generate'] as const).includes(savedToolTab as any)
-        ? savedToolTab as typeof activeToolTab
+      activeToolTab = (['scaffold', 'research', 'artwork', 'generate'] as const).includes(
+        savedToolTab as any,
+      )
+        ? (savedToolTab as typeof activeToolTab)
         : 'scaffold';
       const savedWidth = localStorage.getItem('sidebarWidth');
       if (savedWidth) sidebarWidth = clampSidebarWidth(parseInt(savedWidth, 10));
@@ -149,8 +179,12 @@
     };
   });
 
-  function handleMouseDown() { isResizing = true; }
-  function handleMouseUp() { isResizing = false; }
+  function handleMouseDown() {
+    isResizing = true;
+  }
+  function handleMouseUp() {
+    isResizing = false;
+  }
   function handleMouseMove(e: MouseEvent) {
     if (!isResizing) return;
     const newWidth = window.innerWidth - e.clientX;
@@ -212,7 +246,9 @@
     return null;
   }
 
-  function handleSaveEvent() { void handleSave(); }
+  function handleSaveEvent() {
+    void handleSave();
+  }
 
   async function ensureArticlePath(): Promise<string | null> {
     if (documentStore.filePath) return documentStore.filePath;
@@ -220,7 +256,8 @@
   }
 
   function handleEnsureArticlePathEvent(event: Event) {
-    const { resolve } = (event as CustomEvent<{ resolve: (path: string | null) => void }>).detail || {};
+    const { resolve } =
+      (event as CustomEvent<{ resolve: (path: string | null) => void }>).detail || {};
     void ensureArticlePath()
       .then((path) => resolve?.(path))
       .catch(() => resolve?.(null));
@@ -270,7 +307,8 @@
 
   $effect(() => {
     const fileName = documentStore.filePath?.split('/').pop() ?? 'Untitled';
-    document.title = fileName !== 'Untitled' ? `StackEd ${buildLabel} - ${fileName}` : `StackEd ${buildLabel}`;
+    document.title =
+      fileName !== 'Untitled' ? `StackEd ${buildLabel} - ${fileName}` : `StackEd ${buildLabel}`;
   });
 
   $effect(() => {
@@ -300,43 +338,43 @@
 <header class="flex items-center gap-3 px-5 py-3 border-b border-dark-700 bg-dark-800 shrink-0">
   <img src="/stacked-icon.png" alt="StackEd" class="h-8 w-8 rounded-lg object-contain" />
   <button
-    onclick={() => showSettings = true}
+    onclick={() => (showSettings = true)}
     class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
     title="Settings"
-    aria-label="Settings"
-  ><Settings class="h-5 w-5" /></button>
+    aria-label="Settings"><Settings class="h-5 w-5" /></button
+  >
   <div class="flex items-center gap-2">
     <button
       onclick={handleNew}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
       title="New file"
-      aria-label="New file"
-    ><FilePlus2 class="h-5 w-5" /></button>
+      aria-label="New file"><FilePlus2 class="h-5 w-5" /></button
+    >
     <button
       onclick={handleOpen}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
       title="Open file"
-      aria-label="Open file"
-    ><FolderOpen class="h-5 w-5" /></button>
+      aria-label="Open file"><FolderOpen class="h-5 w-5" /></button
+    >
     <button
       onclick={handleSave}
       disabled={!documentStore.dirty}
       class="px-3 py-2.5 text-lg bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:bg-green-600 disabled:hover:bg-green-600 disabled:opacity-50 disabled:cursor-default"
       title="Save"
-      aria-label="Save"
-    ><Save class="h-5 w-5" /></button>
+      aria-label="Save"><Save class="h-5 w-5" /></button
+    >
     <button
       onclick={handleSaveAs}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
       title="Save as"
-      aria-label="Save as"
-    ><SaveAll class="h-5 w-5" /></button>
+      aria-label="Save as"><SaveAll class="h-5 w-5" /></button
+    >
     <button
-      onclick={() => showRecents = true}
+      onclick={() => (showRecents = true)}
       class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
       title="Recent files"
-      aria-label="Recent files"
-    ><Clock3 class="h-5 w-5" /></button>
+      aria-label="Recent files"><Clock3 class="h-5 w-5" /></button
+    >
   </div>
   <div class="flex-1"></div>
 
@@ -345,20 +383,22 @@
     onclick={() => settingsStore.toggleSidebar()}
     class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
     title="Toggle sidebar"
-    aria-label="Toggle sidebar"
-  ><PanelRight class="h-5 w-5" /></button>
+    aria-label="Toggle sidebar"><PanelRight class="h-5 w-5" /></button
+  >
 </header>
 
 <!-- Tab bar (visible when 2+ tabs are open) -->
 {#if documentStore.tabCount > 1}
-  <div class="flex items-end gap-0 border-b border-dark-700 bg-dark-800 px-2 shrink-0 overflow-x-auto">
+  <div
+    class="flex items-end gap-0 border-b border-dark-700 bg-dark-800 px-2 shrink-0 overflow-x-auto"
+  >
     {#each documentStore.tabMetas as tab, i}
       <button
         onclick={() => documentStore.switchTab(i)}
         class="flex items-center gap-1.5 px-3 py-1.5 text-sm border-x border-t border-b-0 rounded-t shrink-0 max-w-48
           {documentStore.activeIndex === i
-            ? 'border-dark-600 bg-dark-900 text-dark-100 -mb-px'
-            : 'border-transparent text-dark-400 hover:text-dark-200'}"
+          ? 'border-dark-600 bg-dark-900 text-dark-100 -mb-px'
+          : 'border-transparent text-dark-400 hover:text-dark-200'}"
       >
         {#if tab.dirty}<span class="text-primary-400 text-xs">●</span>{/if}
         <span class="truncate">{tab.title}</span>
@@ -366,9 +406,17 @@
           role="button"
           tabindex="0"
           class="ml-0.5 text-dark-500 hover:text-dark-200 leading-none"
-          onclick={(e) => { e.stopPropagation(); handleCloseTab(i); }}
-          onkeydown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); handleCloseTab(i); } }}
-        >×</span>
+          onclick={(e) => {
+            e.stopPropagation();
+            handleCloseTab(i);
+          }}
+          onkeydown={(e) => {
+            if (e.key === 'Enter') {
+              e.stopPropagation();
+              handleCloseTab(i);
+            }
+          }}>×</span
+        >
       </button>
     {/each}
   </div>
@@ -388,34 +436,40 @@
       style="width: {sidebarWidth}px;"
     >
       <div class="flex flex-col flex-1 min-h-0">
-        <div class="flex overflow-x-auto min-h-10 border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0">
+        <div
+          class="flex overflow-x-auto min-h-10 border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0"
+        >
           <button
-            onclick={() => activeToolTab = 'scaffold'}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'scaffold'
+            onclick={() => (activeToolTab = 'scaffold')}
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
+            'scaffold'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
             Scaffold
           </button>
           <button
-            onclick={() => activeToolTab = 'research'}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'research'
+            onclick={() => (activeToolTab = 'research')}
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
+            'research'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
             Research
           </button>
           <button
-            onclick={() => activeToolTab = 'artwork'}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'artwork'
+            onclick={() => (activeToolTab = 'artwork')}
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
+            'artwork'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
             Artwork
           </button>
           <button
-            onclick={() => activeToolTab = 'generate'}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab === 'generate'
+            onclick={() => (activeToolTab = 'generate')}
+            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
+            'generate'
               ? 'border-dark-600 bg-dark-900 text-dark-100'
               : 'border-transparent text-dark-400 hover:text-dark-200'}"
           >
@@ -440,7 +494,9 @@
         role="separator"
         aria-label="Resize sidebar"
         aria-orientation="vertical"
-        class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize bg-primary-700/80 hover:bg-primary-500 transition-colors {isResizing ? 'bg-primary-400' : 'bg-primary-700/80'}"
+        class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize bg-primary-700/80 hover:bg-primary-500 transition-colors {isResizing
+          ? 'bg-primary-400'
+          : 'bg-primary-700/80'}"
         onmousedown={handleMouseDown}
       ></div>
     </aside>
@@ -452,10 +508,10 @@
 
 <!-- Modals -->
 {#if showSettings}
-  <SettingsModal open={showSettings} onclose={() => showSettings = false} />
+  <SettingsModal open={showSettings} onclose={() => (showSettings = false)} />
 {/if}
 {#if showRecents}
-  <RecentFiles onclose={() => showRecents = false} />
+  <RecentFiles onclose={() => (showRecents = false)} />
 {/if}
 {#if showThemeBrowser}
   <ThemeBrowser onclose={() => (showThemeBrowser = false)} />

@@ -4,12 +4,15 @@
   let entries = $state<RecorderEntry[]>([]);
 
   $effect(() => {
-    const unsub = subscribe(buf => { entries = buf; });
+    const unsub = subscribe((buf) => {
+      entries = buf;
+    });
     return unsub;
   });
 
   function color(entry: RecorderEntry): string {
-    if (entry.error || (typeof entry.status === 'number' && entry.status >= 400)) return 'text-red-400';
+    if (entry.error || (typeof entry.status === 'number' && entry.status >= 400))
+      return 'text-red-400';
     if (entry.status === 'pending') return 'text-yellow-400';
     return 'text-green-400';
   }
@@ -19,7 +22,9 @@
   }
 </script>
 
-<div class="flex flex-col h-full text-xs font-mono bg-dark-900 text-dark-100 p-2 gap-2 overflow-hidden">
+<div
+  class="flex flex-col h-full text-xs font-mono bg-dark-900 text-dark-100 p-2 gap-2 overflow-hidden"
+>
   <div class="flex gap-2 items-center">
     <span class="font-semibold">Transport Recorder ({entries.length}/200)</span>
     <button class="px-2 py-1 border border-dark-700 rounded" onclick={clearBuffer}>Clear</button>
@@ -42,7 +47,8 @@
           </div>
           <div>
             <div class="text-dark-400">{e.error ? 'error' : 'body out'}</div>
-            <pre class="whitespace-pre-wrap break-all">{e.error ?? JSON.stringify(e.bodyOut, null, 2)}</pre>
+            <pre class="whitespace-pre-wrap break-all">{e.error ??
+                JSON.stringify(e.bodyOut, null, 2)}</pre>
           </div>
         </div>
       </details>

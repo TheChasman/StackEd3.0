@@ -63,7 +63,9 @@ describe('imagePicker service', () => {
   it('does not read an image when the dialog is canceled', async () => {
     openDialogMock.mockResolvedValue(null);
 
-    await expect(pickImageForArticle('/vault/O_Substack/A_Checkmate/Checkmate.md')).resolves.toBeNull();
+    await expect(
+      pickImageForArticle('/vault/O_Substack/A_Checkmate/Checkmate.md'),
+    ).resolves.toBeNull();
     expect(invokeMock).not.toHaveBeenCalled();
   });
 });

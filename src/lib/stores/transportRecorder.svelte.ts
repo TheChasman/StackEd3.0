@@ -27,7 +27,7 @@ export function recordEntry(entry: RecorderEntry): void {
 
 /** Finds a pending entry by id and patches its fields in place, then notifies. */
 export function updateEntry(id: string, patch: Partial<Omit<RecorderEntry, 'id'>>): void {
-  const entry = buffer.find(e => e.id === id);
+  const entry = buffer.find((e) => e.id === id);
   if (!entry) return;
   Object.assign(entry, patch);
   notify();
@@ -45,7 +45,9 @@ export function getBuffer(): RecorderEntry[] {
 export function subscribe(cb: (entries: RecorderEntry[]) => void): () => void {
   subscribers.add(cb);
   cb([...buffer]);
-  return () => { subscribers.delete(cb); };
+  return () => {
+    subscribers.delete(cb);
+  };
 }
 
 export function useRecorder(): { entries: RecorderEntry[] } {

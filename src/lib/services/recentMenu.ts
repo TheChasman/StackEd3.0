@@ -20,7 +20,7 @@ function toMenuEntry(recent: RecentFile): RecentMenuEntry {
 
 export async function syncRecentFilesMenu(recents?: RecentFile[]): Promise<void> {
   try {
-    const list = recents ?? await pruneRecentFiles();
+    const list = recents ?? (await pruneRecentFiles());
     await setRecentMenuEntries(list.map(toMenuEntry));
   } catch {
     // menu sync is best-effort

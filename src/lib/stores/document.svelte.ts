@@ -28,7 +28,13 @@ function tabTitle(tab: TabState): string {
     }
     return 'Note';
   }
-  if (tab.filePath) return tab.filePath.split('/').pop()?.replace(/\.stacked\.json$/i, '') ?? 'Untitled';
+  if (tab.filePath)
+    return (
+      tab.filePath
+        .split('/')
+        .pop()
+        ?.replace(/\.stacked\.json$/i, '') ?? 'Untitled'
+    );
   return 'Untitled';
 }
 
@@ -37,11 +43,15 @@ class DocumentStore {
   private _activeIndex = $state(0);
   private _loadVersion = $state(0);
 
-  get activeIndex(): number { return this._activeIndex; }
-  get tabCount(): number { return this._tabs.length; }
+  get activeIndex(): number {
+    return this._activeIndex;
+  }
+  get tabCount(): number {
+    return this._tabs.length;
+  }
 
   get tabMetas(): TabMeta[] {
-    return this._tabs.map(tab => ({
+    return this._tabs.map((tab) => ({
       title: tabTitle(tab),
       filePath: tab.filePath,
       dirty: tab.dirty,
@@ -108,10 +118,7 @@ class DocumentStore {
   /** Open a scaffold in a new tab. Reuses active tab if blank. */
   openInNewTab(scaffold: Scaffold, filePath: string | null = null): void {
     const current = this._tabs[this._activeIndex];
-    const reuseEmpty =
-      this._tabs.length === 1 &&
-      current.scaffold === null &&
-      !current.dirty;
+    const reuseEmpty = this._tabs.length === 1 && current.scaffold === null && !current.dirty;
 
     if (reuseEmpty) {
       this.load(scaffold, filePath, false);
@@ -171,7 +178,10 @@ class DocumentStore {
   }
 
   /** Patch a workshop field by key. */
-  patchWorkshop<K extends keyof Scaffold['workshop']>(field: K, value: Scaffold['workshop'][K]): void {
+  patchWorkshop<K extends keyof Scaffold['workshop']>(
+    field: K,
+    value: Scaffold['workshop'][K],
+  ): void {
     const tab = this._tabs[this._activeIndex];
     if (!tab.scaffold) return;
     tab.scaffold.workshop[field] = value;
@@ -185,7 +195,7 @@ class DocumentStore {
     if (!tab.scaffold) return;
     const locked = tab.scaffold.locked;
     if (locked.includes(path)) {
-      tab.scaffold.locked = locked.filter(p => p !== path);
+      tab.scaffold.locked = locked.filter((p) => p !== path);
     } else {
       tab.scaffold.locked = [...locked, path];
     }

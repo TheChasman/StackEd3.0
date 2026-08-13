@@ -52,10 +52,16 @@ export async function tidyPreviousBuild(sourceApp, log = console.log) {
       if (/image-path.*StackEd/i.test(line) && currentDevice) devices.add(currentDevice);
     }
     for (const dev of devices) {
-      try { execFileSync('hdiutil', ['detach', dev, '-force'], { stdio: 'ignore' }); } catch { /* ignore */ }
+      try {
+        execFileSync('hdiutil', ['detach', dev, '-force'], { stdio: 'ignore' });
+      } catch {
+        /* ignore */
+      }
     }
     if (devices.size) log(`Detached ${devices.size} orphaned disk image(s).`);
-  } catch { /* hdiutil unavailable; skip */ }
+  } catch {
+    /* hdiutil unavailable; skip */
+  }
 
   // Remove stray rw.*.dmg temp files from the macos bundle directory.
   const bundleDir = dirname(sourceApp);
@@ -82,8 +88,12 @@ export async function installMacosApp({
 
   if (isAppRunning()) {
     log('Quitting running StackEd…');
-    try { execFileSync('pkill', ['-f', PROCESS_MATCH]); } catch { /* already gone */ }
-    await new Promise(r => setTimeout(r, 300));
+    try {
+      execFileSync('pkill', ['-f', PROCESS_MATCH]);
+    } catch {
+      /* already gone */
+    }
+    await new Promise((r) => setTimeout(r, 300));
     if (isAppRunning()) {
       throw new Error('Quit StackEd before installing');
     }

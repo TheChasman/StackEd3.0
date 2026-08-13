@@ -3,23 +3,43 @@ import type { Byline } from '$lib/types/scaffold';
 import { recordEntry, updateEntry } from '$lib/stores/transportRecorder.svelte';
 
 let entryCounter = 0;
-function newEntryId(): string { return `e_${++entryCounter}`; }
+function newEntryId(): string {
+  return `e_${++entryCounter}`;
+}
 
 /** A return value is treated as a SubstackResponse when it carries the `ok`/`status` pair. */
 function isSubstackResponse(value: unknown): value is SubstackResponse {
-  return typeof value === 'object' && value !== null
-    && typeof (value as SubstackResponse).ok === 'boolean'
-    && typeof (value as SubstackResponse).status === 'number';
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as SubstackResponse).ok === 'boolean' &&
+    typeof (value as SubstackResponse).status === 'number'
+  );
 }
 
 export class RecordingTransport implements SubstackTransport {
   constructor(private readonly inner: SubstackTransport) {}
 
-  private async wrap<T>(method: string, path: string, bodyIn: unknown, call: () => Promise<T>): Promise<T> {
+  private async wrap<T>(
+    method: string,
+    path: string,
+    bodyIn: unknown,
+    call: () => Promise<T>,
+  ): Promise<T> {
     const id = newEntryId();
     const startedAt = Date.now();
     if (import.meta.env.DEV) {
-      recordEntry({ id, startedAt, method, path, bodyIn, status: 'pending', bodyOut: null, error: null, endedAt: null });
+      recordEntry({
+        id,
+        startedAt,
+        method,
+        path,
+        bodyIn,
+        status: 'pending',
+        bodyOut: null,
+        error: null,
+        endedAt: null,
+      });
     }
     try {
       const result = await call();
@@ -46,31 +66,49 @@ export class RecordingTransport implements SubstackTransport {
     return this.wrap('PUT', `/api/v1/drafts/${id}`, body, () => this.inner.updateDraft(id, body));
   }
   publishDraft(id: number, body: unknown): Promise<SubstackResponse> {
-    return this.wrap('PUT', `/api/v1/drafts/${id}/publish`, body, () => this.inner.publishDraft(id, body));
+    return this.wrap('PUT', `/api/v1/drafts/${id}/publish`, body, () =>
+      this.inner.publishDraft(id, body),
+    );
   }
   scheduleDraft(id: number, body: unknown): Promise<SubstackResponse> {
-    return this.wrap('POST', `/api/v1/drafts/${id}/scheduled_release`, body, () => this.inner.scheduleDraft(id, body));
+    return this.wrap('POST', `/api/v1/drafts/${id}/scheduled_release`, body, () =>
+      this.inner.scheduleDraft(id, body),
+    );
   }
   unscheduleDraft(id: number): Promise<SubstackResponse> {
-    return this.wrap('DELETE', `/api/v1/drafts/${id}/scheduled_release`, undefined, () => this.inner.unscheduleDraft(id));
+    return this.wrap('DELETE', `/api/v1/drafts/${id}/scheduled_release`, undefined, () =>
+      this.inner.unscheduleDraft(id),
+    );
   }
   getDraft(draftId: number): Promise<SubstackResponse> {
-    return this.wrap('GET', `/api/v1/drafts/${draftId}`, undefined, () => this.inner.getDraft(draftId));
+    return this.wrap('GET', `/api/v1/drafts/${draftId}`, undefined, () =>
+      this.inner.getDraft(draftId),
+    );
   }
   createNote(body: unknown): Promise<SubstackResponse> {
-    return this.wrap('POST', '/api/v1/comment/feed', body as { bodyJson: unknown }, () => this.inner.createNote(body));
+    return this.wrap('POST', '/api/v1/comment/feed', body as { bodyJson: unknown }, () =>
+      this.inner.createNote(body),
+    );
   }
   listPostTags(): Promise<SubstackResponse> {
-    return this.wrap('GET', '/api/v1/publication/post-tag', undefined, () => this.inner.listPostTags());
+    return this.wrap('GET', '/api/v1/publication/post-tag', undefined, () =>
+      this.inner.listPostTags(),
+    );
   }
   createPostTag(name: string): Promise<SubstackResponse> {
-    return this.wrap('POST', '/api/v1/publication/post-tag', { name }, () => this.inner.createPostTag(name));
+    return this.wrap('POST', '/api/v1/publication/post-tag', { name }, () =>
+      this.inner.createPostTag(name),
+    );
   }
   attachTag(postId: number, tagId: string): Promise<SubstackResponse> {
-    return this.wrap('POST', `/api/v1/post/${postId}/tag/${tagId}`, undefined, () => this.inner.attachTag(postId, tagId));
+    return this.wrap('POST', `/api/v1/post/${postId}/tag/${tagId}`, undefined, () =>
+      this.inner.attachTag(postId, tagId),
+    );
   }
   uploadImage(dataUrl: string): Promise<ImageUploadResult> {
-    return this.wrap('POST', '/api/v1/image', { image: dataUrl }, () => this.inner.uploadImage(dataUrl));
+    return this.wrap('POST', '/api/v1/image', { image: dataUrl }, () =>
+      this.inner.uploadImage(dataUrl),
+    );
   }
   isLoggedIn(): Promise<boolean> {
     return this.wrap('GET', '/api/v1/user/profile/self', undefined, () => this.inner.isLoggedIn());

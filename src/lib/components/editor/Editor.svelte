@@ -2,7 +2,11 @@
   import { onMount, onDestroy, untrack } from 'svelte';
   import { Editor } from '@tiptap/core';
   import { substackExtensions } from '$lib/editor/schema';
-  import { clearHeroImageFlags, insertHeroImageAtTop, replaceHeroImage } from './extensions/heroImage';
+  import {
+    clearHeroImageFlags,
+    insertHeroImageAtTop,
+    replaceHeroImage,
+  } from './extensions/heroImage';
   import { documentStore } from '$lib/stores/document.svelte';
   import type { PMDoc } from '$lib/types/scaffold';
   import Toolbar from './Toolbar.svelte';
@@ -70,14 +74,17 @@
     };
     const imageHandler = (e: Event) => {
       if (!editor) return;
-      const { src, alt, hero, replaceHero, subtitle, credit } = (e as CustomEvent<{
-        src?: string;
-        alt?: string;
-        hero?: boolean;
-        replaceHero?: boolean;
-        subtitle?: string;
-        credit?: string;
-      }>).detail || {};
+      const { src, alt, hero, replaceHero, subtitle, credit } =
+        (
+          e as CustomEvent<{
+            src?: string;
+            alt?: string;
+            hero?: boolean;
+            replaceHero?: boolean;
+            subtitle?: string;
+            credit?: string;
+          }>
+        ).detail || {};
 
       const imageSrc = String(src ?? '').trim();
       if (!imageSrc) return;
@@ -87,12 +94,16 @@
       const imageSubtitle = String(subtitle ?? '').trim();
       const imageCredit = String(credit ?? '').trim();
 
-      if (isHero && shouldReplaceHero && replaceHeroImage(editor, {
-        src: imageSrc,
-        alt: imageAlt,
-        subtitle: imageSubtitle || undefined,
-        credit: imageCredit || undefined,
-      })) {
+      if (
+        isHero &&
+        shouldReplaceHero &&
+        replaceHeroImage(editor, {
+          src: imageSrc,
+          alt: imageAlt,
+          subtitle: imageSubtitle || undefined,
+          credit: imageCredit || undefined,
+        })
+      ) {
         return;
       }
 
@@ -111,13 +122,20 @@
         clearHeroImageFlags(editor);
       }
 
-      editor.chain().focus().insertCaptionedImage({
-        src: imageSrc,
-        alt: imageAlt,
-        title: imageCredit ? `Credit: ${imageCredit}` : null,
-        credit: imageCredit || null,
-        topImage: isHero,
-      }, imageSubtitle || undefined).run();
+      editor
+        .chain()
+        .focus()
+        .insertCaptionedImage(
+          {
+            src: imageSrc,
+            alt: imageAlt,
+            title: imageCredit ? `Credit: ${imageCredit}` : null,
+            credit: imageCredit || null,
+            topImage: isHero,
+          },
+          imageSubtitle || undefined,
+        )
+        .run();
     };
     window.addEventListener('stacked:insert', textHandler);
     window.addEventListener('stacked:insert-image', imageHandler);

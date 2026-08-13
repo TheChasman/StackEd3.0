@@ -73,12 +73,13 @@ export async function syncTags(
 
   const existing = (listResp.body as unknown[]).filter(
     (t): t is ExistingTag =>
-      typeof t === 'object' && t !== null &&
+      typeof t === 'object' &&
+      t !== null &&
       typeof (t as ExistingTag).id === 'string' &&
       typeof (t as ExistingTag).name === 'string',
   );
-  const byName = new Map(existing.map(t => [t.name.toLowerCase(), t]));
-  const publicationTags = existing.map(t => t.name);
+  const byName = new Map(existing.map((t) => [t.name.toLowerCase(), t]));
+  const publicationTags = existing.map((t) => t.name);
 
   for (const tag of tags) {
     try {

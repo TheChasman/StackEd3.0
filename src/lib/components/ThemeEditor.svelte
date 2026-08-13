@@ -3,7 +3,7 @@
 
   let { themeId, onclose }: { themeId: string; onclose: () => void } = $props();
 
-  const foundTheme = customThemesStore.customThemes.find(t => t.id === themeId);
+  const foundTheme = customThemesStore.customThemes.find((t) => t.id === themeId);
   if (!foundTheme) throw new Error(`Theme ${themeId} not found`);
 
   const theme = foundTheme;

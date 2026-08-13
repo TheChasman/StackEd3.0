@@ -15,7 +15,11 @@
     if (level === null) {
       editor.chain().focus().setParagraph().run();
     } else {
-      editor.chain().focus().toggleHeading({ level: level as 2|3|4 }).run();
+      editor
+        .chain()
+        .focus()
+        .toggleHeading({ level: level as 2 | 3 | 4 })
+        .run();
     }
     close();
   }

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { emptyScaffold, isPostPayload, isNotePayload, type PMDoc, type PostPayload, type NotePayload } from '$lib/types/scaffold';
+import {
+  emptyScaffold,
+  isPostPayload,
+  isNotePayload,
+  type PMDoc,
+  type PostPayload,
+  type NotePayload,
+} from '$lib/types/scaffold';
 import {
   buildCreateDraftRequest,
   buildUpdateDraftRequest,
@@ -115,7 +122,10 @@ describe('image helpers', () => {
         type: 'blockquote',
         content: [
           { type: 'image2', attrs: { src: 'https://example.com/foreign.png' } },
-          { type: 'image2', attrs: { src: 'https://substack-post-media.s3.amazonaws.com/image.png' } },
+          {
+            type: 'image2',
+            attrs: { src: 'https://substack-post-media.s3.amazonaws.com/image.png' },
+          },
           { type: 'image2', attrs: { src: 'https://publication.substack.com/image.png' } },
           { type: 'image2', attrs: { src: 'data:image/png;base64,abc' } },
         ],

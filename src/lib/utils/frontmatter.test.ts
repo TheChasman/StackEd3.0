@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import type { ArticleFrontmatter } from '$lib/types/article';
-import { backfillArticleFrontmatter, extractTitleFromBody, parseMarkdownFile, runBodyParser, runBodyParserUpsertOnly, serializeMarkdownFile } from './frontmatter';
+import {
+  backfillArticleFrontmatter,
+  extractTitleFromBody,
+  parseMarkdownFile,
+  runBodyParser,
+  runBodyParserUpsertOnly,
+  serializeMarkdownFile,
+} from './frontmatter';
 
 const SAMPLE_WITH_FRONTMATTER = `---
 TITLE: "Test Article"
@@ -38,7 +45,8 @@ HOOK: Refined opening for reader attention.
 This remains article body copy, not part of HOOK.
 `;
 
-const SAMPLE_FLATTENED_INLINE_LABELS = 'SPARK: Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket. TITLE: Partial Solution SUBTITLE: What does impartiality look like? HOOK: The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"';
+const SAMPLE_FLATTENED_INLINE_LABELS =
+  'SPARK: Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket. TITLE: Partial Solution SUBTITLE: What does impartiality look like? HOOK: The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"';
 
 const EVERNOTE_TASKS_ARTIFACT = `Content not supported
 
@@ -100,9 +108,13 @@ describe('parseMarkdownFile', () => {
 
   it('extracts StackEd fields from flattened inline body labels when YAML is empty', () => {
     const { frontmatter } = parseMarkdownFile(SAMPLE_FLATTENED_INLINE_LABELS);
-    expect(frontmatter.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
+    expect(frontmatter.SPARK).toBe(
+      'Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.',
+    );
     expect(frontmatter.SUBTITLE).toBe('What does impartiality look like?');
-    expect(frontmatter.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
+    expect(frontmatter.HOOK).toBe(
+      'The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"',
+    );
   });
 
   it('parses body content', () => {
@@ -183,14 +195,22 @@ created: "2026-05-22"
 Some body content without section headings.
 `;
     const parsed = parseMarkdownFile(sample);
-    const serialized = serializeMarkdownFile(parsed.frontmatter as any, parsed.fieldOrder, parsed.body);
+    const serialized = serializeMarkdownFile(
+      parsed.frontmatter as any,
+      parsed.fieldOrder,
+      parsed.body,
+    );
     const reparsed = parseMarkdownFile(serialized);
     expect(reparsed.fieldOrder).toEqual(parsed.fieldOrder);
   });
 
   it('round-trips field values correctly', () => {
     const parsed = parseMarkdownFile(SAMPLE_WITH_FRONTMATTER);
-    const serialized = serializeMarkdownFile(parsed.frontmatter as any, parsed.fieldOrder, parsed.body);
+    const serialized = serializeMarkdownFile(
+      parsed.frontmatter as any,
+      parsed.fieldOrder,
+      parsed.body,
+    );
     const reparsed = parseMarkdownFile(serialized);
     expect(reparsed.frontmatter.TITLE).toBe('Test Article');
     expect(reparsed.frontmatter.created).toBe('2026-05-22');
@@ -206,7 +226,11 @@ Some body content without section headings.
 
   it('preserves body exactly', () => {
     const parsed = parseMarkdownFile(SAMPLE_WITH_FRONTMATTER);
-    const serialized = serializeMarkdownFile(parsed.frontmatter as any, parsed.fieldOrder, parsed.body);
+    const serialized = serializeMarkdownFile(
+      parsed.frontmatter as any,
+      parsed.fieldOrder,
+      parsed.body,
+    );
     const reparsed = parseMarkdownFile(serialized);
     expect(reparsed.body).toBe(parsed.body);
   });
@@ -369,7 +393,10 @@ describe('backfillArticleFrontmatter', () => {
       updated: '2026-06-04T00:00:00.000Z',
     };
 
-    const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS);
+    const backfilled = backfillArticleFrontmatter(
+      frontmatter,
+      SAMPLE_NO_FRONTMATTER_WITH_INLINE_LABELS,
+    );
 
     expect(backfilled.SPARK).toBe('Initial idea here.');
     expect(backfilled.SUBTITLE).toBe('The subtitle or hook promise.');
@@ -399,9 +426,13 @@ describe('backfillArticleFrontmatter', () => {
 
     const backfilled = backfillArticleFrontmatter(frontmatter, SAMPLE_FLATTENED_INLINE_LABELS);
 
-    expect(backfilled.SPARK).toBe('Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.');
+    expect(backfilled.SPARK).toBe(
+      'Partial Solution Partiality is easier to see than impartiality. Partiality is easy to spot: Two-Tier Policing by the bucket.',
+    );
     expect(backfilled.SUBTITLE).toBe('What does impartiality look like?');
-    expect(backfilled.HOOK).toBe('The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"');
+    expect(backfilled.HOOK).toBe(
+      'The oath taken by Police Officers in England & Wales was changed in 2002: Originally "without favour or affection, malice or ill will" Now: "with fairness"',
+    );
   });
 
   it('does not overwrite populated StackEd fields on save', () => {
@@ -481,11 +512,23 @@ describe('HOOK length warning', () => {
 describe('runBodyParser', () => {
   it('returns updated frontmatter with Alt selections applied', () => {
     const fm: ArticleFrontmatter = {
-      IMAGE: '', SPARK: '', TITLE: '', SUBTITLE: '', HOOK: '',
-      LANDING: '', TITLE_SELECTED: '', SUBTITLE_SELECTED: '',
-      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
-      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
-      created: '2026-06-13', updated: '2026-06-13',
+      IMAGE: '',
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      TITLE_SELECTED: '',
+      SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '',
+      LANDING_SELECTED: '',
+      AI_GEN: false,
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
+      created: '2026-06-13',
+      updated: '2026-06-13',
     };
     const body = `# My Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
     const result = runBodyParser(fm, body);
@@ -495,11 +538,23 @@ describe('runBodyParser', () => {
 
   it('clears _SELECTED when the [✓] marker is removed from the body', () => {
     const fm: ArticleFrontmatter = {
-      IMAGE: '', SPARK: '', TITLE: '', SUBTITLE: '', HOOK: '',
-      LANDING: '', TITLE_SELECTED: 'Previously Selected', SUBTITLE_SELECTED: '',
-      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
-      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
-      created: '2026-06-13', updated: '2026-06-13',
+      IMAGE: '',
+      SPARK: '',
+      TITLE: '',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      TITLE_SELECTED: 'Previously Selected',
+      SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '',
+      LANDING_SELECTED: '',
+      AI_GEN: false,
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
+      created: '2026-06-13',
+      updated: '2026-06-13',
     };
     const body = `## Alt TITLE\n1. Option A\n2. Option B`; // no [✓] marker
     const result = runBodyParser(fm, body);
@@ -510,11 +565,23 @@ describe('runBodyParser', () => {
 describe('runBodyParserUpsertOnly', () => {
   it('upserts primary sections and Alt selections from the body', () => {
     const fm: ArticleFrontmatter = {
-      IMAGE: '', SPARK: '', TITLE: 'Old Title', SUBTITLE: '', HOOK: '',
-      LANDING: '', TITLE_SELECTED: '', SUBTITLE_SELECTED: '',
-      HOOK_SELECTED: '', LANDING_SELECTED: '', AI_GEN: false,
-      SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '', SEO_TAGS: [],
-      created: '2026-06-13', updated: '2026-06-13',
+      IMAGE: '',
+      SPARK: '',
+      TITLE: 'Old Title',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      TITLE_SELECTED: '',
+      SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '',
+      LANDING_SELECTED: '',
+      AI_GEN: false,
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
+      created: '2026-06-13',
+      updated: '2026-06-13',
     };
     const body = `# New Title\n\n## Alt TITLE\n1. Better Title [✓]\n2. Other`;
 
@@ -526,11 +593,23 @@ describe('runBodyParserUpsertOnly', () => {
 
   it('does not clear existing fields when body tags or checkmarks are absent', () => {
     const fm: ArticleFrontmatter = {
-      IMAGE: '', SPARK: 'Kept Spark', TITLE: 'Kept Title', SUBTITLE: '',
-      HOOK: '', LANDING: '', TITLE_SELECTED: 'Previously Selected',
-      SUBTITLE_SELECTED: '', HOOK_SELECTED: '', LANDING_SELECTED: '',
-      AI_GEN: false, SEO_TITLE: '', SEO_DESCRIPTION: '', SEO_SLUG: '',
-      SEO_TAGS: [], created: '2026-06-13', updated: '2026-06-13',
+      IMAGE: '',
+      SPARK: 'Kept Spark',
+      TITLE: 'Kept Title',
+      SUBTITLE: '',
+      HOOK: '',
+      LANDING: '',
+      TITLE_SELECTED: 'Previously Selected',
+      SUBTITLE_SELECTED: '',
+      HOOK_SELECTED: '',
+      LANDING_SELECTED: '',
+      AI_GEN: false,
+      SEO_TITLE: '',
+      SEO_DESCRIPTION: '',
+      SEO_SLUG: '',
+      SEO_TAGS: [],
+      created: '2026-06-13',
+      updated: '2026-06-13',
     };
     const body = `## Alt TITLE\n1. Option A\n2. Option B`;
 

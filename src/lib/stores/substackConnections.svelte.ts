@@ -16,8 +16,7 @@ export function normaliseSubdomain(input: string): string {
 }
 
 type AddResult =
-  | { ok: true; connection: SubstackConnection }
-  | { ok: false; error: 'empty' | 'duplicate' };
+  { ok: true; connection: SubstackConnection } | { ok: false; error: 'empty' | 'duplicate' };
 
 class SubstackConnectionsStore {
   connections = $state<SubstackConnection[]>([]);

@@ -55,7 +55,8 @@ export async function saveSubstackConnections(connections: SubstackConnection[])
 
 export async function loadSubstackConnections(): Promise<SubstackConnection[]> {
   const db = await DB_PROMISE;
-  const stored = (await db.get('settings', 'substackConnections')) as SubstackConnection[] | undefined;
+  const stored = (await db.get('settings', 'substackConnections')) as
+    SubstackConnection[] | undefined;
   return Array.isArray(stored) ? stored : [];
 }
 
@@ -133,7 +134,5 @@ export async function pruneRecentFiles(
     await tx.done;
   }
 
-  return checks
-    .filter(({ exists }) => exists)
-    .map(({ recent }) => recent);
+  return checks.filter(({ exists }) => exists).map(({ recent }) => recent);
 }

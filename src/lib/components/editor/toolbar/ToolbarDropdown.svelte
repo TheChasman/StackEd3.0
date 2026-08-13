@@ -42,7 +42,9 @@
     type="button"
     {disabled}
     onclick={toggle}
-    class="px-2 py-1 text-sm rounded text-dark-200 hover:bg-dark-600 hover:text-primary-500 {open ? 'bg-dark-600 text-primary-500' : ''}"
+    class="px-2 py-1 text-sm rounded text-dark-200 hover:bg-dark-600 hover:text-primary-500 {open
+      ? 'bg-dark-600 text-primary-500'
+      : ''}"
   >
     {label}
     <svg class="w-3 h-3 inline ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +61,10 @@
       aria-hidden="true"
     ></div>
     <div
-      class="absolute top-full mt-1 z-40 {width} bg-dark-800 border border-dark-600 rounded-lg shadow-xl overflow-hidden {align === 'right' ? 'right-0' : 'left-0'}"
+      class="absolute top-full mt-1 z-40 {width} bg-dark-800 border border-dark-600 rounded-lg shadow-xl overflow-hidden {align ===
+      'right'
+        ? 'right-0'
+        : 'left-0'}"
       transition:fade={{ duration: 100 }}
     >
       {@render children(close)}

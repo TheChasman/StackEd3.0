@@ -2,7 +2,9 @@ import { invoke } from '@tauri-apps/api/core';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { isPathInArtworkFolder, relativeArtworkSrcFromPath } from '$lib/utils/artworkReferences';
 
-const IMAGE_FILTERS = [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] }];
+const IMAGE_FILTERS = [
+  { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] },
+];
 
 export interface PickedImage {
   path: string;
@@ -24,7 +26,9 @@ export function deriveArtworkPath(currentFilePath: string | null): string | unde
   return `${currentFilePath.slice(0, index)}/_artwork`;
 }
 
-export async function pickImageForArticle(currentFilePath: string | null): Promise<PickedImage | null> {
+export async function pickImageForArticle(
+  currentFilePath: string | null,
+): Promise<PickedImage | null> {
   const defaultPath = deriveArtworkPath(currentFilePath);
   const selected = await openDialog({
     title: 'Insert Image',

@@ -19,7 +19,10 @@
     open = false;
   }
 
-  function getThemeColor(schemeId: string, colorName: 'base' | 'text' | 'blue' | 'green' | 'surface0'): string {
+  function getThemeColor(
+    schemeId: string,
+    colorName: 'base' | 'text' | 'blue' | 'green' | 'surface0',
+  ): string {
     const scheme = getBase16Scheme(schemeId);
     if (!scheme) return '#000000';
     return toAppThemeColors(scheme.colors)[colorName];
@@ -76,10 +79,25 @@
           >
             <span class="text-xl">{theme.emoji}</span>
             <div class="flex gap-2">
-              <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'base')}; border: 1px solid {getThemeColor(theme.value, 'surface0')};"></div>
-              <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'text')}"></div>
-              <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'blue')}"></div>
-              <div class="w-4 h-4 rounded-full" style="background-color: {getThemeColor(theme.value, 'green')}"></div>
+              <div
+                class="w-4 h-4 rounded-full"
+                style="background-color: {getThemeColor(
+                  theme.value,
+                  'base',
+                )}; border: 1px solid {getThemeColor(theme.value, 'surface0')};"
+              ></div>
+              <div
+                class="w-4 h-4 rounded-full"
+                style="background-color: {getThemeColor(theme.value, 'text')}"
+              ></div>
+              <div
+                class="w-4 h-4 rounded-full"
+                style="background-color: {getThemeColor(theme.value, 'blue')}"
+              ></div>
+              <div
+                class="w-4 h-4 rounded-full"
+                style="background-color: {getThemeColor(theme.value, 'green')}"
+              ></div>
             </div>
 
             <div class="flex-1">
@@ -88,10 +106,12 @@
             </div>
 
             {#if themeStore.currentSchemeId === theme.value}
-              <svg class="w-5 h-5 text-primary-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-                />
+              <svg
+                class="w-5 h-5 text-primary-500 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
               </svg>
             {/if}
           </button>
@@ -103,7 +123,12 @@
           class="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-dark-700 text-primary-400 transition-colors border-t border-dark-700 font-medium text-base"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Browse & Manage Themes
         </button>
@@ -121,7 +146,7 @@
 </div>
 
 <style>
-  :global([data-sveltekit-preload-data="hover"]) {
+  :global([data-sveltekit-preload-data='hover']) {
     @apply cursor-pointer;
   }
 </style>

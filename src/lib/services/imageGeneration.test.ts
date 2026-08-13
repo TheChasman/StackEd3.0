@@ -6,7 +6,11 @@ vi.mock('@tauri-apps/api/core', () => ({
   invoke: invokeMock,
 }));
 
-import { generateImage, IMAGE_GENERATION_MODELS, saveGeneratedImageToArtwork } from './imageGeneration';
+import {
+  generateImage,
+  IMAGE_GENERATION_MODELS,
+  saveGeneratedImageToArtwork,
+} from './imageGeneration';
 
 describe('imageGeneration service', () => {
   beforeEach(() => {
@@ -69,11 +73,13 @@ describe('imageGeneration service', () => {
   });
 
   it('rejects saving a generated image without an article path', async () => {
-    await expect(saveGeneratedImageToArtwork({
-      articlePath: '  ',
-      prompt: 'Hero concept',
-      dataUrl: 'data:image/png;base64,aGVybw==',
-    })).rejects.toThrow('Article path required');
+    await expect(
+      saveGeneratedImageToArtwork({
+        articlePath: '  ',
+        prompt: 'Hero concept',
+        dataUrl: 'data:image/png;base64,aGVybw==',
+      }),
+    ).rejects.toThrow('Article path required');
     expect(invokeMock).not.toHaveBeenCalled();
   });
 });
