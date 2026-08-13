@@ -156,10 +156,17 @@ npm run tauri:build    # Build native app
 ## Before Committing
 
 1. **Type Safety**: `npm run check`
-2. **Tests**: `npm run test`
-3. **Manual Testing**: Verify in `npm run tauri:dev`
-4. **Git Check**: `git status` and `git diff` before staging
-5. **No Secrets**: Verify no API keys, tokens, or credentials in diffs
+2. **Lint**: `npm run lint`
+3. **Formatting**: `npm run format:check` (or `npm run format` to fix)
+4. **Tests**: `npm run test`
+5. **Manual Testing**: Verify in `npm run tauri:dev`
+6. **Git Check**: `git status` and `git diff` before staging
+7. **No Secrets**: Verify no API keys, tokens, or credentials in diffs
+
+A Husky pre-commit hook runs `lint-staged` (ESLint + Prettier on staged
+files) and then chains to the machine-global SpockLock doctrine hook. The
+same checks (`format:check`, `lint`, `check`, `test`) run in CI on every pull
+request and push to `main`.
 
 ## Testing Strategy
 
