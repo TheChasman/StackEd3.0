@@ -1,0 +1,10 @@
+npx lint-staged
+
+# Preserve SpockLock's global doctrine hook (staged-secret blocking + semver
+# auto-bump). Husky repoints this repo's core.hooksPath at .husky, which would
+# otherwise skip the machine-global hook. Resolve it dynamically so this is a
+# no-op on machines without SpockLock installed.
+global_hooks="$(git config --global core.hooksPath 2>/dev/null || true)"
+if [ -n "$global_hooks" ] && [ -x "$global_hooks/pre-commit" ]; then
+  "$global_hooks/pre-commit" "$@"
+fi

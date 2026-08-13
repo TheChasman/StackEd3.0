@@ -14,8 +14,22 @@
     "install:app": "node scripts/install-macos-app.mjs",
     "version:bump:hook": "node scripts/version-bump-hook.mjs",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,svelte,js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,html}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
@@ -39,6 +53,7 @@
     "turndown": "^7.2.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/vite": "^4.1.17",
     "@tauri-apps/cli": "^2.11.2",
@@ -46,11 +61,21 @@
     "@types/katex": "^0.16.7",
     "@types/marked": "^6.0.0",
     "@types/turndown": "^5.0.5",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.23.0",
+    "globals": "^17.11.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
+    "lint-staged": "^17.3.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-svelte": "^4.1.1",
     "svelte": "^5.39.6",
     "svelte-check": "^4.4.8",
+    "svelte-eslint-parser": "^1.8.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.0",
+    "typescript-eslint": "^8.67.0",
     "vite": "npm:rolldown-vite@^7.1.14",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.8"
