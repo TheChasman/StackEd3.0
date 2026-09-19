@@ -83,6 +83,7 @@ export interface Workshop {
   candidates: WorkshopCandidates;
   research: string;
   aiGen: boolean;
+  targetDate: string | null; // 'YYYY-MM-DD', local planning only (never published)
 }
 
 // --- Remote state (tracked after a draft is created on Substack) ---
@@ -91,6 +92,7 @@ export interface RemoteState {
   publication: string;
   draftId: number | null;
   scheduled: boolean;
+  publishedAt: string | null; // ISO, set when a publish succeeds
 }
 
 // --- The Scaffold ---
@@ -146,6 +148,7 @@ export function emptyWorkshop(): Workshop {
     candidates: { title: [], subtitle: [], hook: [], landing: [] },
     research: '',
     aiGen: false,
+    targetDate: null,
   };
 }
 
@@ -156,7 +159,7 @@ export function emptyScaffold(kind: 'post' | 'note' = 'post'): Scaffold {
     kind,
     created: now,
     updated: now,
-    remote: { publication: '', draftId: null, scheduled: false },
+    remote: { publication: '', draftId: null, scheduled: false, publishedAt: null },
     locked: [],
     payload: kind === 'post' ? emptyPostPayload() : emptyNotePayload(),
     workshop: emptyWorkshop(),

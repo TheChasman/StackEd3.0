@@ -131,3 +131,32 @@ describe('document store', () => {
     expect(documentStore.dirty).toBe(true);
   });
 });
+
+describe('editTick (autosave signal)', () => {
+  it('starts at 0 and increments exactly once per mutation', () => {
+    expect(documentStore.editTick).toBe(0);
+    documentStore.load(newScaffold());
+    expect(documentStore.editTick).toBe(0); // load is not a mutation
+
+    documentStore.patchPayload('draft_title', 'T');
+    expect(documentStore.editTick).toBe(1);
+    documentStore.setBody({ type: 'doc', content: [] });
+    expect(documentStore.editTick).toBe(2);
+    documentStore.patchWorkshop('spark', 's');
+    expect(documentStore.editTick).toBe(3);
+    documentStore.toggleLocked('payload.slug');
+    expect(documentStore.editTick).toBe(4);
+    documentStore.replaceScaffold(newScaffold());
+    expect(documentStore.editTick).toBe(5);
+
+    documentStore.markClean();
+    expect(documentStore.editTick).toBe(5); // saving is not a mutation
+  });
+
+  it('resets to 0 with the store', () => {
+    documentStore.load(newScaffold());
+    documentStore.patchPayload('draft_title', 'T');
+    documentStore.reset();
+    expect(documentStore.editTick).toBe(0);
+  });
+});

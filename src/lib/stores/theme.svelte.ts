@@ -1,54 +1,33 @@
+// Catppuccin-flavour-only theme store (3.0). The flavour is chosen in
+// Settings, never cycled from the keyboard; the 27-scheme base16 catalogue
+// and custom-theme editor are gone (see docs/CHERRIES.md).
 import {
-  applyBase16Theme,
-  DEFAULT_SCHEME_ID,
-  getDarkBase16Schemes,
-  getStoredSchemeId,
-} from '$lib/themes/base16';
-
-type AllThemes = readonly string[];
+  applyCatppuccinTheme,
+  getCatppuccinFlavor,
+  type CatppuccinFlavor,
+} from '$lib/themes/catppuccin';
 
 class ThemeStore {
-  currentSchemeId = $state(DEFAULT_SCHEME_ID);
+  currentFlavor = $state<CatppuccinFlavor>('mocha');
   isLoaded = $state(false);
-  private readonly allSchemeIds: AllThemes = getDarkBase16Schemes().map((scheme) => scheme.id);
 
   constructor() {
     this.loadTheme();
   }
 
   loadTheme(): void {
-    const saved = getStoredSchemeId();
-    const normalized = this.allSchemeIds.includes(saved) ? saved : DEFAULT_SCHEME_ID;
-    this.currentSchemeId = normalized;
-    this.applyTheme(normalized);
+    this.currentFlavor = getCatppuccinFlavor();
+    this.applyTheme();
     this.isLoaded = true;
   }
 
-  setScheme(schemeId: string): void {
-    if (!this.allSchemeIds.includes(schemeId)) return;
-    this.currentSchemeId = schemeId;
-    localStorage.removeItem('activeCustomThemeId');
-    this.applyTheme(schemeId);
+  setFlavor(flavor: CatppuccinFlavor): void {
+    this.currentFlavor = flavor;
+    this.applyTheme();
   }
 
-  cycleNext(): void {
-    const currentIndex = this.allSchemeIds.indexOf(this.currentSchemeId);
-    const nextIndex = (currentIndex + 1) % this.allSchemeIds.length;
-    this.setScheme(this.allSchemeIds[nextIndex]);
-  }
-
-  cyclePrev(): void {
-    const currentIndex = this.allSchemeIds.indexOf(this.currentSchemeId);
-    const prevIndex = (currentIndex - 1 + this.allSchemeIds.length) % this.allSchemeIds.length;
-    this.setScheme(this.allSchemeIds[prevIndex]);
-  }
-
-  getAllSchemeIds(): AllThemes {
-    return this.allSchemeIds;
-  }
-
-  private applyTheme(schemeId: string): void {
-    applyBase16Theme(schemeId);
+  private applyTheme(): void {
+    applyCatppuccinTheme(this.currentFlavor);
   }
 }
 

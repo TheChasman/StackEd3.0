@@ -28,7 +28,13 @@ describe('emptyScaffold', () => {
     expect(s.id).toBeTruthy();
     expect(s.created).toBeTruthy();
     expect(s.updated).toBeTruthy();
-    expect(s.remote).toEqual({ publication: '', draftId: null, scheduled: false });
+    expect(s.remote).toEqual({
+      publication: '',
+      draftId: null,
+      scheduled: false,
+      publishedAt: null,
+    });
+    expect(s.workshop.targetDate).toBeNull();
     expect(s.locked).toEqual([]);
     expect(isPostPayload(s.payload)).toBe(true);
     expect(s.workshop).toEqual(emptyWorkshop());
@@ -167,6 +173,38 @@ describe('serialize/deserialize round-trip', () => {
   it('throws on invalid scaffold', () => {
     expect(() => deserializeScaffold('{}')).toThrow();
     expect(() => deserializeScaffold('{"id":"x"}')).toThrow();
+  });
+
+  it('normalises StackEd 2.0 files: missing targetDate/publishedAt load as null', () => {
+    const legacy = {
+      id: 'legacy',
+      kind: 'post',
+      created: '2026-01-01T00:00:00.000Z',
+      updated: '2026-01-01T00:00:00.000Z',
+      remote: { publication: '', draftId: null, scheduled: false },
+      locked: [],
+      payload: emptyPostPayload(),
+      workshop: {
+        spark: 's',
+        hook: '',
+        landing: '',
+        candidates: { title: [], subtitle: [], hook: [], landing: [] },
+        research: '',
+        aiGen: false,
+      },
+    };
+    const restored = deserializeScaffold(JSON.stringify(legacy));
+    expect(restored.workshop.targetDate).toBeNull();
+    expect(restored.remote.publishedAt).toBeNull();
+  });
+
+  it('preserves targetDate and publishedAt through a round-trip', () => {
+    const s = emptyScaffold('post');
+    s.workshop.targetDate = '2026-10-12';
+    s.remote.publishedAt = '2026-10-12T09:00:00.000Z';
+    const restored = deserializeScaffold(serializeScaffold(s));
+    expect(restored.workshop.targetDate).toBe('2026-10-12');
+    expect(restored.remote.publishedAt).toBe('2026-10-12T09:00:00.000Z');
   });
 });
 

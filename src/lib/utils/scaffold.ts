@@ -62,10 +62,15 @@ export function serializeScaffold(s: Scaffold): string {
 
 export function deserializeScaffold(json: string): Scaffold {
   const parsed = JSON.parse(json) as Scaffold;
-  if (!parsed.id || !parsed.kind || !parsed.payload || !parsed.workshop) {
+  if (!parsed.id || !parsed.kind || !parsed.payload || !parsed.workshop || !parsed.remote) {
     throw new Error('Invalid scaffold: missing required fields');
   }
-  return parsed;
+  // StackEd 2.0 files predate targetDate/publishedAt — both load as null.
+  return {
+    ...parsed,
+    remote: { ...parsed.remote, publishedAt: parsed.remote.publishedAt ?? null },
+    workshop: { ...parsed.workshop, targetDate: parsed.workshop.targetDate ?? null },
+  };
 }
 
 // --- Markdown mirror (one-way, for Obsidian reading) ---

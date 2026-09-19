@@ -13,6 +13,7 @@ import { FRONTMATTER_DEFAULTS, FRONTMATTER_FIELD_ORDER } from '$lib/types/articl
 import { emptyScaffold, type Scaffold } from '$lib/types/scaffold';
 import { substackExtensions } from '$lib/editor/schema';
 import { addRecentFile } from '$lib/services/storage';
+import { upsertLibraryEntryForScaffold } from '$lib/services/library';
 import { syncRecentFilesMenu } from '$lib/services/recentMenu';
 
 const LAST_SAVED_FOLDER_KEY = 'stacked:lastSavedFolder';
@@ -101,15 +102,6 @@ function getArticlePathForNewFile(selectedPath: string): {
 }
 
 // --- Public API ---
-
-export async function openFolder(): Promise<string | null> {
-  const selected = await openDialog({
-    title: 'Select Pipeline Folder',
-    directory: true,
-    multiple: false,
-  });
-  return Array.isArray(selected) ? (selected[0] ?? null) : selected;
-}
 
 export async function openScaffold(): Promise<Scaffold | null> {
   const selected = await openDialog({
@@ -202,6 +194,8 @@ export async function saveScaffoldPath(filePath: string, scaffold: Scaffold): Pr
   const title =
     scaffold.payload && 'draft_title' in scaffold.payload ? scaffold.payload.draft_title : 'Note';
   await addAndSyncRecent(filePath, title);
+  // Library index is a cache — a failed upsert never fails the save.
+  await upsertLibraryEntryForScaffold(filePath, scaffold).catch(() => {});
   return filePath;
 }
 

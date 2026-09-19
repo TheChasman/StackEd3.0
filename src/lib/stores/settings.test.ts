@@ -1,5 +1,27 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
+// vitest's jsdom environment has no localStorage (about:blank origin), so
+// tests that exercise persistence install an in-memory Storage.
+function installLocalStorage(): Storage {
+  const data = new Map<string, string>();
+  const storage: Storage = {
+    get length() {
+      return data.size;
+    },
+    clear: () => data.clear(),
+    getItem: (key) => data.get(key) ?? null,
+    key: (index) => [...data.keys()][index] ?? null,
+    removeItem: (key) => void data.delete(key),
+    setItem: (key, value) => void data.set(key, String(value)),
+  };
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: storage,
+    configurable: true,
+    writable: true,
+  });
+  return storage;
+}
+
 // Mock idb since settings.svelte.ts imports storage.ts (which uses it).
 vi.mock('idb', () => {
   const store: Record<string, unknown> = {};
@@ -22,27 +44,57 @@ vi.mock('idb', () => {
 
 import { settingsStore } from './settings.svelte';
 
-beforeEach(() => settingsStore.reset());
+const storage = installLocalStorage();
+
+beforeEach(() => {
+  storage.clear();
+  settingsStore.reset();
+});
 
 describe('settings store', () => {
-  it('sidebar is visible by default', () => {
-    expect(settingsStore.sidebarVisible).toBe(true);
+  it('tools drawer is closed by default', () => {
+    expect(settingsStore.toolsDrawerOpen).toBe(false);
   });
 
-  it('toggleSidebar flips visibility', () => {
-    settingsStore.toggleSidebar();
-    expect(settingsStore.sidebarVisible).toBe(false);
-    settingsStore.toggleSidebar();
-    expect(settingsStore.sidebarVisible).toBe(true);
+  it('toggleToolsDrawer flips drawer visibility', () => {
+    settingsStore.toggleToolsDrawer();
+    expect(settingsStore.toolsDrawerOpen).toBe(true);
+    settingsStore.toggleToolsDrawer();
+    expect(settingsStore.toolsDrawerOpen).toBe(false);
   });
 
-  it('reset restores the default sidebar state', () => {
-    settingsStore.toggleSidebar();
+  it('openTools opens the drawer on the requested tool', () => {
+    settingsStore.openTools('generate');
+    expect(settingsStore.toolsDrawerOpen).toBe(true);
+    expect(settingsStore.activeTool).toBe('generate');
+  });
+
+  it('library view mode defaults to list and can switch to calendar', () => {
+    expect(settingsStore.libraryViewMode).toBe('list');
+    settingsStore.setLibraryViewMode('calendar');
+    expect(settingsStore.libraryViewMode).toBe('calendar');
+  });
+
+  it('reset restores the defaults', () => {
+    settingsStore.openTools('artwork');
+    settingsStore.setLibraryViewMode('calendar');
     settingsStore.reset();
-    expect(settingsStore.sidebarVisible).toBe(true);
+    expect(settingsStore.toolsDrawerOpen).toBe(false);
+    expect(settingsStore.activeTool).toBe('research');
+    expect(settingsStore.libraryViewMode).toBe('list');
   });
 
   it('loadFromStorage purges any legacy on-disk API keys', async () => {
     await expect(settingsStore.loadFromStorage()).resolves.toBeUndefined();
+  });
+
+  it('loadFromStorage restores persisted drawer and view mode', async () => {
+    localStorage.setItem('toolsDrawerOpen', 'true');
+    localStorage.setItem('activeTool', 'generate');
+    localStorage.setItem('libraryViewMode', 'calendar');
+    await settingsStore.loadFromStorage();
+    expect(settingsStore.toolsDrawerOpen).toBe(true);
+    expect(settingsStore.activeTool).toBe('generate');
+    expect(settingsStore.libraryViewMode).toBe('calendar');
   });
 });

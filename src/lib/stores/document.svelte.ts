@@ -1,9 +1,10 @@
 // Scaffold-based document store.
 // Replaces the old frontmatter+body (markdown) model with a single Scaffold
 // object whose body is ProseMirror JSON — the wire format Substack accepts.
-import type { Scaffold, PostPayload, NotePayload, PMDoc, PMNode } from '$lib/types/scaffold';
+import type { Scaffold, PostPayload, NotePayload, PMDoc } from '$lib/types/scaffold';
 import { emptyScaffold, isPostPayload, isNotePayload, getBody } from '$lib/types/scaffold';
 import { deserializeScaffold } from '$lib/utils/scaffold';
+import { countPMDocWords } from '$lib/utils/pmText';
 
 interface TabState {
   scaffold: Scaffold | null;
@@ -42,6 +43,7 @@ class DocumentStore {
   private _tabs = $state<TabState[]>([emptyTab()]);
   private _activeIndex = $state(0);
   private _loadVersion = $state(0);
+  private _editTick = $state(0);
 
   get activeIndex(): number {
     return this._activeIndex;
@@ -94,8 +96,19 @@ class DocumentStore {
     return this._loadVersion;
   }
 
+  /** Increments on every mutation — drives the 4-second autosave debounce. */
+  get editTick(): number {
+    return this._editTick;
+  }
+
   get wordCount(): number {
     return countPMDocWords(this.body);
+  }
+
+  private touch(tab: TabState): void {
+    tab.scaffold!.updated = new Date().toISOString();
+    tab.dirty = true;
+    this._editTick += 1;
   }
 
   // --- Loading ---
@@ -164,8 +177,7 @@ class DocumentStore {
     } else if (isNotePayload(tab.scaffold.payload)) {
       tab.scaffold.payload.bodyJson = body;
     }
-    tab.scaffold.updated = new Date().toISOString();
-    tab.dirty = true;
+    this.touch(tab);
   }
 
   /** Patch a payload field by key. */
@@ -173,8 +185,7 @@ class DocumentStore {
     const tab = this._tabs[this._activeIndex];
     if (!tab.scaffold || !isPostPayload(tab.scaffold.payload)) return;
     tab.scaffold.payload[field] = value;
-    tab.scaffold.updated = new Date().toISOString();
-    tab.dirty = true;
+    this.touch(tab);
   }
 
   /** Patch a workshop field by key. */
@@ -185,8 +196,7 @@ class DocumentStore {
     const tab = this._tabs[this._activeIndex];
     if (!tab.scaffold) return;
     tab.scaffold.workshop[field] = value;
-    tab.scaffold.updated = new Date().toISOString();
-    tab.dirty = true;
+    this.touch(tab);
   }
 
   /** Toggle a field path in the locked array. */
@@ -199,13 +209,14 @@ class DocumentStore {
     } else {
       tab.scaffold.locked = [...locked, path];
     }
-    tab.dirty = true;
+    this.touch(tab);
   }
 
   /** Replace the entire scaffold (e.g. after AI merge). */
   replaceScaffold(scaffold: Scaffold): void {
-    this._tabs[this._activeIndex].scaffold = scaffold;
-    this._tabs[this._activeIndex].dirty = true;
+    const tab = this._tabs[this._activeIndex];
+    tab.scaffold = scaffold;
+    this.touch(tab);
   }
 
   markClean(): void {
@@ -215,6 +226,7 @@ class DocumentStore {
   reset(): void {
     this._tabs = [emptyTab()];
     this._activeIndex = 0;
+    this._editTick = 0;
   }
 
   /** Create a fresh scaffold in the active tab (for "New" button). */
@@ -223,24 +235,6 @@ class DocumentStore {
     this.load(scaffold, null, true);
     return scaffold;
   }
-}
-
-function countPMDocWords(doc: PMDoc): number {
-  let count = 0;
-  for (const node of doc.content) {
-    count += countNodeWords(node);
-  }
-  return count;
-}
-
-function countNodeWords(node: PMNode): number {
-  if (node.text) {
-    return node.text.split(/\s+/).filter(Boolean).length;
-  }
-  if (node.content) {
-    return node.content.reduce((sum, child) => sum + countNodeWords(child), 0);
-  }
-  return 0;
 }
 
 export const documentStore = new DocumentStore();

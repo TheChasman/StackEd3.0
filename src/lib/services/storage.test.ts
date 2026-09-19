@@ -2,28 +2,48 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const store: Record<string, unknown> = {};
 const recents: Array<{ id: number; filePath: string; title: string; openedAt: number }> = [];
+const library: Array<Record<string, unknown>> = [];
 let nextId = 1;
 
 // Mock idb before importing the module under test
 vi.mock('idb', () => {
   const mockDB = {
-    put: vi.fn(async (_store: string, val: unknown, key: string) => {
-      store[key] = val;
+    put: vi.fn(async (storeName: string, val: unknown, key?: string) => {
+      if (storeName === 'library') {
+        const entry = val as Record<string, unknown>;
+        const idx = library.findIndex((e) => e.filePath === entry.filePath);
+        if (idx >= 0) library[idx] = entry;
+        else library.push(entry);
+      } else if (key !== undefined) {
+        store[key] = val;
+      }
     }),
     get: vi.fn(async (_store: string, key: string) => store[key] ?? undefined),
-    delete: vi.fn(async (_store: string, key: string) => {
-      delete store[key];
+    delete: vi.fn(async (storeName: string, key: string) => {
+      if (storeName === 'library') {
+        const idx = library.findIndex((e) => e.filePath === key);
+        if (idx >= 0) library.splice(idx, 1);
+      } else {
+        delete store[key];
+      }
     }),
-    getAll: vi.fn(async (_store: string) => [...recents]),
-    transaction: vi.fn(() => ({
+    getAll: vi.fn(async (storeName: string) =>
+      storeName === 'library' ? [...library] : [...recents],
+    ),
+    transaction: vi.fn((storeName: string) => ({
       store: {
-        getAll: vi.fn(async () => [...recents]),
+        getAll: vi.fn(async () => (storeName === 'library' ? [...library] : [...recents])),
         add: vi.fn(async (item: { filePath: string; title: string; openedAt: number }) => {
           recents.push({ ...item, id: nextId++ });
         }),
-        delete: vi.fn(async (id: number) => {
-          const idx = recents.findIndex((r) => r.id === id);
-          if (idx >= 0) recents.splice(idx, 1);
+        delete: vi.fn(async (key: number | string) => {
+          if (storeName === 'library') {
+            const idx = library.findIndex((e) => e.filePath === key);
+            if (idx >= 0) library.splice(idx, 1);
+          } else {
+            const idx = recents.findIndex((r) => r.id === key);
+            if (idx >= 0) recents.splice(idx, 1);
+          }
         }),
       },
       done: Promise.resolve(),
@@ -37,18 +57,35 @@ vi.mock('idb', () => {
 
 import {
   clearStoredApiKeys,
-  savePipelineFolderPath,
-  loadPipelineFolderPath,
   addRecentFile,
   getRecentFiles,
   pruneRecentFiles,
   removeRecentFile,
+  upsertLibraryEntry,
+  listLibraryEntries,
+  pruneLibraryEntries,
+  type LibraryEntry,
 } from './storage';
+
+function entry(overrides: Partial<LibraryEntry> = {}): LibraryEntry {
+  return {
+    filePath: '/tmp/a.stacked.json',
+    title: 'A draft',
+    subtitle: '',
+    state: 'draft',
+    targetDate: null,
+    publication: '',
+    updated: '2026-09-19T10:00:00.000Z',
+    wordCount: 100,
+    ...overrides,
+  };
+}
 
 describe('storage service', () => {
   beforeEach(() => {
     Object.keys(store).forEach((key) => delete store[key]);
     recents.splice(0, recents.length);
+    library.splice(0, library.length);
     nextId = 1;
   });
 
@@ -76,15 +113,41 @@ describe('storage service', () => {
     await expect(clearStoredApiKeys()).resolves.toBeUndefined();
   });
 
-  it('saves and loads pipeline folder path', async () => {
-    await savePipelineFolderPath('/tmp/pipeline');
-    const loaded = await loadPipelineFolderPath();
-    expect(loaded).toBe('/tmp/pipeline');
+  it('upsertLibraryEntry inserts then updates by filePath', async () => {
+    await upsertLibraryEntry(entry());
+    await upsertLibraryEntry(entry({ title: 'A draft v2' }));
+    const entries = await listLibraryEntries();
+    expect(entries).toHaveLength(1);
+    expect(entries[0].title).toBe('A draft v2');
   });
 
-  it('returns null or a string for pipeline folder path', async () => {
-    const loaded = await loadPipelineFolderPath();
-    expect(loaded == null || typeof loaded === 'string').toBe(true);
+  it('listLibraryEntries sorts by updated, newest first', async () => {
+    await upsertLibraryEntry(
+      entry({ filePath: '/tmp/old.json', updated: '2026-09-01T00:00:00.000Z' }),
+    );
+    await upsertLibraryEntry(
+      entry({ filePath: '/tmp/new.json', updated: '2026-09-19T00:00:00.000Z' }),
+    );
+    const entries = await listLibraryEntries();
+    expect(entries.map((e) => e.filePath)).toEqual(['/tmp/new.json', '/tmp/old.json']);
+  });
+
+  it('pruneLibraryEntries removes missing files and returns survivors', async () => {
+    await upsertLibraryEntry(entry({ filePath: '/tmp/exists.json' }));
+    await upsertLibraryEntry(entry({ filePath: '/tmp/missing.json' }));
+
+    const survivors = await pruneLibraryEntries(
+      async (filePath) => filePath !== '/tmp/missing.json',
+    );
+    expect(survivors.map((e) => e.filePath)).toEqual(['/tmp/exists.json']);
+
+    const after = await listLibraryEntries();
+    expect(after.map((e) => e.filePath)).toEqual(['/tmp/exists.json']);
+  });
+
+  it('pruneLibraryEntries returns empty without touching the store when empty', async () => {
+    const survivors = await pruneLibraryEntries(async () => true);
+    expect(survivors).toEqual([]);
   });
 
   it('addRecentFile stores a recent entry', async () => {

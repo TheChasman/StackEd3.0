@@ -1,6 +1,18 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { invoke } from '@tauri-apps/api/core';
 import type { SubstackConnection } from '$lib/types/connection';
+import type { DocumentState } from '$lib/utils/documentState';
+
+export interface LibraryEntry {
+  filePath: string;
+  title: string;
+  subtitle: string;
+  state: DocumentState;
+  targetDate: string | null;
+  publication: string;
+  updated: string; // ISO
+  wordCount: number;
+}
 
 interface StackEdDB extends DBSchema {
   settings: { key: string; value: unknown };
@@ -8,12 +20,18 @@ interface StackEdDB extends DBSchema {
     key: number;
     value: { id?: number; filePath: string; title: string; openedAt: number };
   };
+  library: { key: string; value: LibraryEntry };
 }
 
-const DB_PROMISE: Promise<IDBPDatabase<StackEdDB>> = openDB<StackEdDB>('stacked', 1, {
-  upgrade(db) {
-    db.createObjectStore('settings');
-    db.createObjectStore('recents', { keyPath: 'id', autoIncrement: true });
+const DB_PROMISE: Promise<IDBPDatabase<StackEdDB>> = openDB<StackEdDB>('stacked', 2, {
+  upgrade(db, oldVersion) {
+    if (oldVersion < 1) {
+      db.createObjectStore('settings');
+      db.createObjectStore('recents', { keyPath: 'id', autoIncrement: true });
+    }
+    if (oldVersion < 2) {
+      db.createObjectStore('library', { keyPath: 'filePath' });
+    }
   },
 });
 
@@ -36,16 +54,6 @@ export async function clearStoredApiKeys(): Promise<void> {
   for (const key of LEGACY_API_KEY_STORAGE_KEYS) {
     await db.delete('settings', key);
   }
-}
-
-export async function savePipelineFolderPath(path: string): Promise<void> {
-  const db = await DB_PROMISE;
-  await db.put('settings', path, 'pipelineFolderPath');
-}
-
-export async function loadPipelineFolderPath(): Promise<string | null> {
-  const db = await DB_PROMISE;
-  return ((await db.get('settings', 'pipelineFolderPath')) as string | undefined) ?? null;
 }
 
 export async function saveSubstackConnections(connections: SubstackConnection[]): Promise<void> {
@@ -135,4 +143,51 @@ export async function pruneRecentFiles(
   }
 
   return checks.filter(({ exists }) => exists).map(({ recent }) => recent);
+}
+
+// --- Library index ---
+// A cache of saved drafts, keyed by filePath and written on every successful
+// save. Pruned on read when a file has vanished. No document content lives
+// here (design spec §4.4).
+
+export async function upsertLibraryEntry(entry: LibraryEntry): Promise<void> {
+  const db = await DB_PROMISE;
+  await db.put('library', entry);
+}
+
+export async function listLibraryEntries(): Promise<LibraryEntry[]> {
+  const db = await DB_PROMISE;
+  const all = await db.getAll('library');
+  return all
+    .filter((value): value is LibraryEntry => typeof value?.filePath === 'string')
+    .sort((a, b) => (a.updated < b.updated ? 1 : -1));
+}
+
+export async function pruneLibraryEntries(
+  pathExists: (filePath: string) => Promise<boolean> = fileExists,
+): Promise<LibraryEntry[]> {
+  const entries = await listLibraryEntries();
+  if (!entries.length) return entries;
+
+  const checks = await Promise.all(
+    entries.map(async (entry) => ({
+      entry,
+      exists: await pathExists(entry.filePath),
+    })),
+  );
+
+  const missing = checks
+    .map(({ entry, exists }) => (!exists ? entry.filePath : undefined))
+    .filter((filePath): filePath is string => typeof filePath === 'string');
+
+  if (missing.length > 0) {
+    const db = await DB_PROMISE;
+    const tx = db.transaction('library', 'readwrite');
+    for (const filePath of missing) {
+      await tx.store.delete(filePath);
+    }
+    await tx.done;
+  }
+
+  return checks.filter(({ exists }) => exists).map(({ entry }) => entry);
 }
