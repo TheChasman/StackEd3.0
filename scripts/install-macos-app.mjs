@@ -15,18 +15,18 @@ export function getDefaultSourceApp(root = projectRoot) {
     'release',
     'bundle',
     'macos',
-    'StackEd.app',
+    'StackEd3.app',
   );
 }
 
 export function getDefaultDestinationApp() {
-  return '/Applications/StackEd.app';
+  return '/Applications/StackEd3.app';
 }
 
 // Match the running process by its bundle path rather than process name:
-// the bundle is StackEd.app but its executable is `stacked`, and the comm
+// the bundle is StackEd3.app but its executable is `stacked`, and the comm
 // name varies by launch context. The full path is unambiguous.
-const PROCESS_MATCH = 'StackEd.app/Contents/MacOS/';
+const PROCESS_MATCH = 'StackEd3.app/Contents/MacOS/';
 
 export function isStackEdRunning(execFileSyncImpl = execFileSync) {
   try {
@@ -49,7 +49,7 @@ export async function tidyPreviousBuild(sourceApp, log = console.log) {
     for (const line of info.split('\n')) {
       const dev = line.match(/^(\/dev\/disk\d+)\b/);
       if (dev) currentDevice = dev[1];
-      if (/image-path.*StackEd/i.test(line) && currentDevice) devices.add(currentDevice);
+      if (/image-path.*StackEd3/i.test(line) && currentDevice) devices.add(currentDevice);
     }
     for (const dev of devices) {
       try {
@@ -87,7 +87,7 @@ export async function installMacosApp({
   await tidyPreviousBuild(sourceApp, log);
 
   if (isAppRunning()) {
-    log('Quitting running StackEd…');
+    log('Quitting running StackEd3…');
     try {
       execFileSync('pkill', ['-f', PROCESS_MATCH]);
     } catch {
@@ -100,7 +100,7 @@ export async function installMacosApp({
   }
 
   const destinationParent = dirname(destinationApp);
-  const tempApp = join(destinationParent, `.StackEd.app.installing-${process.pid}-${Date.now()}`);
+  const tempApp = join(destinationParent, `.StackEd3.app.installing-${process.pid}-${Date.now()}`);
 
   await mkdir(destinationParent, { recursive: true });
   await rm(tempApp, { recursive: true, force: true });

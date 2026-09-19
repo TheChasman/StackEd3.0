@@ -1,30 +1,53 @@
-# StackEd 2.0
+# StackEd 3.0
 
-A desktop application for managing, editing, and publishing Markdown/YAML documents to Substack, with built-in LLM assistance.
+An offline-first **writing studio** for Substack. You write in a calm, centred
+canvas; publishing is a deliberate step at the end rather than a control panel
+beside the manuscript.
 
-- **Frontend:** Svelte 5 + TypeScript + TailwindCSS
-- **Backend:** Rust (Tauri 2) for native system integration
-- **Editors:** TipTap 3 (rich text) and native YAML editing
-- **LLM integration:** Anthropic Claude and OpenAI
-- **Storage:** IndexedDB (browser storage) + file I/O via Tauri
+StackEd 3.0 is a redesign of [StackEd 2.0](https://github.com/TheChasman/StackEd2.0).
+It keeps the editor, research, artwork and Substack publishing that worked, and
+removes the workflow chrome that had been promoted into permanent furniture.
+Every removal is catalogued with a restore command in
+[`docs/CHERRIES.md`](./docs/CHERRIES.md).
+
+- **Frontend:** Svelte 5 (runes) + TypeScript + TailwindCSS 4
+- **Backend:** Rust (Tauri 2)
+- **Editor:** TipTap 3, ProseMirror JSON on the wire
+- **AI:** OpenRouter via [SpockLock](./SPOCKLOCK.md) (keys never touch disk or the WebView)
+- **Storage:** `.stacked.json` files on disk, IndexedDB for recents and the library index
+
+## The three spaces
+
+| Space | What it is for |
+|---|---|
+| **Library** | Every local draft: search, list, month calendar, state, target date |
+| **Write** | The manuscript. Centred column, title and subtitle in the canvas, minimal toolbar |
+| **Plan** | Spark, Hook, Landing, research notes, target date — never published |
+| **Finish** | SEO, publication, audience, delivery, schedule, readiness, publish |
+
+Research, Artwork and Generate live in an on-demand `Tools` drawer inside Write,
+not a permanent sidebar.
+
+See [`docs/superpowers/specs/2026-09-19-stacked3-design.md`](./docs/superpowers/specs/2026-09-19-stacked3-design.md)
+for the full design.
 
 ## Prerequisites
 
 - **Node.js** 20+ and npm
-- **Rust** (stable toolchain) and Cargo — see https://rustup.rs
-- Platform toolchain for Tauri 2 (Xcode Command Line Tools on macOS). See the
-  [Tauri prerequisites](https://tauri.app/start/prerequisites/).
+- **Rust** (stable) and Cargo — see https://rustup.rs
+- Xcode Command Line Tools on macOS, or the
+  [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform
 
 ## Quick start
 
 ```bash
-git clone git@github.com:TheChasman/StackEd2.0.git
-cd StackEd2.0
-npm install          # install frontend dependencies (also wires git hooks)
-npm run tauri:dev    # launch the desktop app in development
+git clone git@github.com:TheChasman/StackEd3.0.git
+cd StackEd3.0
+npm install          # installs dependencies and wires git hooks
+npm run tauri:dev    # launch the desktop app
 ```
 
-To run only the frontend in a browser (no native shell):
+Frontend only, in a browser (no native file dialogs):
 
 ```bash
 npm run dev          # Vite dev server at http://localhost:5173
@@ -35,53 +58,44 @@ npm run dev          # Vite dev server at http://localhost:5173
 | Command | What it does |
 | --- | --- |
 | `npm run tauri:dev` | Run the full desktop app (Vite + Tauri) in dev mode |
-| `npm run dev` | Run the frontend only (Vite dev server) |
+| `npm run dev` | Run the frontend only |
 | `npm run build` | Build the frontend bundle |
-| `npm run tauri:build` | Build and install the native macOS app |
-| `npm run check` | Type-check Svelte + TypeScript (`svelte-check`) |
+| `npm run tauri:build` | Build and install `StackEd3.app` |
+| `npm run check` | Type-check Svelte + TypeScript |
 | `npm run lint` | Lint with ESLint |
-| `npm run format` | Format the codebase with Prettier |
-| `npm run format:check` | Verify formatting without writing |
-| `npm run test` | Run the unit test suite (Vitest) |
-| `npm run test:watch` | Run tests in watch mode |
-
-## Environment variables & secrets
-
-StackEd requires **no `.env` file** to run. There are no user-configurable
-runtime environment variables; the only environment value read by the app is
-Vite's built-in `import.meta.env.DEV` flag, which Vite sets automatically.
-
-**Secrets (Anthropic / OpenAI API keys) are never stored on disk or in `.env`
-files.** They are resolved at call time from [SpockLock](./SPOCKLOCK.md), a
-1Password-backed secrets manager that keeps resolved values in process memory
-only. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for how to provision and manage them.
-Do not add API keys to this repository in any form.
-
-## Project structure
-
-```
-src/            Svelte frontend (components, stores, services, themes, utils)
-src-tauri/      Rust backend (Tauri commands, file I/O, capabilities)
-docs/           Design specs and plans
-scripts/        Build/deploy/versioning helper scripts
-public/         Static assets
-```
-
-## Development notes
-
-- **State:** Svelte 5 runes (`$state`, `$derived`, `$effect`).
-- **Tauri commands:** defined in `src-tauri/src/lib.rs`, invoked from the
-  frontend via `@tauri-apps/api/core`.
-- **Git hooks:** `npm install` runs Husky, which registers a pre-commit hook
-  that runs `lint-staged` (ESLint + Prettier on staged files) and then chains
-  to the machine-global SpockLock doctrine hook if present.
-- See [`AGENTS.md`](./AGENTS.md) for the full contributor/agent guide and
-  [`CLAUDE.md`](./CLAUDE.md) for coding guidelines.
+| `npm run format` | Format with Prettier |
+| `npm run test` | Run the Vitest suite |
 
 ## Verification before committing
 
 ```bash
-npm run check && npm run lint && npm run format:check && npm run test
+npm run format:check && npm run lint && npm run check && npm run test
 ```
 
-These same checks run in CI on every pull request and push to `main`.
+The same checks run in CI on every pull request and push to `main`.
+
+## Secrets
+
+StackEd needs no `.env` file. Anthropic/OpenAI/OpenRouter keys are resolved at
+call time from SpockLock and held in process memory only. See
+[`SPOCKLOCK.md`](./SPOCKLOCK.md). Never add keys to this repository.
+
+## Project layout
+
+```
+src/                     Svelte frontend
+  lib/components/
+    library/             Library space (list + calendar)
+    write/               Write space (canvas, tools drawer)
+    plan/                Plan space (workshop)
+    finish/              Finish space (publish review)
+    editor/              TipTap editor, toolbar, Substack extensions
+  lib/services/          File I/O, Substack publishing, SEO, artwork, AI
+  lib/stores/            Svelte rune stores (document, view, settings, theme)
+src-tauri/               Rust backend (Tauri commands, file I/O)
+docs/CHERRIES.md         Catalogue of everything removed from 2.0, with restore commands
+docs/superpowers/        Specs and implementation plans
+```
+
+Also see [`AGENTS.md`](./AGENTS.md) for the contributor/agent guide and
+[`CLAUDE.md`](./CLAUDE.md) for coding guidelines.

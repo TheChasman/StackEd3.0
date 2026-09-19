@@ -1,10 +1,10 @@
 [package]
 name = "stacked"
-version = "0.1.65"
-description = "StackEd — Substack post editor for the StackPipe pipeline"
+version = "3.0.0"
+description = "StackEd 3 — offline-first Substack writing studio"
 authors = ["TheChasman"]
 license = ""
-repository = "https://github.com/TheChasman/StackEd2.0"
+repository = "https://github.com/TheChasman/StackEd3.0"
 edition = "2021"
 rust-version = "1.77.2"
 

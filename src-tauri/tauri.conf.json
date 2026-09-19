@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "StackEd",
-  "version": "0.1.65",
-  "identifier": "com.thechasman.stacked",
+  "productName": "StackEd3",
+  "version": "3.0.0",
+  "identifier": "com.thechasman.stacked3",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "StackEd",
+        "title": "StackEd 3",
         "width": 800,
         "height": 600,
         "resizable": true,
@@ -26,7 +26,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app"],
+    "targets": [
+      "app"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -36,13 +38,18 @@
     ],
     "fileAssociations": [
       {
-        "ext": ["md"],
+        "ext": [
+          "md"
+        ],
         "name": "Markdown Document",
         "description": "Markdown document",
         "role": "Editor",
         "rank": "Alternate",
         "mimeType": "text/markdown",
-        "contentTypes": ["public.markdown", "net.daringfireball.markdown"]
+        "contentTypes": [
+          "public.markdown",
+          "net.daringfireball.markdown"
+        ]
       }
     ],
     "android": {

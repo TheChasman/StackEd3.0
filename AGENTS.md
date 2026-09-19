@@ -1,220 +1,168 @@
+<coding_guidelines>
 # AGENTS.md
 
-Agent-specific guidelines and reference for StackEd 2.0 development.
+Agent-specific guidelines and reference for StackEd 3.0 development.
 
 ## Project Overview
 
-**StackEd 2.0** is a desktop application for managing and editing Markdown/YAML documents with LLM integration. Built with:
-- **Frontend**: Svelte 5 + TailwindCSS + TypeScript
-- **Backend**: Rust (Tauri 2) for native system integration
-- **Editors**: TipTap 3 for rich text, native YAML editing
-- **LLM Integration**: Anthropic Claude and OpenAI APIs
-- **Data**: IndexedDB (browser storage), file I/O via Tauri
+**StackEd 3.0** is an offline-first writing studio for Substack. The manuscript
+is the product; publishing is a deliberate final step, not permanent chrome.
+
+- **Frontend**: Svelte 5 (runes) + TailwindCSS 4 + TypeScript
+- **Backend**: Rust (Tauri 2)
+- **Editor**: TipTap 3, ProseMirror JSON as the canonical body format
+- **AI**: OpenRouter, keys resolved in Rust via SpockLock (never in the WebView)
+- **Data**: `.stacked.json` files on disk; IndexedDB for recents + library index
+
+Read [`docs/superpowers/specs/2026-09-19-stacked3-design.md`](./docs/superpowers/specs/2026-09-19-stacked3-design.md)
+before changing structure. Read [`docs/CHERRIES.md`](./docs/CHERRIES.md) before
+re-adding anything that looks missing — it was probably removed on purpose, and
+the restore command is there.
+
+## The three spaces
+
+Navigation is an explicit state machine in `src/lib/stores/view.svelte.ts`, not
+a router. Exactly one space renders at a time.
+
+| Space | Component | Owns |
+|---|---|---|
+| Library | `lib/components/library/LibraryView.svelte` | Draft list, search, calendar, states |
+| Write | `lib/components/write/WriteView.svelte` | Title, subtitle, body, tools drawer |
+| Plan | `lib/components/plan/PlanView.svelte` | Workshop fields, target date |
+| Finish | `lib/components/finish/FinishView.svelte` | SEO, destination, delivery, timing, publish |
+
+**Do not add a permanent sidebar.** Research/Artwork/Generate belong in the
+Write tools drawer, on request. That arrangement is the whole point of 3.0.
 
 ## Repository Structure
 
 ```
-StackEd2.0/
-├── src/                    # Svelte frontend
-│   ├── App.svelte         # Root component
+StackEd3.0/
+├── src/
+│   ├── App.svelte              # Shell: space switching, file lifecycle, autosave
 │   ├── lib/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── services/      # API and file operations
-│   │   ├── stores/        # Svelte rune stores (state)
-│   │   ├── themes/        # Theme definitions (Catppuccin)
-│   │   └── utils/         # Helpers (zoom, markdown, etc.)
-├── src-tauri/             # Rust backend
+│   │   ├── components/
+│   │   │   ├── library/        # Library space
+│   │   │   ├── write/          # Write space + tools drawer
+│   │   │   ├── plan/           # Plan space
+│   │   │   ├── finish/         # Finish space
+│   │   │   ├── editor/         # TipTap editor, toolbar, Substack extensions
+│   │   │   ├── research/       # Research tool (drawer)
+│   │   │   ├── artwork/        # Artwork tool (drawer)
+│   │   │   └── image-generation/ # Generate tool (drawer)
+│   │   ├── services/           # files, substack/*, seo, artwork, ai, storage
+│   │   ├── stores/             # document, view, settings, theme, substackConnections
+│   │   ├── themes/             # catppuccin.ts + catppuccin.css
+│   │   └── utils/              # scaffold, frontmatter, zoom, pmText, documentState
+├── src-tauri/                  # Rust backend
 │   ├── src/
-│   │   ├── lib.rs         # Command definitions
-│   │   ├── file_io.rs     # File operations
-│   │   └── zoom.rs        # [DELETED] zoom functionality
-│   └── tauri.conf.json    # Tauri configuration
-├── public/                # Static assets
-├── dist/                  # Build output
-├── CLAUDE.md              # LLM coding guidelines
-├── package.json           # Frontend dependencies
-└── vite.config.ts         # Vite build config
+│   │   ├── lib.rs              # Tauri commands + native menu
+│   │   ├── file_io.rs          # File + artwork I/O
+│   │   ├── ai.rs               # SEO + research calls
+│   │   ├── image_generation.rs # OpenRouter image generation
+│   │   └── spocklock.rs        # Secret resolution
+│   └── tauri.conf.json
+├── docs/CHERRIES.md            # Everything removed from 2.0, with restore commands
+└── docs/superpowers/           # Specs and plans
 ```
 
 ## Key Modules
 
-### Frontend (Svelte)
+**Stores** (`src/lib/stores/`)
+- `view.svelte.ts` — which space is on screen; `openDocument()` / `goLibrary()`
+- `document.svelte.ts` — tabs, active scaffold, `editTick` (drives autosave)
+- `settings.svelte.ts` — tools-drawer visibility, library view mode
+- `theme.svelte.ts` — Catppuccin flavour, chosen in Settings only
+- `substackConnections.svelte.ts` — saved publication subdomains
 
-**Stores** (src/lib/stores/):
-- `theme.svelte.ts`: Theme switching (Catppuccin flavors)
-- `settings.svelte.ts`: User preferences
-- Other state management via Svelte 5 runes
+**Services** (`src/lib/services/`)
+- `files.ts` — open/save/new, Markdown mirror, library-index upkeep
+- `library.ts` — IndexedDB library index read/write/prune
+- `substack/` — `transport.ts`, `webviewTransport.ts`, `payloadBuilder.ts`, `publisher.ts`
+- `seo.ts` — SEO prompt, parse, apply, tag canonicalisation
+- `storage.ts` — IndexedDB (settings, recents, library)
 
-**Components** (src/lib/components/):
-- `ThemeSwitcher.svelte`: Theme toggle UI
-- `ThemeEditor.svelte`: Edit theme colors
-- `ThemeBrowser.svelte`: Browse available themes
-- `yaml/YamlPanel.svelte`: YAML editor
-- `yaml/FieldFree.svelte`: Generic YAML field component
-- TipTap-based rich text editor
-
-**Services** (src/lib/services/):
-- `files.ts`: File I/O via Tauri commands
-- LLM API clients (Claude, OpenAI)
-
-**Utils** (src/lib/utils/):
-- `zoom.ts`: UI zoom handling
-
-**Themes** (src/lib/themes/):
-- `catppuccin.ts`: Catppuccin color palette
-
-### Backend (Rust)
-
-**Commands** (src-tauri/src/):
-- `lib.rs`: Tauri command invocations (file operations, CLI args)
-- `file_io.rs`: Read/write files, manage document state
-- `zoom.rs`: [DELETED] zoom window handling
-
-**Configuration**:
-- `tauri.conf.json`: Window setup, menu, permissions
-- `capabilities/default.json`: Security permissions
+**Utils** (`src/lib/utils/`)
+- `scaffold.ts` — readiness, (de)serialisation, Markdown mirror
+- `documentState.ts` — derives `draft | ready | scheduled | published`
 
 ## Development Workflow
 
-### Starting the Dev Environment
-
 ```bash
-# Terminal 1: Frontend dev server
-npm run dev
-
-# Terminal 2: Tauri desktop app
-npm run dev:app
-
-# Or combined (single terminal):
-npm run tauri:dev
-```
-
-### Building for Release
-
-```bash
-npm run build          # Vite bundle frontend
-npm run tauri:build    # Build native app
+npm run dev          # frontend only (Vite, http://localhost:5173)
+npm run tauri:dev    # full desktop app
+npm run tauri:build  # build + install StackEd3.app
 ```
 
 ### Verification
 
-- **Type Check**: `npm run check` (svelte-check)
-- **Tests**: `npm run test` (vitest)
-- **Watch Tests**: `npm run test:watch`
+```bash
+npm run format:check && npm run lint && npm run check && npm run test
+```
+
+Run all four before claiming work is done. CI runs the same on every PR and on
+pushes to `main`.
 
 ## Common Agent Tasks
 
-### Adding a New Svelte Component
+### Adding a Svelte component
 
-1. Create in `src/lib/components/`
-2. Use Svelte 5 runes for state: `let count = $state(0)`
-3. Run `npm run check` to verify types
-4. Import and use in parent component
+1. Put it in the folder for its space (`library/`, `write/`, `plan/`, `finish/`).
+2. Use runes: `let x = $state(0)`, `$derived`, `$effect`.
+3. Run `npm run check`.
 
-### Modifying Theme System
+### Adding a Tauri command
 
-1. Update `src/lib/themes/catppuccin.ts` for color definitions
-2. Modify `src/lib/stores/theme.svelte.ts` for theme logic
-3. Update `ThemeEditor.svelte` and `ThemeSwitcher.svelte` if UI changes needed
-4. Run checks: `npm run check`
+1. Define in `src-tauri/src/lib.rs` with `#[tauri::command]`, register it in
+   `invoke_handler!`.
+2. Call it from the frontend with `invoke` from `@tauri-apps/api/core`.
+3. Secrets stay in Rust — never return an API key to the WebView.
 
-### Adding Tauri Commands
+### Changing the document model
 
-1. Define in `src-tauri/src/lib.rs` using `#[tauri::command]`
-2. Rebuild: backend recompiles on changes in `dev:app`
-3. Call from frontend using `@tauri-apps/api` invoke
-
-### Working with Files
-
-- **Frontend**: Use `src/lib/services/files.ts` to invoke Tauri commands
-- **Backend**: Use `src-tauri/src/file_io.rs` for file operations
-- **Data Persistence**: IndexedDB for browser storage, file system for saved documents
+`.stacked.json` is the canonical format. New fields must load as `null`/default
+from older files (see `deserializeScaffold` in `lib/utils/scaffold.ts`) so 2.0
+documents keep opening.
 
 ## Important Patterns
 
-### Svelte 5 State Management
-
-```svelte
-<script>
-  let count = $state(0);           // Reactive state
-  let derived = $derived(count * 2); // Computed value
-</script>
-```
-
-### Tauri File Operations
-
-- Commands run in the Tauri backend
-- Use `@tauri-apps/api/core` to invoke from frontend
-- File I/O is sandboxed by Tauri security
-
-### Styling
-
-- **Tailwind CSS** for utilities
-- **CSS-in-JS** via component `<style>` blocks
-- **Theme colors** injected via CSS custom properties
+- **Autosave**: `documentStore.editTick` increments on every mutation; a
+  4-second debounce in `App.svelte` writes back to the existing path. Documents
+  with no path are never autosaved.
+- **Library index**: every successful save upserts a `LibraryEntry`. The index
+  is a cache; missing files are pruned on read.
+- **Cross-component events**: the editor listens for `stacked:insert` and
+  `stacked:insert-image`. Prefer props and stores for anything new.
+- **Styling**: Tailwind utilities; theme colours as CSS custom properties. The
+  writing column width is `--stacked-measure`.
 
 ## Before Committing
 
-1. **Type Safety**: `npm run check`
-2. **Lint**: `npm run lint`
-3. **Formatting**: `npm run format:check` (or `npm run format` to fix)
-4. **Tests**: `npm run test`
-5. **Manual Testing**: Verify in `npm run tauri:dev`
-6. **Git Check**: `git status` and `git diff` before staging
-7. **No Secrets**: Verify no API keys, tokens, or credentials in diffs
+1. `npm run check`
+2. `npm run lint`
+3. `npm run format:check`
+4. `npm run test`
+5. Manual check in `npm run tauri:dev`
+6. `git status` and `git diff`
+7. No secrets in the diff
+8. If you removed a feature, add it to `docs/CHERRIES.md`
 
-A Husky pre-commit hook runs `lint-staged` (ESLint + Prettier on staged
-files) and then chains to the machine-global SpockLock doctrine hook. The
-same checks (`format:check`, `lint`, `check`, `test`) run in CI on every pull
-request and push to `main`.
+A Husky pre-commit hook runs `lint-staged` (ESLint + Prettier on staged files)
+and then chains to the machine-global SpockLock doctrine hook.
 
 ## Testing Strategy
 
-- **Unit Tests**: Vitest (src/*.test.ts, src/lib/**/*.test.ts)
-- **Integration**: Test Tauri commands with real file I/O
-- **Manual**: Test in dev app with multiple themes and document types
-
-## Debugging
-
-**Frontend**:
-- Browser DevTools (right-click → Inspect in dev app)
-- Console logs visible in browser
-
-**Backend**:
-- Rust logs via `println!` or `dbg!`
-- Tauri logs in console
-
-**File Issues**:
-- Check `src-tauri/tauri.conf.json` for file scope permissions
-- Verify `capabilities/default.json` has required permissions
-
-## Dependency Management
-
-- **Frontend**: npm (package.json)
-- **Backend**: Cargo (Cargo.toml in src-tauri/)
-- **Before adding**: Check if already installed (npm list, cargo tree)
-- **Update carefully**: Test after dependency updates
-
-## Known Issues & Workarounds
-
-- **Zoom functionality**: Previously in `src-tauri/src/zoom.rs` (deleted) — now handled in `src/lib/utils/zoom.ts`
-- **TipTap v3**: Using latest API, ensure extensions match version
-- **SVG imports**: May need special handling in Vite
-
-## Useful References
-
-- **Tauri Docs**: https://tauri.app/
-- **Svelte 5**: https://svelte.dev/
-- **TipTap 3**: https://tiptap.dev/
-- **Catppuccin**: https://catppuccin.com/
+- **Unit**: Vitest (`src/**/*.test.ts`, `scripts/**/*.test.mjs`)
+- **Manual**: the desktop app, across Library → Write → Plan → Finish
 
 ## Git Workflow
 
-- **Default branch**: `main`
-- **Changes tracked**: Use `git status` and `git diff` before commits
-- **Message style**: Follow Conventional Commits (feat:, fix:, refactor:, etc.)
-- **No force pushes** unless coordinating with team
+- Default branch `main`
+- Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`)
+- No force pushes
 
 ## Secrets Management
 
-This project uses SpockLock for secrets. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for how secrets are managed here — what to touch, what not to touch.
+This project uses SpockLock. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for what to
+touch and what not to touch.
+</coding_guidelines>
