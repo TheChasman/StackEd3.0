@@ -3,6 +3,7 @@
   import { openScaffoldPath } from '$lib/services/files';
   import { syncRecentFilesMenu } from '$lib/services/recentMenu';
   import { documentStore } from '$lib/stores/document.svelte';
+  import { viewStore } from '$lib/stores/view.svelte';
 
   let { onclose }: { onclose: () => void } = $props();
   let recents = $state<RecentFile[]>([]);
@@ -20,6 +21,7 @@
     try {
       const scaffold = await openScaffoldPath(file.filePath);
       documentStore.openInNewTab(scaffold, file.filePath);
+      viewStore.openDocument();
       onclose();
     } catch {
       if (typeof file.id === 'number') {

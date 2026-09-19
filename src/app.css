@@ -30,6 +30,9 @@
 }
 
 @layer base {
+  :root {
+    --stacked-measure: 72ch;
+  }
   html,
   body {
     @apply h-full overflow-hidden bg-dark-900 text-dark-50;
@@ -42,7 +45,7 @@
 @import 'katex/dist/katex.min.css';
 
 .ProseMirror {
-  @apply outline-none min-h-full px-8 py-6;
+  @apply outline-none py-6;
 }
 
 .ProseMirror p {

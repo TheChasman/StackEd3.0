@@ -4,62 +4,71 @@
   import { listen } from '@tauri-apps/api/event';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { message } from '@tauri-apps/plugin-dialog';
-  import {
-    Clock3,
-    FilePlus2,
-    FolderOpen,
-    PanelRight,
-    Save,
-    SaveAll,
-    Settings,
-  } from 'lucide-svelte';
-  import Editor from '$lib/components/editor/Editor.svelte';
-  import ScaffoldPanel from '$lib/components/scaffold/ScaffoldPanel.svelte';
-  import ResearchPanel from '$lib/components/research/ResearchPanel.svelte';
-  import ArtworkPanel from '$lib/components/artwork/ArtworkPanel.svelte';
-  import ImageGenerationPanel from '$lib/components/image-generation/ImageGenerationPanel.svelte';
+  import LibraryView from '$lib/components/library/LibraryView.svelte';
+  import WriteView from '$lib/components/write/WriteView.svelte';
+  import PlanView from '$lib/components/plan/PlanView.svelte';
+  import FinishView from '$lib/components/finish/FinishView.svelte';
   import StatusBar from '$lib/components/StatusBar.svelte';
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import RecentFiles from '$lib/components/RecentFiles.svelte';
-  import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
-  import ThemeBrowser from '$lib/components/ThemeBrowser.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { substackConnectionsStore } from '$lib/stores/substackConnections.svelte';
-  import { themeStore } from '$lib/stores/theme.svelte';
+  import { viewStore } from '$lib/stores/view.svelte';
+  import '$lib/stores/theme.svelte'; // applies the saved Catppuccin flavour at startup
   import {
     createNewScaffold,
     openScaffold,
     openScaffoldPath,
     saveScaffoldPath,
     saveScaffoldAs,
-    titleFromFilePath,
-    writeFilePath,
   } from '$lib/services/files';
-  import { buildLabel } from '$lib/utils/buildInfo';
   import { setupZoomShortcuts } from '$lib/utils/zoom';
   import { syncRecentFilesMenu } from '$lib/services/recentMenu';
   import '$lib/themes/catppuccin.css';
 
   let showSettings = $state(false);
   let showRecents = $state(false);
-  let showThemeBrowser = $state(false);
-  let activeToolTab = $state<'scaffold' | 'research' | 'artwork' | 'generate'>('scaffold');
-  let sidebarWidth = $state(320);
-  let isResizing = $state(false);
+  let saveStatus = $state<'' | 'unsaved' | 'saving' | 'saved'>('');
 
-  const SIDEBAR_MIN_WIDTH = 320;
-  const SIDEBAR_MAX_WIDTH = 600;
+  // --- Autosave (design spec §4.5): 4s debounce, path-backed documents only ---
+  const AUTOSAVE_DEBOUNCE_MS = 4000;
+  let autosaveTimer: ReturnType<typeof setTimeout> | undefined;
 
-  function clampSidebarWidth(width: number): number {
-    if (!Number.isFinite(width)) return SIDEBAR_MIN_WIDTH;
-    return Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, width));
+  $effect(() => {
+    const dirty = documentStore.dirty;
+    const filePath = documentStore.filePath;
+    void documentStore.editTick;
+    if (dirty) saveStatus = 'unsaved';
+    if (autosaveTimer) clearTimeout(autosaveTimer);
+    if (dirty && filePath) {
+      autosaveTimer = setTimeout(() => {
+        void handleAutosave();
+      }, AUTOSAVE_DEBOUNCE_MS);
+    }
+    return () => {
+      if (autosaveTimer) clearTimeout(autosaveTimer);
+    };
+  });
+
+  async function handleAutosave(): Promise<void> {
+    if (!documentStore.scaffold || !documentStore.filePath || !documentStore.dirty) return;
+    saveStatus = 'saving';
+    try {
+      await saveScaffoldPath(documentStore.filePath, documentStore.scaffold);
+      documentStore.markClean();
+      saveStatus = 'saved';
+    } catch (e) {
+      console.error('Autosave failed:', e);
+      saveStatus = 'unsaved';
+    }
   }
 
   async function loadFilePath(filePath: string) {
     try {
       const scaffold = await openScaffoldPath(filePath);
       documentStore.openInNewTab(scaffold, filePath);
+      viewStore.openDocument();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes('No file selected')) {
@@ -91,6 +100,7 @@
     });
     void listen('stacked:menu-new-tab', () => {
       documentStore.newTab();
+      viewStore.openDocument();
     }).then((unlisten) => {
       unlistenMenuNewTab = unlisten;
     });
@@ -155,14 +165,6 @@
       if (initialPath) {
         await loadFilePath(initialPath);
       }
-      const savedToolTab = localStorage.getItem('activeToolTab');
-      activeToolTab = (['scaffold', 'research', 'artwork', 'generate'] as const).includes(
-        savedToolTab as any,
-      )
-        ? (savedToolTab as typeof activeToolTab)
-        : 'scaffold';
-      const savedWidth = localStorage.getItem('sidebarWidth');
-      if (savedWidth) sidebarWidth = clampSidebarWidth(parseInt(savedWidth, 10));
       setupZoomShortcuts();
       await syncRecentFilesMenu();
     })();
@@ -179,22 +181,13 @@
     };
   });
 
-  function handleMouseDown() {
-    isResizing = true;
-  }
-  function handleMouseUp() {
-    isResizing = false;
-  }
-  function handleMouseMove(e: MouseEvent) {
-    if (!isResizing) return;
-    const newWidth = window.innerWidth - e.clientX;
-    sidebarWidth = clampSidebarWidth(newWidth);
-  }
-
   async function handleOpen() {
     try {
       const scaffold = await openScaffold();
-      if (scaffold) documentStore.openInNewTab(scaffold);
+      if (scaffold) {
+        documentStore.openInNewTab(scaffold);
+        viewStore.openDocument();
+      }
     } catch (e) {
       alert('Open failed: ' + (e instanceof Error ? e.message : e));
     }
@@ -205,6 +198,7 @@
       const result = await createNewScaffold();
       if (result) {
         documentStore.openInNewTab(result.scaffold, result.filePath);
+        viewStore.openDocument();
       }
     } catch (e) {
       alert('New file failed: ' + (e instanceof Error ? e.message : e));
@@ -225,6 +219,7 @@
     try {
       await saveScaffoldPath(documentStore.filePath, documentStore.scaffold);
       documentStore.markClean();
+      saveStatus = 'saved';
       return documentStore.filePath;
     } catch (e) {
       alert('Save failed: ' + (e instanceof Error ? e.message : e));
@@ -238,6 +233,7 @@
       const filePath = await saveScaffoldAs(documentStore.scaffold);
       if (filePath) {
         documentStore.load(documentStore.scaffold, filePath, false);
+        saveStatus = 'saved';
         return filePath;
       }
     } catch (e) {
@@ -264,8 +260,7 @@
   }
 
   function openImageGenerator() {
-    if (!settingsStore.sidebarVisible) settingsStore.toggleSidebar();
-    activeToolTab = 'generate';
+    settingsStore.openTools('generate');
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -273,16 +268,7 @@
       if (e.key === 't') {
         e.preventDefault();
         documentStore.newTab();
-        return;
-      }
-      if (e.shiftKey) {
-        if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          themeStore.cycleNext();
-        } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          themeStore.cyclePrev();
-        }
+        viewStore.openDocument();
       }
     }
   }
@@ -301,94 +287,13 @@
   });
 
   $effect(() => {
-    localStorage.setItem('activeToolTab', activeToolTab);
-    localStorage.setItem('sidebarWidth', String(sidebarWidth));
-  });
-
-  $effect(() => {
-    const fileName = documentStore.filePath?.split('/').pop() ?? 'Untitled';
-    document.title =
-      fileName !== 'Untitled' ? `StackEd ${buildLabel} - ${fileName}` : `StackEd ${buildLabel}`;
-  });
-
-  $effect(() => {
-    if (isResizing) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
+    const fileName = documentStore.filePath?.split('/').pop() ?? null;
+    document.title = fileName ? `StackEd 3 — ${documentStore.title || fileName}` : 'StackEd 3';
   });
 </script>
 
-<svelte:window onmousemove={handleMouseMove} onmouseup={handleMouseUp} />
-
-{#if isResizing}
-  <style>
-    :global(body) {
-      cursor: col-resize;
-      user-select: none;
-    }
-  </style>
-{/if}
-
-<!-- App chrome: header -->
-<header class="flex items-center gap-3 px-5 py-3 border-b border-dark-700 bg-dark-800 shrink-0">
-  <img src="/stacked-icon.png" alt="StackEd" class="h-8 w-8 rounded-lg object-contain" />
-  <button
-    onclick={() => (showSettings = true)}
-    class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-    title="Settings"
-    aria-label="Settings"><Settings class="h-5 w-5" /></button
-  >
-  <div class="flex items-center gap-2">
-    <button
-      onclick={handleNew}
-      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-      title="New file"
-      aria-label="New file"><FilePlus2 class="h-5 w-5" /></button
-    >
-    <button
-      onclick={handleOpen}
-      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-      title="Open file"
-      aria-label="Open file"><FolderOpen class="h-5 w-5" /></button
-    >
-    <button
-      onclick={handleSave}
-      disabled={!documentStore.dirty}
-      class="px-3 py-2.5 text-lg bg-primary-600 text-dark-900 rounded hover:bg-primary-700 disabled:bg-green-600 disabled:hover:bg-green-600 disabled:opacity-50 disabled:cursor-default"
-      title="Save"
-      aria-label="Save"><Save class="h-5 w-5" /></button
-    >
-    <button
-      onclick={handleSaveAs}
-      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-      title="Save as"
-      aria-label="Save as"><SaveAll class="h-5 w-5" /></button
-    >
-    <button
-      onclick={() => (showRecents = true)}
-      class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-      title="Recent files"
-      aria-label="Recent files"><Clock3 class="h-5 w-5" /></button
-    >
-  </div>
-  <div class="flex-1"></div>
-
-  <ThemeSwitcher onBrowse={() => (showThemeBrowser = true)} />
-  <button
-    onclick={() => settingsStore.toggleSidebar()}
-    class="px-3 py-2.5 text-lg border border-dark-600 rounded hover:bg-dark-700"
-    title="Toggle sidebar"
-    aria-label="Toggle sidebar"><PanelRight class="h-5 w-5" /></button
-  >
-</header>
-
-<!-- Tab bar (visible when 2+ tabs are open) -->
-{#if documentStore.tabCount > 1}
+<!-- Tab bar (visible when 2+ tabs are open and a document space is showing) -->
+{#if viewStore.current !== 'library' && documentStore.tabCount > 1}
   <div
     class="flex items-end gap-0 border-b border-dark-700 bg-dark-800 px-2 shrink-0 overflow-x-auto"
   >
@@ -422,89 +327,30 @@
   </div>
 {/if}
 
-<!-- Main area -->
+<!-- Main area: exactly one space on screen at a time -->
 <div class="flex flex-1 min-h-0 overflow-hidden">
-  <!-- Editor area -->
   <div class="flex-1 min-w-0 flex flex-col">
-    <Editor />
+    {#if viewStore.current === 'library'}
+      <LibraryView
+        onnew={handleNew}
+        onopen={handleOpen}
+        onopenpath={loadFilePath}
+        onrecents={() => (showRecents = true)}
+        onsettings={() => (showSettings = true)}
+      />
+    {:else if viewStore.current === 'write'}
+      <WriteView />
+    {:else if viewStore.current === 'plan'}
+      <PlanView />
+    {:else if viewStore.current === 'finish'}
+      <FinishView />
+    {/if}
   </div>
-
-  <!-- Right sidebar -->
-  {#if settingsStore.sidebarVisible}
-    <aside
-      class="z-20 border-l-2 border-primary-500 bg-dark-900 flex flex-col h-full min-h-0 shrink-0 relative"
-      style="width: {sidebarWidth}px;"
-    >
-      <div class="flex flex-col flex-1 min-h-0">
-        <div
-          class="flex overflow-x-auto min-h-10 border-b border-dark-600 bg-dark-800 px-2 pt-2 shrink-0"
-        >
-          <button
-            onclick={() => (activeToolTab = 'scaffold')}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
-            'scaffold'
-              ? 'border-dark-600 bg-dark-900 text-dark-100'
-              : 'border-transparent text-dark-400 hover:text-dark-200'}"
-          >
-            Scaffold
-          </button>
-          <button
-            onclick={() => (activeToolTab = 'research')}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
-            'research'
-              ? 'border-dark-600 bg-dark-900 text-dark-100'
-              : 'border-transparent text-dark-400 hover:text-dark-200'}"
-          >
-            Research
-          </button>
-          <button
-            onclick={() => (activeToolTab = 'artwork')}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
-            'artwork'
-              ? 'border-dark-600 bg-dark-900 text-dark-100'
-              : 'border-transparent text-dark-400 hover:text-dark-200'}"
-          >
-            Artwork
-          </button>
-          <button
-            onclick={() => (activeToolTab = 'generate')}
-            class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-t border border-b-0 {activeToolTab ===
-            'generate'
-              ? 'border-dark-600 bg-dark-900 text-dark-100'
-              : 'border-transparent text-dark-400 hover:text-dark-200'}"
-          >
-            Generate
-          </button>
-        </div>
-        <div class="flex-1 overflow-y-auto min-h-0">
-          {#if activeToolTab === 'scaffold'}
-            <ScaffoldPanel />
-          {:else if activeToolTab === 'research'}
-            <ResearchPanel />
-          {:else if activeToolTab === 'artwork'}
-            <ArtworkPanel />
-          {:else}
-            <ImageGenerationPanel />
-          {/if}
-        </div>
-      </div>
-
-      <!-- Resize handle -->
-      <div
-        role="separator"
-        aria-label="Resize sidebar"
-        aria-orientation="vertical"
-        class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize bg-primary-700/80 hover:bg-primary-500 transition-colors {isResizing
-          ? 'bg-primary-400'
-          : 'bg-primary-700/80'}"
-        onmousedown={handleMouseDown}
-      ></div>
-    </aside>
-  {/if}
 </div>
 
-<!-- Status bar -->
-<StatusBar />
+{#if viewStore.current !== 'library'}
+  <StatusBar {saveStatus} />
+{/if}
 
 <!-- Modals -->
 {#if showSettings}
@@ -512,7 +358,4 @@
 {/if}
 {#if showRecents}
   <RecentFiles onclose={() => (showRecents = false)} />
-{/if}
-{#if showThemeBrowser}
-  <ThemeBrowser onclose={() => (showThemeBrowser = false)} />
 {/if}

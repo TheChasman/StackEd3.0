@@ -5,10 +5,8 @@
   import MoreDropdown from './toolbar/MoreDropdown.svelte';
   import { documentStore } from '$lib/stores/document.svelte';
   import { pickImageForArticle } from '$lib/services/imagePicker';
-  import { copyEditorHtmlForSubstack } from '$lib/services/substackClipboard';
 
   let { editor }: { editor: Editor | null } = $props();
-  let copyStatus = $state('');
 
   function run(fn: () => void) {
     if (!editor) return;
@@ -90,20 +88,6 @@
 
   function openImageGenerator() {
     window.dispatchEvent(new CustomEvent('stacked:open-image-generator'));
-  }
-
-  async function copyForSubstack() {
-    if (!editor) return;
-    copyStatus = 'Copying…';
-    try {
-      await copyEditorHtmlForSubstack(editor.getHTML(), documentStore.filePath);
-      copyStatus = 'Copied';
-      window.setTimeout(() => {
-        copyStatus = '';
-      }, 2000);
-    } catch (e) {
-      copyStatus = e instanceof Error ? e.message : 'Copy failed';
-    }
   }
 </script>
 
@@ -268,14 +252,6 @@
           d="M9.5 3.5l1.2 3.1 3.3 1.2-3.3 1.2-1.2 3.1-1.2-3.1L5 7.8l3.3-1.2 1.2-3.1zM17 10l.8 2.1L20 13l-2.2.9L17 16l-.8-2.1L14 13l2.2-.9L17 10zM12 15l.6 1.6 1.6.6-1.6.6L12 20l-.6-1.6-1.6-.6 1.6-.6L12 15z"
         />
       </svg>
-    </button>
-
-    <button
-      onclick={copyForSubstack}
-      class="rounded border border-dark-600 px-2 py-1 text-xs text-dark-200 hover:bg-dark-700"
-      title="Copy article for Substack paste"
-    >
-      {copyStatus || 'Copy Substack'}
     </button>
 
     <div class="w-px h-4 bg-dark-600 mx-1"></div>

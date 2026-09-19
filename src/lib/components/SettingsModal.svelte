@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { openFolder } from '$lib/services/files';
-  import { loadPipelineFolderPath, savePipelineFolderPath } from '$lib/services/storage';
+  import { themeStore } from '$lib/stores/theme.svelte';
+  import type { CatppuccinFlavor } from '$lib/themes/catppuccin';
   import { substackConnectionsStore } from '$lib/stores/substackConnections.svelte';
 
   let { open = false, onclose }: { open: boolean; onclose: () => void } = $props();
-  let pipelineFolderPath = $state('');
-  let pipelineFolderName = $derived(folderName(pipelineFolderPath));
+
+  const FLAVORS: Array<{ id: CatppuccinFlavor; label: string }> = [
+    { id: 'latte', label: 'Latte' },
+    { id: 'frappe', label: 'Frappé' },
+    { id: 'macchiato', label: 'Macchiato' },
+    { id: 'mocha', label: 'Mocha' },
+  ];
 
   let newSubdomain = $state('');
   let newNickname = $state('');
@@ -30,35 +34,6 @@
     const trimmed = value.trim();
     if (trimmed) void substackConnectionsStore.renameConnection(id, trimmed);
   }
-
-  function folderName(path: string): string {
-    const normalized = path.replaceAll('\\', '/').replace(/\/+$/, '');
-    return normalized.split('/').pop() ?? normalized;
-  }
-
-  onMount(() => {
-    loadPipelineFolderPath()
-      .then((path) => {
-        pipelineFolderPath = path ?? '';
-      })
-      .catch(() => {});
-  });
-
-  function save() {
-    onclose();
-  }
-
-  async function connectFolder() {
-    try {
-      const path = await openFolder();
-      if (!path) return;
-      await savePipelineFolderPath(path);
-      pipelineFolderPath = path;
-      alert(`Connected: ${path}`);
-    } catch (e) {
-      alert('Could not connect Pipeline Folder: ' + (e instanceof Error ? e.message : e));
-    }
-  }
 </script>
 
 {#if open}
@@ -72,6 +47,24 @@
     >
       <h2 class="text-lg font-semibold">Settings</h2>
 
+      <!-- Appearance -->
+      <section class="flex flex-col gap-2">
+        <span class="text-sm font-medium">Appearance</span>
+        <div class="flex gap-1">
+          {#each FLAVORS as flavor (flavor.id)}
+            <button
+              onclick={() => themeStore.setFlavor(flavor.id)}
+              class="flex-1 px-3 py-2 rounded border text-sm {themeStore.currentFlavor === flavor.id
+                ? 'border-primary-500 bg-dark-900 text-dark-100'
+                : 'border-dark-600 text-dark-300 hover:bg-dark-700'}"
+            >
+              {flavor.label}
+            </button>
+          {/each}
+        </div>
+        <p class="text-xs text-dark-400">Catppuccin flavour for the app chrome and editor.</p>
+      </section>
+
       <!-- AI credentials -->
       <section class="flex flex-col gap-1">
         <span class="text-sm font-medium">AI Credentials</span>
@@ -81,35 +74,13 @@
         </p>
       </section>
 
-      <!-- Pipeline folder -->
-      <section class="flex flex-col gap-1">
-        <span class="text-sm font-medium">Pipeline Folder</span>
-        <button
-          onclick={connectFolder}
-          class="px-3 py-2 border border-dark-600 rounded text-sm hover:bg-dark-700 text-left"
-        >
-          Connect folder…
-        </button>
-        {#if pipelineFolderPath}
-          <div class="rounded border border-dark-600 bg-dark-900/60 px-3 py-2">
-            <p class="text-xs font-medium text-green-400">Connected: {pipelineFolderName}</p>
-            <p class="text-xs text-dark-300 truncate" title={pipelineFolderPath}>
-              {pipelineFolderPath}
-            </p>
-          </div>
-        {/if}
-        <p class="text-xs text-dark-400">
-          Select your StackPipe vault folder for quick file access.
-        </p>
-      </section>
-
       <!-- Substack connections -->
       <section class="flex flex-col gap-2">
         <span class="text-sm font-medium">Substack Connections</span>
         {#if substackConnectionsStore.connections.length === 0}
           <p class="text-xs text-dark-400">
             No connections yet. Add a Substack subdomain below; it will appear in the publication
-            dropdown on each post.
+            picker in Finish.
           </p>
         {:else}
           <ul class="flex flex-col gap-1">
@@ -176,12 +147,7 @@
       <!-- Actions -->
       <div class="flex justify-end gap-2 pt-2">
         <button onclick={onclose} class="px-4 py-2 text-sm text-dark-200 hover:bg-dark-700 rounded"
-          >Cancel</button
-        >
-        <button
-          onclick={save}
-          class="px-4 py-2 text-sm bg-primary-600 text-dark-900 rounded hover:bg-primary-700"
-          >Save</button
+          >Close</button
         >
       </div>
     </div>

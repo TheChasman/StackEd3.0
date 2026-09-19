@@ -1,21 +1,27 @@
 // Library index upkeep (design spec §4.4): derive a LibraryEntry from a
 // scaffold and hand it to the storage layer. The index is a cache written on
 // every successful save; it never holds document content.
+import { invoke } from '@tauri-apps/api/core';
 import type { Scaffold } from '$lib/types/scaffold';
 import { getBody, isPostPayload } from '$lib/types/scaffold';
 import { documentState } from '$lib/utils/documentState';
 import { countPMDocWords } from '$lib/utils/pmText';
-import { pruneLibraryEntries, upsertLibraryEntry, type LibraryEntry } from './storage';
+import {
+  listLibraryEntries,
+  pruneLibraryEntries,
+  upsertLibraryEntry,
+  type LibraryEntry,
+} from './storage';
 
 export async function upsertLibraryEntryForScaffold(
   filePath: string,
   scaffold: Scaffold,
 ): Promise<void> {
-  const post = isPostPayload(scaffold.payload);
+  const payload = scaffold.payload;
   await upsertLibraryEntry({
     filePath,
-    title: post ? scaffold.payload.draft_title : 'Note',
-    subtitle: post ? scaffold.payload.draft_subtitle : '',
+    title: isPostPayload(payload) ? payload.draft_title : 'Note',
+    subtitle: isPostPayload(payload) ? payload.draft_subtitle : '',
     state: documentState(scaffold),
     targetDate: scaffold.workshop.targetDate ?? null,
     publication: scaffold.remote.publication,
@@ -24,7 +30,20 @@ export async function upsertLibraryEntryForScaffold(
   });
 }
 
-/** Read the library index, pruning entries whose file has vanished. */
+/** Verify a path through the Tauri backend (rejects in a plain browser). */
+async function tauriFileExists(path: string): Promise<boolean> {
+  return invoke<boolean>('file_exists', { path });
+}
+
+/**
+ * Read the library index, pruning entries whose file has vanished. Without a
+ * Tauri backend (plain browser dev) nothing can be verified, so the index is
+ * listed unpruned rather than wiping entries we cannot check.
+ */
 export async function loadLibrary(): Promise<LibraryEntry[]> {
-  return pruneLibraryEntries();
+  try {
+    return await pruneLibraryEntries(tauriFileExists);
+  } catch {
+    return listLibraryEntries();
+  }
 }
