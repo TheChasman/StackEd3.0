@@ -74,7 +74,7 @@
     "svelte-check": "^4.4.8",
     "svelte-eslint-parser": "^1.8.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.0",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.67.0",
     "vite": "npm:rolldown-vite@^7.1.14",
     "vite-plugin-pwa": "^1.2.0",
