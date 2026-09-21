@@ -2,8 +2,22 @@
   import { themeStore } from '$lib/stores/theme.svelte';
   import type { CatppuccinFlavor } from '$lib/themes/catppuccin';
   import { substackConnectionsStore } from '$lib/stores/substackConnections.svelte';
+  import { buildLabel } from '$lib/utils/buildInfo';
 
   let { open = false, onclose }: { open: boolean; onclose: () => void } = $props();
+
+  let copied = $state(false);
+
+  async function copyBuildLabel() {
+    try {
+      await navigator.clipboard.writeText(buildLabel);
+      copied = true;
+      setTimeout(() => (copied = false), 1500);
+    } catch {
+      // Clipboard access can fail (e.g. no permission); the label is still
+      // visible to read and copy by hand.
+    }
+  }
 
   const FLAVORS: Array<{ id: CatppuccinFlavor; label: string }> = [
     { id: 'latte', label: 'Latte' },
@@ -142,6 +156,18 @@
         {#if addError}
           <p class="text-xs text-red-400">{addError}</p>
         {/if}
+      </section>
+
+      <!-- About -->
+      <section class="flex flex-col gap-1">
+        <span class="text-sm font-medium">About</span>
+        <button
+          onclick={copyBuildLabel}
+          class="self-start text-xs text-dark-400 hover:text-dark-200 font-mono"
+          title="Click to copy"
+        >
+          {copied ? 'Copied!' : buildLabel}
+        </button>
       </section>
 
       <!-- Actions -->
