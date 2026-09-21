@@ -10,7 +10,8 @@
     Search,
     Settings,
   } from 'lucide-svelte';
-  import { loadLibrary } from '$lib/services/library';
+  import { importVaultIntoLibrary, loadLibrary } from '$lib/services/library';
+  import { getDefaultOpenPath } from '$lib/services/files';
   import type { LibraryEntry } from '$lib/services/storage';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import type { DocumentState } from '$lib/utils/documentState';
@@ -37,6 +38,13 @@
   $effect(() => {
     loadError = '';
     void loadLibrary()
+      .then(async (loaded) => {
+        if (loaded.length > 0) return loaded;
+        // First launch, or a vault with drafts saved before the Library
+        // index existed: scan the vault folder once and try again.
+        await importVaultIntoLibrary(getDefaultOpenPath()).catch(() => {});
+        return loadLibrary();
+      })
       .then((loaded) => (entries = loaded))
       .catch(() => (loadError = 'Could not load the library index.'));
   });

@@ -48,7 +48,7 @@ function rememberLastSavedFolder(filePath: string): void {
   if (folder) getLocalStorage()?.setItem(LAST_SAVED_FOLDER_KEY, folder);
 }
 
-function getDefaultOpenPath(): string {
+export function getDefaultOpenPath(): string {
   return getLocalStorage()?.getItem(LAST_SAVED_FOLDER_KEY) || DEFAULT_OPEN_FOLDER;
 }
 
