@@ -18,7 +18,10 @@ dist-ssr
 
 # macOS
 .DS_Store
-Icon?
+# Finder's custom-icon marker file (Icon + trailing CR). Written as a
+# character class, not `Icon?`, because on macOS's case-insensitive
+# filesystem `Icon?` also matches a plain directory named "icons".
+Icon[!a-zA-Z0-9]
 
 # Playwright MCP scratch artifacts
 .playwright-mcp
