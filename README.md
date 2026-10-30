@@ -99,3 +99,9 @@ docs/superpowers/        Specs and implementation plans
 
 Also see [`AGENTS.md`](./AGENTS.md) for the contributor/agent guide and
 [`CLAUDE.md`](./CLAUDE.md) for coding guidelines.
+
+## Canonical project context
+
+Read the [design spec](./docs/superpowers/specs/2026-09-19-stacked3-design.md),
+[removed-feature register](./docs/CHERRIES.md), and [project conventions](./AGENTS.md).
+Entry points: [AGENTS.md](./AGENTS.md), [CLAUDE.md](./CLAUDE.md), [README.md](./README.md).

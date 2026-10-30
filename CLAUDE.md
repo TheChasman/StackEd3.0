@@ -56,3 +56,9 @@ For multi-step tasks, state a brief plan:
 ## Secrets Management
 
 This project uses SpockLock for secrets. See [`SPOCKLOCK.md`](./SPOCKLOCK.md) for how secrets are managed here — what to touch, what not to touch.
+
+## Canonical project context
+
+Read the [design spec](./docs/superpowers/specs/2026-09-19-stacked3-design.md),
+[removed-feature register](./docs/CHERRIES.md), and [project conventions](./AGENTS.md).
+Entry points: [AGENTS.md](./AGENTS.md), [CLAUDE.md](./CLAUDE.md), [README.md](./README.md).

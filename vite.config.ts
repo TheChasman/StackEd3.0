@@ -51,6 +51,14 @@ export default defineConfig({
     },
   },
   test: {
+    alias: [
+      {
+        find: /^svelte$/,
+        replacement: fileURLToPath(
+          new URL('./node_modules/svelte/src/index-client.js', import.meta.url),
+        ),
+      },
+    ],
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
