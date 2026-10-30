@@ -48,7 +48,19 @@ async fn check_with_timeout(raw: String, timeout: Duration) -> LinkCheckResult {
         );
     }
     let client = match reqwest::Client::builder()
-        .redirect(reqwest::redirect::Policy::limited(5))
+        .redirect(reqwest::redirect::Policy::custom(|attempt| {
+            let url = attempt.url();
+            if attempt.previous().len() > 5 {
+                attempt.error("Too many redirects")
+            } else if !["http", "https"].contains(&url.scheme())
+                || !url.username().is_empty()
+                || url.password().is_some()
+            {
+                attempt.error("Unsupported redirect destination")
+            } else {
+                attempt.follow()
+            }
+        }))
         .user_agent("StackEd/3 LinkChecker")
         .build()
     {
@@ -139,7 +151,12 @@ mod tests {
                     let parts: Vec<_> = request.split_whitespace().collect();
                     let method = parts.first().copied().unwrap_or("");
                     let path = parts.get(1).copied().unwrap_or("");
+                    let credential_location = format!(
+                        "Location: http://user:secret@{}/ok\r\n",
+                        listener.local_addr().unwrap()
+                    );
                     let (code, extra) = match path {
+                        "/credential-redirect" => (302, credential_location.as_str()),
                         "/redirect" => (302, "Location: /ok\r\n"),
                         "/loop" => (302, "Location: /loop\r\n"),
                         "/fallback" if method == "HEAD" => (405, ""),
@@ -177,6 +194,7 @@ mod tests {
         for (path, expected) in [
             ("ok", LinkStatus::Working),
             ("redirect", LinkStatus::Working),
+            ("credential-redirect", LinkStatus::Unknown),
             ("fallback", LinkStatus::Working),
             ("notfound", LinkStatus::Dead),
             ("gone", LinkStatus::Dead),

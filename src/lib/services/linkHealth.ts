@@ -162,3 +162,16 @@ export async function checkBodyLinks(
     })),
   );
 }
+
+/** Publication uses fresh results, never the editor cache. */
+export async function assertLinksGreen(body: PMDoc): Promise<void> {
+  const blockers = (await checkBodyLinks(body, { fresh: true })).filter(
+    (link) => link.status !== 'working',
+  );
+  if (blockers.length) {
+    throw new Error(
+      'Cannot send to Substack until every link is verified green:\n' +
+        blockers.map((link) => `${link.url || '(empty URL)'}: ${link.reason}`).join('\n'),
+    );
+  }
+}

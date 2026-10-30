@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as publisher from './publisher';
+import { linkHealth } from '$lib/services/linkHealth';
+import { getBody } from '$lib/types/scaffold';
 import { emptyScaffold, isPostPayload, type Scaffold, type Byline } from '$lib/types/scaffold';
 import type { SubstackTransport, SubstackResponse, ImageUploadResult } from './transport';
 import { syncTags } from './publisher';
@@ -118,5 +121,139 @@ describe('syncTags', () => {
 
     expect(result).toEqual({ warnings: [], publicationTags: [] });
     expect(transport.attached).toEqual([]);
+  });
+});
+
+// Publication gate tests exercise the real orchestrator and record every external call.
+class PublicationTransport extends StubTransport {
+  calls: string[] = [];
+  sentBody: unknown;
+  override async getUserInfo(): Promise<Byline> {
+    this.calls.push('user');
+    return { id: 1, publicationUserId: 1 };
+  }
+  override async createDraft(body?: unknown): Promise<SubstackResponse> {
+    this.calls.push('draft');
+    this.sentBody = body;
+    return ok({ id: 42 });
+  }
+  override async publishDraft(): Promise<SubstackResponse> {
+    this.calls.push('publish');
+    return ok({});
+  }
+  override async scheduleDraft(): Promise<SubstackResponse> {
+    this.calls.push('schedule');
+    return ok({});
+  }
+  override async createNote(body?: unknown): Promise<SubstackResponse> {
+    this.calls.push('note');
+    this.sentBody = body;
+    return ok({ id: 'note-1' });
+  }
+  override async uploadImage(): Promise<ImageUploadResult> {
+    this.calls.push('image');
+    throw new Error('No image expected');
+  }
+}
+function linkedScaffold(kind: 'post' | 'note' = 'post') {
+  const scaffold = emptyScaffold(kind);
+  const body = getBody(scaffold);
+  body.content = [
+    {
+      type: 'paragraph',
+      content: [
+        {
+          type: 'text',
+          text: 'Reference',
+          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }],
+        },
+      ],
+    },
+  ];
+  if (isPostPayload(scaffold.payload)) {
+    scaffold.payload.send = true;
+    scaffold.payload.tags = [];
+  }
+  return scaffold;
+}
+afterEach(() => vi.restoreAllMocks());
+describe('all-green publication gate', () => {
+  it.each(['dead', 'unknown', 'checking'] as const)(
+    'blocks %s links before every transport call',
+    async (status) => {
+      vi.spyOn(linkHealth, 'check').mockResolvedValue({ status, reason: 'Fixture blocker' });
+      const transport = new PublicationTransport();
+      await expect(
+        publisher.publishToSubstack(linkedScaffold(), transport, async () => ''),
+      ).rejects.toThrow('https://example.com');
+      expect(transport.calls).toEqual([]);
+    },
+  );
+  it.each(['post', 'note'] as const)('also blocks scheduling and %s publication', async (kind) => {
+    vi.spyOn(linkHealth, 'check').mockResolvedValue({ status: 'unknown', reason: 'Offline' });
+    const scaffold = linkedScaffold(kind);
+    if (isPostPayload(scaffold.payload)) scaffold.payload.trigger_at = '2026-12-01T12:00:00Z';
+    const transport = new PublicationTransport();
+    await expect(
+      publisher.publishToSubstack(scaffold, transport, async () => ''),
+    ).rejects.toThrow();
+    expect(transport.calls).toEqual([]);
+  });
+  it('forces a fresh check even when a cached green exists', async () => {
+    vi.spyOn(linkHealth, 'get').mockReturnValue({ status: 'working', reason: 'Cached' });
+    const probe = vi
+      .spyOn(linkHealth, 'check')
+      .mockResolvedValue({ status: 'dead', reason: 'HTTP 404' });
+    await expect(
+      publisher.publishToSubstack(linkedScaffold(), new PublicationTransport(), async () => ''),
+    ).rejects.toThrow();
+    expect(probe).toHaveBeenCalledWith('https://example.com', { fresh: true });
+  });
+  it.each(['post', 'note'] as const)('allows green %s publication', async (kind) => {
+    vi.spyOn(linkHealth, 'check').mockResolvedValue({ status: 'working', reason: 'HTTP 200' });
+    const transport = new PublicationTransport();
+    const result = await publisher.publishToSubstack(
+      linkedScaffold(kind),
+      transport,
+      async () => '',
+    );
+    expect(kind === 'post' ? result.published : Boolean(result.noteId)).toBe(true);
+    expect(transport.calls).toContain(kind === 'post' ? 'publish' : 'note');
+  });
+  it('allows a document without links', async () => {
+    const scaffold = linkedScaffold();
+    getBody(scaffold).content = [
+      { type: 'paragraph', content: [{ type: 'text', text: 'No links' }] },
+    ];
+    const result = await publisher.publishToSubstack(
+      scaffold,
+      new PublicationTransport(),
+      async () => '',
+    );
+    expect(result.published).toBe(true);
+  });
+  it('sends the validated snapshot when the original is edited during validation', async () => {
+    let resolve!: (value: { status: 'working'; reason: string }) => void;
+    vi.spyOn(linkHealth, 'check').mockImplementation(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+    const scaffold = linkedScaffold();
+    const expectedBody = JSON.stringify(getBody(scaffold));
+    const transport = new PublicationTransport();
+    const pending = publisher.publishToSubstack(scaffold, transport, async () => '');
+    await vi.waitFor(() => expect(resolve).toBeDefined());
+    getBody(scaffold).content = [
+      { type: 'paragraph', content: [{ type: 'text', text: 'Unvalidated edit' }] },
+    ];
+    resolve({ status: 'working', reason: 'HTTP 200' });
+    await pending;
+    expect((transport.sentBody as { draft_body: string }).draft_body).toBe(expectedBody);
+  });
+  it('exposes no unguarded publication helper', () => {
+    for (const name of ['createDraft', 'scheduleDraft', 'publishDraft', 'createNote'])
+      expect(name in publisher).toBe(false);
   });
 });

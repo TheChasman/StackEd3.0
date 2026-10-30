@@ -33,7 +33,12 @@ fn extract_message_content(response: &Value) -> Result<String, String> {
 fn extract_citations(response: &Value) -> Vec<String> {
     response["citations"]
         .as_array()
-        .map(|arr| arr.iter().filter_map(|c| c.as_str()).map(String::from).collect())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|c| c.as_str())
+                .map(String::from)
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -124,7 +129,10 @@ mod tests {
         });
         assert_eq!(
             extract_citations(&response),
-            vec!["https://a.example".to_string(), "https://b.example".to_string()]
+            vec![
+                "https://a.example".to_string(),
+                "https://b.example".to_string()
+            ]
         );
     }
 

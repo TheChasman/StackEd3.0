@@ -69,7 +69,11 @@ async fn post_openrouter_image(prompt: &str, model: &str, api_key: &str) -> Resu
 }
 
 #[tauri::command]
-pub async fn generate_openrouter_image(app: tauri::AppHandle, prompt: String, model: String) -> Result<GeneratedImage, String> {
+pub async fn generate_openrouter_image(
+    app: tauri::AppHandle,
+    prompt: String,
+    model: String,
+) -> Result<GeneratedImage, String> {
     let prompt = prompt.trim().to_string();
     if prompt.is_empty() {
         return Err("Prompt required".to_string());

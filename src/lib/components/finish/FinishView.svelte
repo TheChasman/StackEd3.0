@@ -282,7 +282,10 @@
         <section class="flex flex-col gap-2">
           <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider">Readiness</h3>
           {#if r}
-            {#if r.blocking.length === 0 && r.advisory.length === 0}
+            {#if linkBlocked}
+              <p class="text-xs text-amber-400">Link verification required before publication.</p>
+            {/if}
+            {#if !linkBlocked && r.blocking.length === 0 && r.advisory.length === 0}
               <p class="text-xs text-green-400">Ready to publish.</p>
             {:else}
               {#each r.blocking as check (check)}

@@ -157,7 +157,9 @@ fn artwork_metadata_path(artwork_dir: &Path) -> PathBuf {
     artwork_dir.join(".stacked-metadata.json")
 }
 
-fn read_artwork_metadata_map(artwork_dir: &Path) -> Result<BTreeMap<String, ArtworkMetadata>, String> {
+fn read_artwork_metadata_map(
+    artwork_dir: &Path,
+) -> Result<BTreeMap<String, ArtworkMetadata>, String> {
     let path = artwork_metadata_path(artwork_dir);
     if !path.exists() {
         return Ok(BTreeMap::new());
@@ -171,8 +173,13 @@ fn write_artwork_metadata_map(
     artwork_dir: &Path,
     metadata: &BTreeMap<String, ArtworkMetadata>,
 ) -> Result<(), String> {
-    std::fs::create_dir_all(artwork_dir)
-        .map_err(|e| format!("failed to create directory {}: {}", artwork_dir.display(), e))?;
+    std::fs::create_dir_all(artwork_dir).map_err(|e| {
+        format!(
+            "failed to create directory {}: {}",
+            artwork_dir.display(),
+            e
+        )
+    })?;
     let path = artwork_metadata_path(artwork_dir);
     let raw = serde_json::to_string_pretty(metadata)
         .map_err(|e| format!("failed to serialize artwork metadata: {}", e))?;
@@ -321,8 +328,13 @@ pub fn save_generated_image_to_artwork(
         .parent()
         .ok_or_else(|| "article path must include a parent directory".to_string())?;
     let artwork_dir = article_dir.join("_artwork");
-    std::fs::create_dir_all(&artwork_dir)
-        .map_err(|e| format!("failed to create directory {}: {}", artwork_dir.display(), e))?;
+    std::fs::create_dir_all(&artwork_dir).map_err(|e| {
+        format!(
+            "failed to create directory {}: {}",
+            artwork_dir.display(),
+            e
+        )
+    })?;
 
     let (mime, payload) = parse_data_url(data_url.trim())?;
     let extension = extension_for_image_mime(mime)
@@ -331,7 +343,8 @@ pub fn save_generated_image_to_artwork(
 
     let stem = slugify_image_name(&prompt);
     let path = unique_image_path(&artwork_dir, &stem, extension);
-    std::fs::write(&path, bytes).map_err(|e| format!("failed to write {}: {}", path.display(), e))?;
+    std::fs::write(&path, bytes)
+        .map_err(|e| format!("failed to write {}: {}", path.display(), e))?;
 
     Ok(ArtworkImage {
         name: path
@@ -379,7 +392,10 @@ fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, Strin
         let article_dir = if article_path.is_dir() {
             article_path
         } else {
-            article_path.parent().unwrap_or_else(|| Path::new("")).to_path_buf()
+            article_path
+                .parent()
+                .unwrap_or_else(|| Path::new(""))
+                .to_path_buf()
         };
 
         let candidate = article_dir.join("_artwork");
@@ -531,13 +547,8 @@ pub fn read_markdown_file(file_path: String) -> Result<String, String> {
 pub fn write_markdown_file(file_path: String, content: String) -> Result<(), String> {
     let path = PathBuf::from(file_path);
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| {
-            format!(
-                "failed to create directory {}: {}",
-                parent.display(),
-                e
-            )
-        })?;
+        std::fs::create_dir_all(parent)
+            .map_err(|e| format!("failed to create directory {}: {}", parent.display(), e))?;
     }
     std::fs::write(&path, content).map_err(|e| format!("failed to write {}: {}", path.display(), e))
 }
@@ -764,7 +775,10 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(std::fs::read_to_string(&article_path).unwrap(), "saved article");
+        assert_eq!(
+            std::fs::read_to_string(&article_path).unwrap(),
+            "saved article"
+        );
 
         std::fs::remove_dir_all(root).unwrap();
     }
@@ -896,7 +910,10 @@ mod tests {
                 .to_string_lossy()
                 .to_string()
         );
-        assert_eq!(std::fs::read(article_dir.join("_artwork").join("hero-concept.png")).unwrap(), b"hero");
+        assert_eq!(
+            std::fs::read(article_dir.join("_artwork").join("hero-concept.png")).unwrap(),
+            b"hero"
+        );
         assert_eq!(saved.data_url, "data:image/png;base64,aGVybw==");
 
         std::fs::remove_dir_all(root).unwrap();
@@ -926,7 +943,10 @@ mod tests {
         .unwrap();
 
         assert_eq!(saved.name, "hero-concept-2.png");
-        assert_eq!(std::fs::read(artwork_dir.join("hero-concept-2.png")).unwrap(), b"new");
+        assert_eq!(
+            std::fs::read(artwork_dir.join("hero-concept-2.png")).unwrap(),
+            b"new"
+        );
 
         std::fs::remove_dir_all(root).unwrap();
     }
