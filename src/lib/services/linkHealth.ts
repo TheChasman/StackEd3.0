@@ -20,6 +20,8 @@ export function nodeLinks(node: PMNode): string[] {
     urls.push(node.attrs.href);
   if (node.type === 'shareButton' && node.attrs?.variant === 'custom')
     urls.push(String(node.attrs.url || '#'));
+  if (node.type === 'embeddedPublication')
+    urls.push(typeof node.attrs?.url === 'string' ? node.attrs.url : '');
   return urls;
 }
 export function collectLinks(body: PMDoc): string[] {
@@ -31,23 +33,21 @@ export function collectLinks(body: PMDoc): string[] {
   visit(body);
   return [...urls];
 }
-export function checkFragment(url: string, body: PMDoc): LinkCheckResult {
-  let target: string;
+export function checkFragment(url: string, _body: PMDoc): LinkCheckResult {
   try {
-    target = decodeURIComponent(url.slice(1));
+    decodeURIComponent(url.slice(1));
   } catch {
     return { status: 'dead', reason: 'Invalid fragment encoding' };
   }
-  let found = false;
-  function visit(node: PMNode) {
-    if (target && node.attrs?.id === target) found = true;
-    node.content?.forEach(visit);
-  }
-  visit(body);
-  return found
-    ? { status: 'working', reason: 'Target exists in this document' }
-    : { status: 'unknown', reason: 'No matching target in this document' };
+  // No node in the shared schema currently preserves an authorable anchor ID.
+  // Raw imported attrs.id is discarded by the editor/exporter, so it cannot
+  // establish a working destination. Keep fragments unverified until supported.
+  return {
+    status: 'unknown',
+    reason: 'Internal anchor targets are not supported by the article schema',
+  };
 }
+
 function localResult(raw: string): LinkCheckResult | undefined {
   let url: URL;
   try {

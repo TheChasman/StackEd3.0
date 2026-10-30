@@ -2,8 +2,12 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { LinkHealth } from './LinkHealth';
+import { substackExtensions } from '$lib/editor/schema';
+import { checkFragment } from '$lib/services/linkHealth';
+import type { PMDoc } from '$lib/types/scaffold';
 import { Image2 } from './Image2';
 import { ShareButton } from './ShareButton';
+import { EmbeddedPublication } from './EmbeddedPublication';
 import { LinkHealthService, type LinkCheckResult } from '$lib/services/linkHealth';
 import { generateMarkdownMirror } from '$lib/utils/scaffold';
 import { emptyScaffold, isPostPayload } from '$lib/types/scaffold';
@@ -18,7 +22,13 @@ function create(
   content = '<p><a href="https://example.com">Words</a></p>',
 ) {
   editor = new Editor({
-    extensions: [StarterKit, Image2, ShareButton, LinkHealth.configure({ service })],
+    extensions: [
+      StarterKit,
+      Image2,
+      ShareButton,
+      EmbeddedPublication,
+      LinkHealth.configure({ service }),
+    ],
     content,
   });
   return editor;
@@ -54,6 +64,7 @@ it.each(['dead', 'unknown'] as const)(
     const service = new LinkHealthService(async () => ({ status, reason: 'Fixture reason' }));
     const instance = create(service, '<p><a href="https://example.com">Text</a></p>');
     instance.commands.insertContent([
+      { type: 'embeddedPublication', attrs: { url: 'https://publication.test' } },
       { type: 'image2', attrs: { src: 'https://example.com/a.png', href: 'https://image.test' } },
       {
         type: 'shareButton',
@@ -68,6 +79,9 @@ it.each(['dead', 'unknown'] as const)(
     expect(
       instance.view.dom.querySelector(`.link-health-${status}`)?.getAttribute('title'),
     ).toContain('Fixture reason');
+    expect(
+      instance.view.dom.querySelector(`[data-type="embedded-publication"].link-health-${status}`),
+    ).not.toBeNull();
     expect(instance.view.dom.querySelector(`.link-health-${status} a`)).not.toBeNull();
   },
 );
@@ -102,4 +116,24 @@ it('ignores late responses after replacing the document and after destruction', 
   expect(instance.view.dom.querySelector('[class*="link-health-"]')).toBeNull();
   instance.destroy();
   editor = undefined;
+});
+
+it('does not approve fragment IDs discarded by the real shared schema', () => {
+  const raw: PMDoc = {
+    type: 'doc',
+    content: [
+      { type: 'paragraph', attrs: { id: 'target' }, content: [{ type: 'text', text: 'Target' }] },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: 'Jump', marks: [{ type: 'link', attrs: { href: '#target' } }] },
+        ],
+      },
+    ],
+  };
+  editor = new Editor({ extensions: substackExtensions, content: raw });
+  expect(editor.view.dom.querySelector('#target')).toBeNull();
+  expect(editor.getHTML()).not.toContain('id="target"');
+  expect(checkFragment('#target', raw).status).toBe('unknown');
+  expect(checkFragment('#target', editor.getJSON() as PMDoc).status).toBe('unknown');
 });

@@ -581,7 +581,7 @@
               onclick={handlePublish}
               disabled={publishing || linkBlocked || (r !== null && r.blocking.length > 0)}
               class="border border-primary-500 shadow-sm px-4 py-2 bg-primary-600 text-dark-900 rounded text-sm font-medium hover:bg-primary-700
-                disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed transition-colors"
+                disabled:opacity-50 disabled:saturate-50 disabled:shadow-none disabled:cursor-not-allowed transition-colors"
             >
               {publishing ? 'Working...' : actionLabel}
             </button>

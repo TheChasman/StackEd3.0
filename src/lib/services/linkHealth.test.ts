@@ -40,8 +40,8 @@ it('collects nested authored destinations once without probing media or generate
     'https://button.test',
   ]);
 });
-it('validates fragments against each document, including removed targets', () => {
-  expect(checkFragment('#target', body).status).toBe('working');
+it('keeps unsupported fragment targets unverified in every document', () => {
+  expect(checkFragment('#target', body).status).toBe('unknown');
   expect(checkFragment('#target', { type: 'doc', content: [] }).status).toBe('unknown');
   expect(checkFragment('#%broken', body).status).toBe('dead');
 });
@@ -115,4 +115,16 @@ describe('LinkHealthService', () => {
     expect((await service.check('https://user:secret@example.com')).status).toBe('unknown');
     expect(probe).not.toHaveBeenCalled();
   });
+});
+
+it('collects embedded publication destinations including empty URLs as blockers', () => {
+  expect(
+    collectLinks({
+      type: 'doc',
+      content: [
+        { type: 'embeddedPublication', attrs: { url: 'https://publication.test' } },
+        { type: 'embeddedPublication', attrs: { url: '' } },
+      ],
+    }),
+  ).toEqual(['https://publication.test', '']);
 });

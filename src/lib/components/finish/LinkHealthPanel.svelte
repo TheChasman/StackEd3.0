@@ -49,7 +49,7 @@
     <button
       onclick={recheck}
       disabled={retrying || report.length === 0}
-      class="rounded-md border border-dark-600 px-3 py-1.5 text-xs shadow-sm hover:bg-dark-700 hover:shadow-md focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+      class="rounded-md border border-dark-600 px-3 py-1.5 text-xs shadow-sm hover:bg-dark-700 hover:shadow-md focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:saturate-50 disabled:shadow-none disabled:cursor-not-allowed"
       >{retrying ? 'Checking…' : 'Recheck links'}</button
     >
   </div>

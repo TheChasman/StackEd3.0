@@ -37,20 +37,21 @@ success. Successful final HTTP responses are green; confirmed missing resources
 rate-limiting, server failures and network errors are unverified, with a reason.
 Non-HTTP destinations must not become green without an applicable validator.
 
-The scope is authored hyperlinks: text link marks, image hrefs and custom button
-URLs. Generated Substack actions and media source URLs are not authored
-hyperlinks. For local fragments, verify a corresponding target in the current document
-without sharing fragment results across documents;
-otherwise report unverified. Do not send email, launch applications, or follow
-non-HTTP schemes to test them.
+The scope is authored hyperlinks: text link marks, image hrefs, custom button
+URLs and embedded publication URLs. Generated Substack actions and media source
+URLs are not authored hyperlinks. For local fragments, approve only targets
+preserved and rendered by the supported article schema; raw imported IDs do not
+establish a target. The current schema has no authorable anchor IDs, so fragments
+remain unverified. Do not share fragment results across documents. Do not send
+email, launch applications, or follow non-HTTP schemes to test them.
 
 Use editor-only ProseMirror inline decorations for text links and node
-decorations/status treatment for linked image and custom-button node views.
-Make publication helpers private so every service entry point uses the gate.
-Use a shared
-session service for results. Use Catppuccin green, red and yellow so all four
-flavours remain readable. Include status words/reasons in tooltips and the Finish
-list; colour is accompanied by underline style and explanatory text.
+decorations/status treatment for linked image, custom-button and embedded
+publication node views. Make publication helpers private so every service entry
+point uses the gate. Use a shared session service for results. Use Catppuccin
+green, red and yellow so all four flavours remain readable. Include status
+words/reasons in tooltips and the Finish list; colour is accompanied by underline
+style and explanatory text.
 
 Cached results may support editing for up to five minutes. Entering Finish can
 refresh them; publication always performs fresh checks. No override or bypass is

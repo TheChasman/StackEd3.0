@@ -257,3 +257,34 @@ describe('all-green publication gate', () => {
       expect(name in publisher).toBe(false);
   });
 });
+
+it('blocks an embedded publication link before any Substack operation', async () => {
+  vi.spyOn(linkHealth, 'check').mockResolvedValue({ status: 'dead', reason: 'HTTP 404' });
+  const scaffold = linkedScaffold();
+  getBody(scaffold).content = [
+    { type: 'embeddedPublication', attrs: { url: 'https://publication.test' } },
+  ];
+  const transport = new PublicationTransport();
+  await expect(publisher.publishToSubstack(scaffold, transport, async () => '')).rejects.toThrow(
+    'https://publication.test',
+  );
+  expect(transport.calls).toEqual([]);
+});
+
+it('blocks imported fragment targets which the document schema cannot render', async () => {
+  const scaffold = linkedScaffold();
+  getBody(scaffold).content = [
+    { type: 'paragraph', attrs: { id: 'target' }, content: [{ type: 'text', text: 'Target' }] },
+    {
+      type: 'paragraph',
+      content: [
+        { type: 'text', text: 'Jump', marks: [{ type: 'link', attrs: { href: '#target' } }] },
+      ],
+    },
+  ];
+  const transport = new PublicationTransport();
+  await expect(publisher.publishToSubstack(scaffold, transport, async () => '')).rejects.toThrow(
+    '#target',
+  );
+  expect(transport.calls).toEqual([]);
+});
