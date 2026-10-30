@@ -10,6 +10,7 @@
   import { documentStore } from '$lib/stores/document.svelte';
   import { isPostPayload, type PMDoc } from '$lib/types/scaffold';
   import Toolbar from './Toolbar.svelte';
+  import { LinkHealth } from './extensions/LinkHealth';
 
   let element: HTMLDivElement;
   let editor = $state<Editor | null>(null);
@@ -36,7 +37,7 @@
   onMount(() => {
     editor = new Editor({
       element,
-      extensions: substackExtensions,
+      extensions: [...substackExtensions, LinkHealth],
       content: '',
       onUpdate: () => {
         documentStore.setBody(getDoc());

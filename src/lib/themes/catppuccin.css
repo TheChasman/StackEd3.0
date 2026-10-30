@@ -148,3 +148,32 @@ button:hover {
     color-scheme: dark;
   }
 }
+
+/* Editor-only decorations: these classes are never written into manuscript HTML. */
+.ProseMirror .link-health-working,
+.ProseMirror .link-health-working a {
+  color: var(--cat-green) !important;
+  text-decoration: underline solid var(--cat-green) !important;
+  text-underline-offset: 3px;
+}
+.ProseMirror .link-health-dead,
+.ProseMirror .link-health-dead a {
+  color: var(--cat-red) !important;
+  text-decoration: underline wavy var(--cat-red) !important;
+  text-underline-offset: 3px;
+}
+.ProseMirror .link-health-unknown,
+.ProseMirror .link-health-unknown a {
+  color: var(--cat-yellow) !important;
+  text-decoration: underline dotted var(--cat-yellow) !important;
+  text-underline-offset: 3px;
+}
+.ProseMirror .link-health-working:has(img) {
+  outline: 2px solid var(--cat-green);
+}
+.ProseMirror .link-health-dead:has(img) {
+  outline: 2px dashed var(--cat-red);
+}
+.ProseMirror .link-health-unknown:has(img) {
+  outline: 2px dotted var(--cat-yellow);
+}

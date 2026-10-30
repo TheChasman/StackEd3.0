@@ -72,6 +72,7 @@ export class LinkHealthService {
   private cache = new Map<string, Entry>();
   private listeners = new Set<() => void>();
   private active = 0;
+  private expiryTimer?: ReturnType<typeof setInterval>;
   private queue: (() => void)[] = [];
   constructor(
     private probe: (url: string) => Promise<LinkCheckResult> = (url) =>
@@ -80,7 +81,14 @@ export class LinkHealthService {
   ) {}
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    if (!this.expiryTimer) this.expiryTimer = setInterval(() => this.notify(), 30_000);
+    return () => {
+      this.listeners.delete(listener);
+      if (this.listeners.size === 0) {
+        clearInterval(this.expiryTimer);
+        this.expiryTimer = undefined;
+      }
+    };
   }
   private notify() {
     this.listeners.forEach((listener) => listener());
