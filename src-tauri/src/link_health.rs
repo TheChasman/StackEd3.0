@@ -116,7 +116,7 @@ async fn check_with_timeout(raw: String, timeout: Duration) -> LinkCheckResult {
 mod tests {
     use super::*;
     use std::io::{Read, Write};
-    use std::net::TcpListener;
+    use std::net::{TcpListener, TcpStream};
     use std::sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
@@ -142,12 +142,23 @@ mod tests {
                         thread::sleep(Duration::from_millis(2));
                         continue;
                     };
+                    // macOS can inherit the listener's nonblocking flag on accept.
+                    stream.set_nonblocking(false).unwrap();
                     stream
                         .set_read_timeout(Some(Duration::from_secs(1)))
                         .unwrap();
+                    let mut request_bytes = Vec::new();
                     let mut buf = [0; 2048];
-                    let n = stream.read(&mut buf).unwrap_or(0);
-                    let request = String::from_utf8_lossy(&buf[..n]);
+                    while !request_bytes.ends_with(b"\r\n\r\n") {
+                        match stream.read(&mut buf) {
+                            Ok(0) | Err(_) => break,
+                            Ok(n) => request_bytes.extend_from_slice(&buf[..n]),
+                        }
+                    }
+                    if !request_bytes.ends_with(b"\r\n\r\n") {
+                        continue;
+                    }
+                    let request = String::from_utf8_lossy(&request_bytes);
                     let parts: Vec<_> = request.split_whitespace().collect();
                     let method = parts.first().copied().unwrap_or("");
                     let path = parts.get(1).copied().unwrap_or("");
@@ -171,7 +182,8 @@ mod tests {
                         }
                         _ => (200, ""),
                     };
-                    let _ = write!(stream, "HTTP/1.1 {code} Test\r\n{extra}Content-Length: 0\r\nConnection: close\r\n\r\n");
+                    let response = format!("HTTP/1.1 {code} Test\r\n{extra}Content-Length: 0\r\nConnection: close\r\n\r\n");
+                    let _ = stream.write_all(response.as_bytes());
                 }
             });
             Self {
@@ -186,6 +198,28 @@ mod tests {
             self.stop.store(true, Ordering::Relaxed);
             self.worker.take().unwrap().join().unwrap();
         }
+    }
+
+    #[test]
+    fn fixture_waits_for_complete_request_headers() {
+        let server = Server::new();
+        let mut stream = TcpStream::connect(server.base.trim_start_matches("http://")).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_millis(50)))
+            .unwrap();
+        stream.write_all(b"HEAD /ok HTTP/1.1\r\n").unwrap();
+        let mut byte = [0];
+        assert!(
+            stream.read(&mut byte).is_err(),
+            "fixture replied to an incomplete request"
+        );
+        stream.write_all(b"Host: localhost\r\n\r\n").unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .unwrap();
+        let mut response = String::new();
+        stream.read_to_string(&mut response).unwrap();
+        assert!(response.starts_with("HTTP/1.1 200"));
     }
 
     #[test]
