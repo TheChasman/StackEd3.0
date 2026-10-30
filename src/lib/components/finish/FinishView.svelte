@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LinkHealthPanel from './LinkHealthPanel.svelte';
+  import { linkHealth, linkReport } from '$lib/services/linkHealth';
   import { generateHTML } from '@tiptap/html';
   import { invoke } from '@tauri-apps/api/core';
   import { ArrowLeft, Copy } from 'lucide-svelte';
@@ -45,6 +47,16 @@
   let r = $derived(scaffold ? readiness(scaffold) : null);
   let slugLocked = $derived(scaffold ? scaffold.locked.includes(SEO_FIELD_PATHS.slug) : false);
   let errorMap = $derived(new Map(r?.blocking.map((b) => [b.split(' ')[0], b]) ?? []));
+  let linkRevision = $state(0);
+  $effect(() =>
+    linkHealth.subscribe(() => {
+      linkRevision++;
+    }),
+  );
+  let linkBlocked = $derived.by(() => {
+    void linkRevision;
+    return linkReport(documentStore.body).some((link) => link.status !== 'working');
+  });
   let publishStatus = $state('');
   let publishing = $state(false);
   let seoLoading = $state(false);
@@ -123,6 +135,10 @@
 
   async function handlePublish() {
     if (!scaffold) return;
+    if (linkBlocked) {
+      publishStatus = 'Error: Every link must be verified green before sending to Substack.';
+      return;
+    }
     if (r && r.blocking.length > 0) {
       alert('Cannot publish: ' + r.blocking.join(', '));
       return;
@@ -266,7 +282,10 @@
         <section class="flex flex-col gap-2">
           <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider">Readiness</h3>
           {#if r}
-            {#if r.blocking.length === 0 && r.advisory.length === 0}
+            {#if linkBlocked}
+              <p class="text-xs text-amber-400">Link verification required before publication.</p>
+            {/if}
+            {#if !linkBlocked && r.blocking.length === 0 && r.advisory.length === 0}
               <p class="text-xs text-green-400">Ready to publish.</p>
             {:else}
               {#each r.blocking as check (check)}
@@ -538,6 +557,8 @@
           </section>
         {/if}
 
+        <LinkHealthPanel body={documentStore.body} />
+
         <!-- 6. Action -->
         <section class="flex flex-col gap-3 border-t border-dark-700 pt-5">
           <h3 class="text-xs font-semibold text-dark-400 uppercase tracking-wider">Action</h3>
@@ -558,9 +579,9 @@
           <div class="flex items-center gap-3">
             <button
               onclick={handlePublish}
-              disabled={publishing || (r !== null && r.blocking.length > 0)}
-              class="px-4 py-2 bg-primary-600 text-dark-900 rounded text-sm font-medium hover:bg-primary-700
-                disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={publishing || linkBlocked || (r !== null && r.blocking.length > 0)}
+              class="border border-primary-500 shadow-sm px-4 py-2 bg-primary-600 text-dark-900 rounded text-sm font-medium hover:bg-primary-700
+                disabled:opacity-50 disabled:saturate-50 disabled:shadow-none disabled:cursor-not-allowed transition-colors"
             >
               {publishing ? 'Working...' : actionLabel}
             </button>

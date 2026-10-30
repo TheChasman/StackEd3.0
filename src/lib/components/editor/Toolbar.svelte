@@ -51,16 +51,45 @@
     run(() => editor!.chain().redo().run());
   }
 
+  let linkDialogOpen = $state(false);
+  let linkUrl = $state('');
+  let linkSelection: { from: number; to: number } | null = null;
+  let linkDialog = $state<HTMLDialogElement>();
+  let linkInput = $state<HTMLInputElement>();
+
+  $effect(() => {
+    if (linkDialogOpen) {
+      linkDialog?.showModal();
+      linkInput?.focus();
+      linkInput?.select();
+    } else {
+      linkDialog?.close();
+    }
+  });
+
   function addLink() {
     if (!editor) return;
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-    if (url === null) return;
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+    const { from, to } = editor.state.selection;
+    linkSelection = { from, to };
+    linkUrl = editor.getAttributes('link').href ?? '';
+    linkDialogOpen = true;
+  }
+
+  function closeLink() {
+    linkDialogOpen = false;
+    if (editor && linkSelection) {
+      editor.chain().setTextSelection(linkSelection).focus().run();
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  }
+
+  function applyLink(event: SubmitEvent) {
+    event.preventDefault();
+    if (!editor || !linkSelection) return;
+    const chain = editor.chain().setTextSelection(linkSelection).extendMarkRange('link');
+    const url = linkUrl.trim();
+    if (url) chain.setLink({ href: url }).run();
+    else chain.unsetLink().run();
+    closeLink();
   }
 
   async function addImage() {
@@ -92,6 +121,46 @@
 </script>
 
 {#if editor}
+  <dialog
+    bind:this={linkDialog}
+    aria-labelledby="link-dialog-title"
+    oncancel={(event) => {
+      event.preventDefault();
+      closeLink();
+    }}
+    class="m-auto w-96 max-w-[calc(100vw-2rem)] rounded-lg border border-dark-600 bg-dark-800 p-5 text-dark-100 shadow-xl backdrop:bg-black/50"
+  >
+    <form onsubmit={applyLink} class="flex flex-col gap-4">
+      <h2 id="link-dialog-title" class="text-lg font-semibold">Link</h2>
+      <label class="flex flex-col gap-2">
+        URL
+        <input
+          bind:this={linkInput}
+          bind:value={linkUrl}
+          aria-label="URL"
+          type="text"
+          inputmode="url"
+          placeholder="https://example.com"
+          class="w-full rounded-md border border-dark-600 bg-dark-900 px-3 py-2 shadow-inner focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+      </label>
+      <p class="text-sm text-dark-300">Clear the URL to remove an existing link.</p>
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          title="Cancel link"
+          onclick={closeLink}
+          class="rounded-md border border-dark-600 px-3 py-2 shadow-sm hover:bg-dark-600 focus:ring-2 focus:ring-primary-500"
+          >Cancel</button
+        >
+        <button
+          type="submit"
+          class="rounded-md border border-primary-500 bg-primary-600 px-3 py-2 text-white shadow-sm hover:bg-primary-500 focus:ring-2 focus:ring-primary-500"
+          >Apply link</button
+        >
+      </div>
+    </form>
+  </dialog>
   <div
     class="flex items-center gap-1 p-2 border-b border-dark-700 bg-dark-800 relative z-20 flex-wrap"
   >
@@ -215,7 +284,11 @@
     <!-- Link / Image -->
     <button
       onclick={addLink}
-      class="p-1.5 rounded hover:bg-dark-600 text-dark-200 {editor.isActive('link')
+      onmousedown={(event) => event.preventDefault()}
+      aria-haspopup="dialog"
+      class="p-1.5 border border-dark-600 shadow-sm rounded hover:bg-dark-600 text-dark-200 {editor.isActive(
+        'link',
+      )
         ? 'bg-dark-600 text-primary-500'
         : ''}"
       title="Link"

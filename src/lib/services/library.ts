@@ -70,9 +70,7 @@ async function listStackedJsonFiles(dir: string): Promise<string[]> {
       files.push(`${dir}/${name}`);
       continue;
     }
-    const nested = await invoke<string[]>('list_files', { path: `${dir}/${name}` }).catch(
-      () => [],
-    );
+    const nested = await invoke<string[]>('list_files', { path: `${dir}/${name}` }).catch(() => []);
     for (const nestedName of nested) {
       if (nestedName.toLowerCase().endsWith('.stacked.json')) {
         files.push(`${dir}/${name}/${nestedName}`);

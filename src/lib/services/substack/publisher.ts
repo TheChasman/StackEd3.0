@@ -12,6 +12,8 @@
 //
 // The caller (UI) must confirm with the user before calling publish().
 
+import { assertLinksGreen } from '$lib/services/linkHealth';
+import { getBody } from '$lib/types/scaffold';
 import type { Scaffold, PMDoc } from '$lib/types/scaffold';
 import { isPostPayload, isNotePayload, withBody } from '$lib/types/scaffold';
 import type { SubstackTransport, ImageUploadResult, SubstackResponse } from './transport';
@@ -148,7 +150,7 @@ export async function uploadImages(
  * Create a draft on Substack. Does NOT publish or schedule.
  * Returns the draft ID from Substack's response.
  */
-export async function createDraft(
+async function createDraft(
   scaffold: Scaffold,
   transport: SubstackTransport,
 ): Promise<{ draftId: number; response: SubstackResponse }> {
@@ -171,7 +173,7 @@ export async function createDraft(
  * Schedule a draft for future publication.
  * Uses trigger_at (NOT post_date) per the API spec.
  */
-export async function scheduleDraft(
+async function scheduleDraft(
   draftId: number,
   scaffold: Scaffold,
   transport: SubstackTransport,
@@ -190,7 +192,7 @@ export async function scheduleDraft(
 /**
  * Publish a draft immediately. Irreversible — caller must confirm.
  */
-export async function publishDraft(
+async function publishDraft(
   draftId: number,
   scaffold: Scaffold,
   transport: SubstackTransport,
@@ -206,7 +208,7 @@ export async function publishDraft(
 /**
  * Create a Note on Substack.
  */
-export async function createNote(
+async function createNote(
   scaffold: Scaffold,
   transport: SubstackTransport,
 ): Promise<SubstackResponse> {
@@ -230,6 +232,10 @@ export async function publishToSubstack(
   transport: SubstackTransport,
   readImageAsDataUrl: (src: string) => Promise<string>,
 ): Promise<PublishResult> {
+  // Freeze the exact content being checked and sent, even if the writer edits meanwhile.
+  scaffold = JSON.parse(JSON.stringify(scaffold)) as Scaffold;
+  await assertLinksGreen(getBody(scaffold));
+
   // Step 0: Auto-assign the current user as byline if none set
   if (isPostPayload(scaffold.payload) && scaffold.payload.draft_bylines.length === 0) {
     scaffold.payload.draft_bylines = [await transport.getUserInfo()];

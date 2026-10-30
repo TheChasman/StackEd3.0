@@ -1,6 +1,7 @@
 mod ai;
 mod file_io;
 mod image_generation;
+mod link_health;
 mod spocklock;
 
 use serde::Deserialize;
@@ -31,7 +32,8 @@ fn build_menu(
     let menu = Menu::default(app)?;
 
     let new_item = MenuItem::with_id(app, "file-new", "New…", true, Some("CmdOrCtrl+N"))?;
-    let new_tab_item = MenuItem::with_id(app, "file-new-tab", "New Tab", true, Some("CmdOrCtrl+T"))?;
+    let new_tab_item =
+        MenuItem::with_id(app, "file-new-tab", "New Tab", true, Some("CmdOrCtrl+T"))?;
     let open_item = MenuItem::with_id(app, "file-open", "Open…", true, Some("CmdOrCtrl+O"))?;
     let save_item = MenuItem::with_id(app, "file-save", "Save", true, Some("CmdOrCtrl+S"))?;
     let save_as_item = MenuItem::with_id(
@@ -112,7 +114,10 @@ fn set_recent_files_menu(
 ) -> Result<(), String> {
     let recent_entries: Vec<RecentMenuEntry> = entries.into_iter().take(MAX_RECENTS).collect();
     {
-        let mut map = state.0.lock().map_err(|_| "failed to lock recent menu state")?;
+        let mut map = state
+            .0
+            .lock()
+            .map_err(|_| "failed to lock recent menu state")?;
         map.clear();
         for (index, entry) in recent_entries.iter().enumerate() {
             map.insert(
@@ -123,9 +128,7 @@ fn set_recent_files_menu(
     }
 
     let menu = build_menu(&app, &recent_entries).map_err(|e| e.to_string())?;
-    app.set_menu(menu)
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    app.set_menu(menu).map(|_| ()).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -148,8 +151,7 @@ fn eval_in_webview(app: tauri::AppHandle, label: String, script: String) -> Resu
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_dialog::init());
+    let mut builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
 
     #[cfg(desktop)]
     {
@@ -229,6 +231,7 @@ pub fn run() {
             image_generation::generate_openrouter_image,
             ai::generate_seo_text,
             ai::research_web,
+            link_health::check_link,
             set_recent_files_menu,
             eval_in_webview,
         ])
