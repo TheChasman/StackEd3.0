@@ -39,11 +39,15 @@ Non-HTTP destinations must not become green without an applicable validator.
 
 The scope is authored hyperlinks: text link marks, image hrefs and custom button
 URLs. Generated Substack actions and media source URLs are not authored
-hyperlinks. For local fragments, verify a corresponding target in the document;
+hyperlinks. For local fragments, verify a corresponding target in the current document
+without sharing fragment results across documents;
 otherwise report unverified. Do not send email, launch applications, or follow
 non-HTTP schemes to test them.
 
-Use editor-only ProseMirror decorations for the inline treatment and a shared
+Use editor-only ProseMirror inline decorations for text links and node
+decorations/status treatment for linked image and custom-button node views.
+Make publication helpers private so every service entry point uses the gate.
+Use a shared
 session service for results. Use Catppuccin green, red and yellow so all four
 flavours remain readable. Include status words/reasons in tooltips and the Finish
 list; colour is accompanied by underline style and explanatory text.

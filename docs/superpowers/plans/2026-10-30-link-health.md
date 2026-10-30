@@ -35,11 +35,12 @@
 - Rust command `check_link(url: String) -> LinkCheckResult` serialises `{ status: 'working' | 'dead' | 'unknown', reason: string }`.
 - TypeScript exports `LinkStatus`, `LinkCheckResult`, `collectLinks(body: PMDoc): string[]`, and a `LinkHealthService` with `check(url, { fresh? })`, `subscribe(listener)` and `get(url)`.
 - Export one shared `linkHealth` instance; backend IPC is injected in tests.
+- Validate fragments through `checkFragment(url: string, body: PMDoc): LinkCheckResult`, outside the shared HTTP cache: fragment targets depend on the current document, not just the URL.
 
 - [ ] Write failing Rust tests against a local HTTP fixture: 200, redirect to 200, HEAD 405 then GET 200, 404, 410, 403, 429, 500, redirect loop and timeout. Assert green only on success; definite absence red; blocked/network failures unknown.
 - [ ] Run `cargo test --manifest-path src-tauri/Cargo.toml link_health` and observe the expected failures.
 - [ ] Implement the command with redirects limited to five, total timeout ten seconds, HEAD and GET fallback, no downloaded body consumption and HTTP(S) scheme validation.
-- [ ] Write failing Vitest cases for nested marks, duplicate destinations, image href/custom button URL extraction, unsupported schemes, concurrent deduplication, forced refresh, TTL expiry, late responses and network rejection.
+- [ ] Write failing Vitest cases for nested marks, duplicate destinations, image href/custom button URL extraction, unsupported schemes, concurrent deduplication, forced refresh, TTL expiry, late responses and network rejection. Add fragment tests where the same `#target` exists in only one of two documents and where editing removes its target.
 - [ ] Run `npm test -- src/lib/services/linkHealth.test.ts` and observe expected failures.
 - [ ] Implement the service with at most four concurrent probes, a five-minute cache, status subscriptions and generation-safe updates. Checking results are observable immediately; rejected IPC becomes unknown.
 - [ ] Verify both suites and commit `feat: check authored link destinations`.
@@ -49,7 +50,7 @@
 **Files:** Create `src/lib/components/editor/extensions/LinkHealth.ts`, its `.test.ts`, and `src/lib/components/finish/LinkHealthPanel.svelte` with its `.test.ts`; modify `src/lib/components/editor/Editor.svelte`, `src/lib/components/finish/FinishView.svelte`, and `src/lib/themes/catppuccin.css`.
 
 **Interfaces:**
-- `LinkHealth` editor extension consumes the shared service and produces only decorations, never marks/attributes in the document model.
+- `LinkHealth` editor extension consumes the shared service and produces only decorations, never marks/attributes in the document model. Authored image/custom-button atom nodes receive node decorations with a status class and tooltip; their node-view anchors inherit the status treatment. Test their actual rendered DOM as well as text links.
 - `LinkHealthPanel` receives `body: PMDoc` and `onblockedchange(blocked: boolean)`; it lists all non-green destinations, exposes recheck and reports current blockers synchronously when the body changes.
 - `FinishView` adds link blockers to action disabling and rechecks them in its click handler; the service guard in Task 3 remains authoritative.
 
@@ -67,8 +68,9 @@
 **Interfaces:**
 - `assertLinksGreen(body: PMDoc): Promise<void>` freshly checks every collected destination and throws an error listing non-green URLs/reasons.
 - `publishToSubstack` snapshots its scaffold before awaiting anything, validates that snapshot before any Substack transport call, and publishes exactly the validated snapshot.
+- Make `createDraft`, `scheduleDraft`, `publishDraft` and `createNote` private helpers so `publishToSubstack` is the only service entry point that can publish; no exported bypass remains.
 
-- [ ] Write failing orchestrator tests: dead/unknown/checking link prevents every transport operation; cached green is rechecked; all-green/no-links permits the existing flow; scheduling and note publication have the same gate.
+- [ ] Write failing orchestrator tests: dead/unknown/checking link prevents every transport operation; cached green is rechecked; all-green/no-links permits the existing flow; scheduling and note publication have the same gate. Verify the public module exposes no unguarded publication helpers.
 - [ ] Add a deferred-check test: mutating the original document during validation cannot change the body eventually sent to Substack.
 - [ ] Run focused tests and observe expected failures.
 - [ ] Implement the gate before byline lookup/image upload/draft creation and keep existing tag behaviour.
