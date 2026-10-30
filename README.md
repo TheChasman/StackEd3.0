@@ -105,3 +105,5 @@ Also see [`AGENTS.md`](./AGENTS.md) for the contributor/agent guide and
 Read the [design spec](./docs/superpowers/specs/2026-09-19-stacked3-design.md),
 [removed-feature register](./docs/CHERRIES.md), and [project conventions](./AGENTS.md).
 Entry points: [AGENTS.md](./AGENTS.md), [CLAUDE.md](./CLAUDE.md), [README.md](./README.md).
+
+Link work: [approved link-health design](./docs/superpowers/specs/2026-10-30-link-health-design.md) and [implementation plan](./docs/superpowers/plans/2026-10-30-link-health.md).
