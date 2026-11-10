@@ -6,6 +6,7 @@ import { marked } from 'marked';
 import type { ArticleFrontmatter } from '$lib/types/article';
 import type { Scaffold, PostPayload, PMDoc } from '$lib/types/scaffold';
 import { emptyScaffold } from '$lib/types/scaffold';
+import { sanitizeHtml } from '$lib/utils/sanitizeHtml';
 
 type Extensions = any[];
 
@@ -82,8 +83,8 @@ function extractAltCandidates(body: string): {
   return result;
 }
 
-function markdownToPMDoc(md: string, extensions: Extensions): PMDoc {
-  const html = marked.parse(md) as string;
+export function markdownToPMDoc(md: string, extensions: Extensions): PMDoc {
+  const html = sanitizeHtml(marked.parse(md) as string);
   const json = generateJSON(html, extensions);
   return json as PMDoc;
 }
