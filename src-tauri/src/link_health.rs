@@ -1,4 +1,6 @@
 use serde::Serialize;
+use std::net::{IpAddr, SocketAddr, ToSocketAddrs};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -39,6 +41,12 @@ fn is_blocked_ip(ip: std::net::IpAddr) -> bool {
                 || (v4.octets()[0] == 100 && (v4.octets()[1] & 0b1100_0000) == 0b0100_0000)
         }
         std::net::IpAddr::V6(v6) => {
+            if v6.is_loopback() || v6.is_unspecified() {
+                return true;
+            }
+            if let Some(v4) = v6.to_ipv4() {
+                return is_blocked_ip(IpAddr::V4(v4));
+            }
             let seg0 = v6.segments()[0];
             v6.is_loopback()
                 || v6.is_unspecified()
@@ -51,49 +59,77 @@ fn is_blocked_ip(ip: std::net::IpAddr) -> bool {
     }
 }
 
-/// Synchronous block check for redirect targets (no DNS): IP literals and
-/// `localhost` only.
+// `url::Host` is not a direct dependency. Its display representation brackets
+// IPv6 literals, so remove those brackets before parsing the address.
+fn host_parts(url: &reqwest::Url) -> Option<(String, Option<IpAddr>)> {
+    let host = url.host()?.to_string();
+    let unbracketed = host
+        .strip_prefix('[')
+        .and_then(|h| h.strip_suffix(']'))
+        .unwrap_or(&host);
+    Some((unbracketed.to_string(), unbracketed.parse().ok()))
+}
+
+/// Synchronous redirect check; domains are checked by the resolver on connect.
 fn host_is_blocked_sync(url: &reqwest::Url) -> bool {
-    let Some(host) = url.host_str() else {
+    match host_parts(url) {
+        None => true,
+        Some((host, ip)) => host.eq_ignore_ascii_case("localhost") || ip.is_some_and(is_blocked_ip),
+    }
+}
+
+fn filter_addrs(addrs: Vec<SocketAddr>, allow_private: bool) -> std::io::Result<Vec<SocketAddr>> {
+    if addrs.is_empty() || (!allow_private && addrs.iter().any(|addr| is_blocked_ip(addr.ip()))) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::PermissionDenied,
+            "Blocked or empty DNS result",
+        ));
+    }
+    Ok(addrs)
+}
+
+struct FilteringResolver {
+    allow_private: bool,
+}
+
+impl reqwest::dns::Resolve for FilteringResolver {
+    fn resolve(&self, name: reqwest::dns::Name) -> reqwest::dns::Resolving {
+        let host = name.as_str().to_owned();
+        let allow_private = self.allow_private;
+        Box::pin(async move {
+            let addrs = tauri::async_runtime::spawn_blocking(move || {
+                (host.as_str(), 0)
+                    .to_socket_addrs()
+                    .map(|addrs| addrs.collect())
+            })
+            .await??;
+            let addrs = filter_addrs(addrs, allow_private)?;
+            Ok(Box::new(addrs.into_iter()) as reqwest::dns::Addrs)
+        })
+    }
+}
+
+/// Full initial check; resolution errors fail closed.
+async fn host_is_private(url: &reqwest::Url) -> bool {
+    let Some((host, ip)) = host_parts(url) else {
         return true;
     };
+    if let Some(ip) = ip {
+        return is_blocked_ip(ip);
+    }
     if host.eq_ignore_ascii_case("localhost") {
         return true;
     }
-    host.parse::<std::net::IpAddr>()
-        .map(is_blocked_ip)
-        .unwrap_or(false)
-}
-
-/// Full check for the initial URL: IP literals and `localhost` directly,
-/// otherwise DNS — blocked if any resolved address is blocked.
-async fn host_is_private(url: &reqwest::Url) -> bool {
-    let Some(host) = url.host_str() else {
-        return true;
-    };
-    if host.eq_ignore_ascii_case("localhost")
-        || host
-            .parse::<std::net::IpAddr>()
-            .map(is_blocked_ip)
-            .unwrap_or(false)
-    {
-        return true;
-    }
-    if host.parse::<std::net::IpAddr>().is_ok() {
-        return false;
-    }
     let port = url.port_or_known_default().unwrap_or(80);
-    let host = host.to_string();
     let resolved = tauri::async_runtime::spawn_blocking(move || {
-        use std::net::ToSocketAddrs;
         (host.as_str(), port)
             .to_socket_addrs()
-            .map(|addrs| addrs.collect::<Vec<_>>())
+            .map(|addrs| addrs.collect())
     })
     .await;
     match resolved {
-        Ok(Ok(addrs)) => addrs.into_iter().any(|addr| is_blocked_ip(addr.ip())),
-        _ => false,
+        Ok(Ok(addrs)) => filter_addrs(addrs, false).is_err(),
+        _ => true,
     }
 }
 async fn check_with_timeout(raw: String, timeout: Duration) -> LinkCheckResult {
@@ -134,6 +170,8 @@ async fn check_inner(raw: String, timeout: Duration, allow_private: bool) -> Lin
         );
     }
     let client = match reqwest::Client::builder()
+        .no_proxy()
+        .dns_resolver(Arc::new(FilteringResolver { allow_private }))
         .redirect(reqwest::redirect::Policy::custom(move |attempt| {
             let url = attempt.url();
             if attempt.previous().len() > 5 {
@@ -367,6 +405,68 @@ mod tests {
                 "{allowed} should be allowed"
             );
         }
+    }
+
+    #[test]
+    fn blocks_ipv6_literals_before_request_and_on_redirect() {
+        for raw in [
+            "http://[::1]/",
+            "http://[::ffff:127.0.0.1]/",
+            "http://[::ffff:a9fe:a9fe]/",
+        ] {
+            let url = reqwest::Url::parse(raw).unwrap();
+            let result = tauri::async_runtime::block_on(check_with_timeout(
+                raw.into(),
+                Duration::from_millis(100),
+            ));
+            assert_eq!(
+                result.reason, "Private or local addresses are not checked",
+                "{raw}"
+            );
+            assert!(host_is_blocked_sync(&url), "redirect: {raw}");
+        }
+    }
+
+    #[test]
+    fn blocks_ipv4_embedded_ipv6_addresses() {
+        for raw in [
+            "::ffff:127.0.0.1",
+            "::ffff:169.254.169.254",
+            "::127.0.0.1",
+            "::169.254.169.254",
+        ] {
+            assert!(is_blocked_ip(raw.parse().unwrap()), "{raw}");
+        }
+        for raw in ["::ffff:1.1.1.1", "::1.1.1.1"] {
+            assert!(!is_blocked_ip(raw.parse().unwrap()), "{raw}");
+        }
+    }
+
+    #[test]
+    fn resolver_rejects_any_private_address_and_preserves_public_addresses() {
+        let public = vec![
+            "1.1.1.1:0".parse().unwrap(),
+            "[2606:4700::1111]:0".parse().unwrap(),
+        ];
+        let mut mixed = public.clone();
+        mixed.push("127.0.0.1:0".parse().unwrap());
+        assert_eq!(filter_addrs(public.clone(), false).unwrap(), public);
+        assert!(filter_addrs(mixed.clone(), false).is_err());
+        assert_eq!(filter_addrs(mixed.clone(), true).unwrap(), mixed);
+        assert!(filter_addrs(Vec::new(), false).is_err());
+    }
+
+    #[test]
+    fn resolver_blocks_localhost() {
+        use reqwest::dns::Resolve;
+        let name = "localhost".parse().unwrap();
+        let resolved = tauri::async_runtime::block_on(
+            FilteringResolver {
+                allow_private: false,
+            }
+            .resolve(name),
+        );
+        assert!(resolved.is_err());
     }
 
     #[test]
