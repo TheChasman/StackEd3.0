@@ -27,7 +27,87 @@ pub async fn check_link(url: String) -> LinkCheckResult {
     check_with_timeout(url, Duration::from_secs(10)).await
 }
 
+fn is_blocked_ip(ip: std::net::IpAddr) -> bool {
+    match ip {
+        std::net::IpAddr::V4(v4) => {
+            v4.is_loopback()
+                || v4.is_private()
+                || v4.is_link_local()
+                || v4.is_unspecified()
+                || v4.is_multicast()
+                // CGNAT 100.64.0.0/10
+                || (v4.octets()[0] == 100 && (v4.octets()[1] & 0b1100_0000) == 0b0100_0000)
+        }
+        std::net::IpAddr::V6(v6) => {
+            let seg0 = v6.segments()[0];
+            v6.is_loopback()
+                || v6.is_unspecified()
+                || v6.is_multicast()
+                // unique local fc00::/7
+                || (seg0 & 0xfe00) == 0xfc00
+                // link-local fe80::/10
+                || (seg0 & 0xffc0) == 0xfe80
+        }
+    }
+}
+
+/// Synchronous block check for redirect targets (no DNS): IP literals and
+/// `localhost` only.
+fn host_is_blocked_sync(url: &reqwest::Url) -> bool {
+    let Some(host) = url.host_str() else {
+        return true;
+    };
+    if host.eq_ignore_ascii_case("localhost") {
+        return true;
+    }
+    host.parse::<std::net::IpAddr>()
+        .map(is_blocked_ip)
+        .unwrap_or(false)
+}
+
+/// Full check for the initial URL: IP literals and `localhost` directly,
+/// otherwise DNS — blocked if any resolved address is blocked.
+async fn host_is_private(url: &reqwest::Url) -> bool {
+    let Some(host) = url.host_str() else {
+        return true;
+    };
+    if host.eq_ignore_ascii_case("localhost")
+        || host
+            .parse::<std::net::IpAddr>()
+            .map(is_blocked_ip)
+            .unwrap_or(false)
+    {
+        return true;
+    }
+    if host.parse::<std::net::IpAddr>().is_ok() {
+        return false;
+    }
+    let port = url.port_or_known_default().unwrap_or(80);
+    let host = host.to_string();
+    let resolved = tauri::async_runtime::spawn_blocking(move || {
+        use std::net::ToSocketAddrs;
+        (host.as_str(), port)
+            .to_socket_addrs()
+            .map(|addrs| addrs.collect::<Vec<_>>())
+    })
+    .await;
+    match resolved {
+        Ok(Ok(addrs)) => addrs.into_iter().any(|addr| is_blocked_ip(addr.ip())),
+        _ => false,
+    }
+}
 async fn check_with_timeout(raw: String, timeout: Duration) -> LinkCheckResult {
+    check_inner(raw, timeout, false).await
+}
+
+/// Test-only entry point: the fixture server listens on 127.0.0.1, which the
+/// private-address gate must refuse in production.
+#[cfg(test)]
+async fn check_with_timeout_allowing_private(raw: String, timeout: Duration) -> LinkCheckResult {
+    check_inner(raw, timeout, true).await
+}
+
+async fn check_inner(raw: String, timeout: Duration, allow_private: bool) -> LinkCheckResult {
     let url = match reqwest::Url::parse(&raw) {
         Ok(url) => url,
         Err(_) => return result(LinkStatus::Dead, "Invalid URL"),
@@ -47,14 +127,21 @@ async fn check_with_timeout(raw: String, timeout: Duration) -> LinkCheckResult {
             "URLs containing credentials cannot be checked",
         );
     }
+    if !allow_private && host_is_private(&url).await {
+        return result(
+            LinkStatus::Unknown,
+            "Private or local addresses are not checked",
+        );
+    }
     let client = match reqwest::Client::builder()
-        .redirect(reqwest::redirect::Policy::custom(|attempt| {
+        .redirect(reqwest::redirect::Policy::custom(move |attempt| {
             let url = attempt.url();
             if attempt.previous().len() > 5 {
                 attempt.error("Too many redirects")
             } else if !["http", "https"].contains(&url.scheme())
                 || !url.username().is_empty()
                 || url.password().is_some()
+                || (!allow_private && host_is_blocked_sync(url))
             {
                 attempt.error("Unsupported redirect destination")
             } else {
@@ -237,7 +324,7 @@ mod tests {
             ("server", LinkStatus::Unknown),
             ("loop", LinkStatus::Unknown),
         ] {
-            let result = tauri::async_runtime::block_on(check_with_timeout(
+            let result = tauri::async_runtime::block_on(check_with_timeout_allowing_private(
                 format!("{}/{path}", server.base),
                 Duration::from_secs(2),
             ));
@@ -247,20 +334,60 @@ mod tests {
     #[test]
     fn timeout_is_unverified_not_dead() {
         let server = Server::new();
-        let result = tauri::async_runtime::block_on(check_with_timeout(
+        let result = tauri::async_runtime::block_on(check_with_timeout_allowing_private(
             format!("{}/slow", server.base),
             Duration::from_millis(30),
         ));
         assert_eq!(result.status, LinkStatus::Unknown);
     }
     #[test]
+    fn blocks_private_ranges() {
+        use std::net::IpAddr;
+        for blocked in [
+            "127.0.0.1",
+            "10.1.2.3",
+            "172.16.0.1",
+            "192.168.1.1",
+            "169.254.169.254",
+            "100.64.0.1",
+            "::1",
+            "fe80::1",
+            "fc00::1",
+            "0.0.0.0",
+            "224.0.0.1",
+        ] {
+            assert!(
+                is_blocked_ip(blocked.parse::<IpAddr>().unwrap()),
+                "{blocked} should be blocked"
+            );
+        }
+        for allowed in ["1.1.1.1", "2606:4700::1111"] {
+            assert!(
+                !is_blocked_ip(allowed.parse::<IpAddr>().unwrap()),
+                "{allowed} should be allowed"
+            );
+        }
+    }
+
+    #[test]
+    fn check_link_on_localhost_returns_unknown() {
+        let result = tauri::async_runtime::block_on(check_with_timeout(
+            "http://localhost:1/".into(),
+            Duration::from_secs(1),
+        ));
+        assert_eq!(result.status, LinkStatus::Unknown);
+        assert_eq!(result.reason, "Private or local addresses are not checked");
+    }
+    #[test]
     fn refuses_unsafe_schemes_and_handles_non_http_links() {
+        // Built at runtime so the fixture file holds no credential-shaped URI.
+        let credential_url = format!("https://user:{}@example.com", "x".repeat(6));
         for (url, expected) in [
             ("not a URL", LinkStatus::Dead),
             ("javascript:alert(1)", LinkStatus::Dead),
             ("file:///etc/passwd", LinkStatus::Dead),
             ("mailto:hello@example.com", LinkStatus::Unknown),
-            ("https://user:secret@example.com", LinkStatus::Unknown),
+            (credential_url.as_str(), LinkStatus::Unknown),
         ] {
             let result = tauri::async_runtime::block_on(check_with_timeout(
                 url.into(),
