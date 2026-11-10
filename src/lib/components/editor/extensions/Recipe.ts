@@ -109,6 +109,7 @@ export const Recipe = Node.create({
       const render = (n: typeof node) => {
         const ings = (n.attrs.ingredients as string[]) || [];
         const stps = (n.attrs.steps as string[]) || [];
+        // eslint-disable-next-line no-restricted-properties -- values escaped with escapeHtml
         dom.innerHTML = `
           <div class="text-xl font-bold text-dark-100 mb-1" data-edit="title">${escapeHtml(n.attrs.title)}</div>
           <div class="text-xs text-dark-300 mb-3">

@@ -75,7 +75,7 @@ pub fn list_files(path: String) -> Result<Vec<String>, String> {
     let mut files = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|e| format!("failed to read entry: {}", e))?;
-        if let Some(name) = entry.file_name().into_string().ok() {
+        if let Ok(name) = entry.file_name().into_string() {
             files.push(name);
         }
     }
@@ -436,7 +436,7 @@ pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkIm
         });
     }
 
-    images.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    images.sort_by_key(|a| a.name.to_lowercase());
     Ok(images)
 }
 

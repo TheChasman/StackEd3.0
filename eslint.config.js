@@ -41,6 +41,24 @@ export default ts.config(
     languageOptions: { globals: { ...globals.node } },
   },
   {
+    files: ['src/**/*.{ts,js,svelte}'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        { property: 'innerHTML', message: 'Use textContent or DOM construction.' },
+        { property: 'outerHTML', message: 'Use textContent or DOM construction.' },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'CallExpression[callee.type="MemberExpression"][callee.property.name="insertAdjacentHTML"], CallExpression[callee.type="MemberExpression"][callee.property.value="insertAdjacentHTML"]',
+          message: 'Use textContent or DOM construction.',
+        },
+      ],
+    },
+  },
+  {
     // Correctness-focused ruleset. Formatting is owned by Prettier; these
     // downgrades keep the linter useful without demanding a codebase-wide
     // rewrite of pre-existing pragmatic patterns.

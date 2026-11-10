@@ -54,10 +54,14 @@ export const Poll = Node.create<PollOptions>({
       // Header
       const header = document.createElement('div');
       header.className = 'flex items-center justify-between mb-4';
-      header.innerHTML = `
-        <span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-dark-400">Poll</span>
-        <span class="text-xs text-gray-500 dark:text-dark-400">Duration: ${node.attrs.duration}</span>
-      `;
+      const label = document.createElement('span');
+      label.className =
+        'text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-dark-400';
+      label.textContent = 'Poll';
+      const duration = document.createElement('span');
+      duration.className = 'text-xs text-gray-500 dark:text-dark-400';
+      duration.textContent = `Duration: ${node.attrs.duration}`;
+      header.append(label, duration);
       dom.appendChild(header);
 
       // Question Input
@@ -83,7 +87,7 @@ export const Poll = Node.create<PollOptions>({
       optionsContainer.className = 'space-y-2';
 
       const renderOptions = () => {
-        optionsContainer.innerHTML = '';
+        optionsContainer.replaceChildren();
         node.attrs.options.forEach((option: string, index: number) => {
           const optionWrapper = document.createElement('div');
           optionWrapper.className = 'flex items-center gap-2';
@@ -110,7 +114,7 @@ export const Poll = Node.create<PollOptions>({
           // Remove button
           if (node.attrs.options.length > 2) {
             const removeBtn = document.createElement('button');
-            removeBtn.innerHTML = '&times;';
+            removeBtn.textContent = '×';
             removeBtn.className = 'text-gray-400 hover:text-red-500 px-2';
             removeBtn.onclick = () => {
               const pos = safePos();

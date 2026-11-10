@@ -88,6 +88,7 @@ export async function createSubstackClipboardHtml({
     image.removeAttribute('sizes');
   }
 
+  // eslint-disable-next-line no-restricted-properties -- read-only serialisation
   return doc.body.innerHTML.trim();
 }
 

@@ -156,7 +156,7 @@ pub fn run() {
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            if let Some(path) = file_io::first_markdown_arg(argv.into_iter()) {
+            if let Some(path) = file_io::first_markdown_arg(argv) {
                 let _ = app.emit("stacked:open-file", path);
             }
             if let Some(window) = app.get_webview_window("main") {
