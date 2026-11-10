@@ -1,3 +1,4 @@
+use crate::file_scope::{self, Access};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -44,31 +45,33 @@ where
 
 #[tauri::command]
 pub fn read_file(path: String) -> Result<String, String> {
-    let path = PathBuf::from(path);
+    let path = file_scope::check(&path, Access::ReadText)?;
     std::fs::read_to_string(&path).map_err(|e| format!("failed to read {}: {}", path.display(), e))
 }
 
 #[tauri::command]
 pub fn file_exists(path: String) -> bool {
-    PathBuf::from(path).exists()
+    file_scope::check(&path, Access::ReadText)
+        .map(|path| path.exists())
+        .unwrap_or(false)
 }
 
 #[tauri::command]
 pub fn write_file(path: String, contents: String) -> Result<(), String> {
-    let path = PathBuf::from(path);
+    let path = file_scope::check(&path, Access::Write)?;
     std::fs::write(&path, contents)
         .map_err(|e| format!("failed to write {}: {}", path.display(), e))
 }
 
 #[tauri::command]
 pub fn delete_file(path: String) -> Result<(), String> {
-    let path = PathBuf::from(path);
+    let path = file_scope::check(&path, Access::Delete)?;
     std::fs::remove_file(&path).map_err(|e| format!("failed to delete {}: {}", path.display(), e))
 }
 
 #[tauri::command]
 pub fn list_files(path: String) -> Result<Vec<String>, String> {
-    let path = PathBuf::from(path);
+    let path = file_scope::check(&path, Access::Dir)?;
     let entries = std::fs::read_dir(&path)
         .map_err(|e| format!("failed to read directory {}: {}", path.display(), e))?;
 
@@ -323,7 +326,7 @@ pub fn save_generated_image_to_artwork(
     prompt: String,
     data_url: String,
 ) -> Result<ArtworkImage, String> {
-    let article_path = PathBuf::from(article_path.trim());
+    let article_path = file_scope::check(article_path.trim(), Access::Write)?;
     let article_dir = article_path
         .parent()
         .ok_or_else(|| "article path must include a parent directory".to_string())?;
@@ -343,6 +346,7 @@ pub fn save_generated_image_to_artwork(
 
     let stem = slugify_image_name(&prompt);
     let path = unique_image_path(&artwork_dir, &stem, extension);
+    let path = file_scope::check(&path.to_string_lossy(), Access::WriteImage)?;
     std::fs::write(&path, bytes)
         .map_err(|e| format!("failed to write {}: {}", path.display(), e))?;
 
@@ -361,7 +365,8 @@ pub fn save_generated_image_to_artwork(
 
 #[tauri::command]
 pub fn read_image_data_url(path: String) -> Result<String, String> {
-    image_data_url(&PathBuf::from(path))
+    let path = file_scope::check(&path, Access::ReadImage)?;
+    image_data_url(&path)
 }
 
 #[tauri::command]
@@ -369,6 +374,7 @@ pub fn load_artwork_metadata(
     article_path: String,
     image_name: String,
 ) -> Result<ArtworkMetadata, String> {
+    file_scope::check(&article_path, Access::ReadText)?;
     let artwork_dir = artwork_dir_for_article_path(&article_path)?;
     let metadata = read_artwork_metadata_map(&artwork_dir)?;
     Ok(metadata.get(&image_name).cloned().unwrap_or_default())
@@ -380,6 +386,7 @@ pub fn save_artwork_metadata(
     image_name: String,
     metadata: ArtworkMetadata,
 ) -> Result<(), String> {
+    file_scope::check(&article_path, Access::Write)?;
     let artwork_dir = artwork_dir_for_article_path(&article_path)?;
     let mut map = read_artwork_metadata_map(&artwork_dir)?;
     map.insert(image_name, metadata);
@@ -409,6 +416,9 @@ fn find_artwork_dir(article_path: Option<&str>) -> Result<Option<PathBuf>, Strin
 
 #[tauri::command]
 pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkImage>, String> {
+    if let Some(article_path) = article_path.as_deref() {
+        file_scope::check(article_path, Access::ReadText)?;
+    }
     let Some(artwork_dir) = find_artwork_dir(article_path.as_deref())? else {
         return Ok(Vec::new());
     };
@@ -442,7 +452,7 @@ pub fn list_artwork_images(article_path: Option<String>) -> Result<Vec<ArtworkIm
 
 #[tauri::command]
 pub fn create_dir_recursive(path: String) -> Result<(), String> {
-    let path = PathBuf::from(path);
+    let path = file_scope::check(&path, Access::Dir)?;
     std::fs::create_dir_all(&path)
         .map_err(|e| format!("failed to create directory {}: {}", path.display(), e))
 }
@@ -485,14 +495,8 @@ pub fn organize_pipeline_article(
         return Ok(file_path);
     }
 
-    let pipeline = std::fs::canonicalize(PathBuf::from(&pipeline_folder_path)).map_err(|e| {
-        format!(
-            "failed to resolve pipeline folder {}: {}",
-            pipeline_folder_path, e
-        )
-    })?;
-    let source = std::fs::canonicalize(&path)
-        .map_err(|e| format!("failed to resolve article file {}: {}", path.display(), e))?;
+    let pipeline = file_scope::check(&pipeline_folder_path, Access::Dir)?;
+    let source = file_scope::check(&file_path, Access::Write)?;
 
     if !source.starts_with(&pipeline) {
         return Ok(file_path);
@@ -538,14 +542,14 @@ pub fn initial_file_path() -> Option<String> {
 
 #[tauri::command]
 pub fn read_markdown_file(file_path: String) -> Result<String, String> {
-    let path = PathBuf::from(file_path);
+    let path = file_scope::check(&file_path, Access::ReadText)?;
     ensure_single_backup(&path)?;
     std::fs::read_to_string(&path).map_err(|e| format!("failed to read {}: {}", path.display(), e))
 }
 
 #[tauri::command]
 pub fn write_markdown_file(file_path: String, content: String) -> Result<(), String> {
-    let path = PathBuf::from(file_path);
+    let path = file_scope::check(&file_path, Access::Write)?;
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)
             .map_err(|e| format!("failed to create directory {}: {}", parent.display(), e))?;
@@ -591,6 +595,49 @@ fn ensure_single_backup(path: &Path) -> Result<Option<PathBuf>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // file_scope reads HOME; tests run in one process, so serialise env mutation.
+    static HOME_LOCK: Mutex<()> = Mutex::new(());
+
+    fn set_home(dir: &Path) -> std::sync::MutexGuard<'static, ()> {
+        let guard = HOME_LOCK.lock().unwrap_or_else(|e| e.into_inner());
+        std::env::set_var("HOME", dir);
+        guard
+    }
+
+    #[test]
+    fn test_commands_refuse_disallowed_paths() {
+        let root = std::env::temp_dir().join(format!(
+            "stacked-guard-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let root = std::fs::canonicalize({
+            std::fs::create_dir_all(&root).unwrap();
+            root
+        })
+        .unwrap();
+        let _home = set_home(&root);
+        std::fs::create_dir_all(root.join("notes")).unwrap();
+        std::fs::create_dir_all(root.join(".ssh")).unwrap();
+        std::os::unix::fs::symlink(root.join(".ssh"), root.join("link")).unwrap();
+
+        let traversal = root.join("notes").join("..").join(".zshrc");
+        let err = write_file(traversal.to_string_lossy().to_string(), "x".to_string()).unwrap_err();
+        assert!(err.starts_with("path not allowed: "), "{err}");
+        assert!(!traversal.exists());
+
+        let via_link = root.join("link").join("x.md");
+        let err = write_file(via_link.to_string_lossy().to_string(), "x".to_string()).unwrap_err();
+        assert!(err.starts_with("path not allowed: "), "{err}");
+
+        assert!(!file_exists("/etc/hosts".to_string()));
+        assert!(read_file("/etc/hosts".to_string()).is_err());
+
+        std::fs::remove_dir_all(root).unwrap();
+    }
 
     #[test]
     fn test_first_markdown_arg_returns_passed_article_path() {
@@ -645,6 +692,7 @@ mod tests {
                 .as_nanos()
         ));
         std::fs::create_dir_all(&root).unwrap();
+        let _home = set_home(&root);
         let file_path = root.join("exists.md");
         std::fs::write(&file_path, "ok").unwrap();
 
@@ -678,6 +726,7 @@ mod tests {
                 .as_nanos()
         ));
         std::fs::create_dir_all(&root).unwrap();
+        let _home = set_home(&root);
         let image_path = root.join("hero.png");
         std::fs::write(&image_path, b"hero").unwrap();
 
@@ -740,6 +789,7 @@ mod tests {
                 .as_nanos()
         ));
         std::fs::create_dir_all(&root).unwrap();
+        let _home = set_home(&root);
 
         let article_path = root.join("Article.md");
         std::fs::write(&article_path, "original").unwrap();
@@ -767,6 +817,8 @@ mod tests {
                 .unwrap()
                 .as_nanos()
         ));
+        std::fs::create_dir_all(&root).unwrap();
+        let _home = set_home(&root);
         let article_path = root.join("Article").join("Article.md");
 
         write_markdown_file(
@@ -793,6 +845,7 @@ mod tests {
                 .as_nanos()
         ));
         std::fs::create_dir_all(&root).unwrap();
+        let _home = set_home(&root);
         let article_path = root.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
 
@@ -829,6 +882,7 @@ mod tests {
         // Article already in A_* folder — should stay put, get _artwork created
         let article_dir = root.join("A_Checkmate");
         std::fs::create_dir_all(&article_dir).unwrap();
+        let _home = set_home(&root);
         let article_path = article_dir.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
 
@@ -866,6 +920,7 @@ mod tests {
         std::fs::create_dir_all(&outside).unwrap();
         let article_path = outside.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
+        let _home = set_home(&root);
 
         let final_path = organize_pipeline_article(
             article_path.to_string_lossy().to_string(),
@@ -891,6 +946,7 @@ mod tests {
         ));
         let article_dir = root.join("A_Checkmate");
         std::fs::create_dir_all(&article_dir).unwrap();
+        let _home = set_home(&root);
         let article_path = article_dir.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
 
@@ -904,9 +960,8 @@ mod tests {
         assert_eq!(saved.name, "hero-concept.png");
         assert_eq!(
             saved.path,
-            article_dir
-                .join("_artwork")
-                .join("hero-concept.png")
+            std::fs::canonicalize(article_dir.join("_artwork").join("hero-concept.png"))
+                .unwrap()
                 .to_string_lossy()
                 .to_string()
         );
@@ -934,6 +989,7 @@ mod tests {
         let article_path = article_dir.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
         std::fs::write(artwork_dir.join("hero-concept.png"), b"old").unwrap();
+        let _home = set_home(&root);
 
         let saved = save_generated_image_to_artwork(
             article_path.to_string_lossy().to_string(),
@@ -966,6 +1022,7 @@ mod tests {
         let article_path = article_dir.join("Checkmate.md");
         std::fs::write(&article_path, "article").unwrap();
         std::fs::write(artwork_dir.join("hero.png"), b"hero").unwrap();
+        let _home = set_home(&root);
 
         save_artwork_metadata(
             article_path.to_string_lossy().to_string(),

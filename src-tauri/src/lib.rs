@@ -1,5 +1,6 @@
 mod ai;
 mod file_io;
+mod file_scope;
 mod image_generation;
 mod link_health;
 mod spocklock;
