@@ -4,6 +4,7 @@ mod file_scope;
 mod image_generation;
 mod link_health;
 mod spocklock;
+mod substack_bridge;
 
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -138,18 +139,6 @@ fn set_recent_files_menu(_entries: Vec<RecentMenuEntry>) -> Result<(), String> {
     Ok(())
 }
 
-/// Evaluate JavaScript in a webview identified by its label.
-/// Used by the Substack WebView transport to inject API-calling scripts
-/// into the Substack auth window where the session cookie lives.
-#[tauri::command]
-fn eval_in_webview(app: tauri::AppHandle, label: String, script: String) -> Result<(), String> {
-    if let Some(webview) = app.get_webview_window(&label) {
-        webview.eval(&script).map_err(|e| e.to_string())
-    } else {
-        Err(format!("Webview '{}' not found", label))
-    }
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
@@ -234,7 +223,8 @@ pub fn run() {
             ai::research_web,
             link_health::check_link,
             set_recent_files_menu,
-            eval_in_webview,
+            substack_bridge::substack_inject_bridge,
+            substack_bridge::substack_navigate,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");

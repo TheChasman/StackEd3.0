@@ -28,43 +28,21 @@ interface PendingRequest {
 }
 
 /**
- * The script injected into the Substack WebView. It listens for
- * `substack:request` events, makes same-origin fetch calls, and
- * emits `substack:response` events with the results.
+ * Payload guard for `substack:response` events: anything not exactly
+ * `{id: string, ok: boolean, status: number, body: unknown}` is ignored.
  */
-const INJECTED_SCRIPT = `
-(function() {
-  if (window.__substackInjected) return;
-  window.__substackInjected = true;
-  const { listen, emit } = window.__TAURI__.event;
-  listen('${REQUEST_EVENT}', async (event) => {
-    const { id, method, url, body } = event.payload;
-    try {
-      const opts = { method, headers: { 'Content-Type': 'application/json' } };
-      if (body !== null && body !== undefined) {
-        opts.body = typeof body === 'string' ? body : JSON.stringify(body);
-      }
-      const resp = await fetch(url, opts);
-      const text = await resp.text();
-      let parsed;
-      try { parsed = JSON.parse(text); } catch { parsed = text; }
-      emit('${RESPONSE_EVENT}', {
-        id,
-        ok: resp.ok,
-        status: resp.status,
-        body: parsed,
-      });
-    } catch (err) {
-      emit('${RESPONSE_EVENT}', {
-        id,
-        ok: false,
-        status: 0,
-        body: { error: String(err) },
-      });
-    }
-  });
-})();
-`;
+export function isSubstackResponse(
+  v: unknown,
+): v is { id: string; ok: boolean; status: number; body: unknown } {
+  if (typeof v !== 'object' || v === null) return false;
+  const r = v as Record<string, unknown>;
+  return (
+    typeof r.id === 'string' &&
+    typeof r.ok === 'boolean' &&
+    typeof r.status === 'number' &&
+    'body' in r
+  );
+}
 
 export class WebViewTransport implements SubstackTransport {
   private publication: string;
@@ -88,17 +66,16 @@ export class WebViewTransport implements SubstackTransport {
     if (this.initialized) return;
 
     // Listen for responses from the injected script
-    this.unlisten = await listen<{ id: string; ok: boolean; status: number; body: unknown }>(
-      RESPONSE_EVENT,
-      (event) => {
-        const { id, ok, status, body } = event.payload;
-        const pending = this.pending.get(id);
-        if (!pending) return;
-        clearTimeout(pending.timeout);
-        this.pending.delete(id);
-        pending.resolve({ ok, status, body });
-      },
-    );
+    this.unlisten = await listen<unknown>(RESPONSE_EVENT, (event) => {
+      const payload = event.payload;
+      if (!isSubstackResponse(payload)) return;
+      const { id, ok, status, body } = payload;
+      const pending = this.pending.get(id);
+      if (!pending) return;
+      clearTimeout(pending.timeout);
+      this.pending.delete(id);
+      pending.resolve({ ok, status, body });
+    });
 
     // Create or reuse the WebView window
     const existing = await WebviewWindow.getByLabel(WINDOW_LABEL);
@@ -106,10 +83,7 @@ export class WebViewTransport implements SubstackTransport {
       this.window = existing;
       // Navigate to the correct publication if the window is on a different one
       if (WebViewTransport.currentPublication !== this.publication) {
-        await invoke('eval_in_webview', {
-          label: WINDOW_LABEL,
-          script: `window.location.href = 'https://${this.publication}.substack.com'`,
-        });
+        await invoke('substack_navigate', { publication: this.publication });
         // Wait for the new page to load
         await new Promise((r) => setTimeout(r, 1500));
         WebViewTransport.currentPublication = this.publication;
@@ -145,8 +119,9 @@ export class WebViewTransport implements SubstackTransport {
     if (!this.window) return;
     // Small delay to ensure the page is loaded enough for __TAURI__ to be available
     await new Promise((r) => setTimeout(r, 500));
-    // Use the Rust-side eval command since the Tauri 2 JS API doesn't expose eval()
-    await invoke('eval_in_webview', { label: WINDOW_LABEL, script: INJECTED_SCRIPT });
+    // The bridge script lives in Rust (substack_bridge.js) and is the only
+    // script that may run in the Substack window.
+    await invoke('substack_inject_bridge');
   }
 
   /**
