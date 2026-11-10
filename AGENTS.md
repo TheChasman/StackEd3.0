@@ -11,7 +11,12 @@ is the product; publishing is a deliberate final step, not permanent chrome.
 - **Frontend**: Svelte 5 (runes) + TailwindCSS 4 + TypeScript
 - **Backend**: Rust (Tauri 2)
 - **Editor**: TipTap 3, ProseMirror JSON as the canonical body format
-- **AI**: OpenRouter, keys resolved in Rust via SpockLock (never in the WebView)
+- **AI**: OpenRouter, keys resolved in Rust via SpockLock (never in the WebView).
+  The SpockLock client speaks mTLS to the daemon: StackEd presents a client
+  certificate named `stacked3` (`stacked3.pem` + `stacked3-key.pem`, next to
+  `ca.pem` in the SpockLock cert dir — `STACKED_SPOCKLOCK_CERT_DIR`,
+  `SPOCKLOCK_CERT_DIR`, or the platform default). Chas creates it once per
+  machine with `spocklock-daemon cert-generate client --name stacked3`.
 - **Data**: `.stacked.json` files on disk; IndexedDB for recents + library index
 
 Read [`docs/superpowers/specs/2026-09-19-stacked3-design.md`](./docs/superpowers/specs/2026-09-19-stacked3-design.md)
