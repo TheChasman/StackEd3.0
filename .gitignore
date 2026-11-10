@@ -25,3 +25,4 @@ Icon[!a-zA-Z0-9]
 
 # Playwright MCP scratch artifacts
 .playwright-mcp
+.playwright-mcp/
